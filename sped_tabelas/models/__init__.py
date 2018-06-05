@@ -30,4 +30,6 @@ from . import codigo_aliquota_FPAS
 from . import FPAS_classificacao_tributaria
 from . import tipos_lotacao_classificacao
 
+from . import classificacao_servico
+
 from . import inherited_res_company

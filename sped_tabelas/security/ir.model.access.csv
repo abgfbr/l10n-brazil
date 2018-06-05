@@ -1,6 +1,8 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_sped_tabelas_user_1,Operador (Leitura),model_sped_agente_causador,group_user,1,0,0,0
 access_sped_tabelas_gerente_1,Gerente (Todas permissões),model_sped_agente_causador,group_manager,1,1,1,1
+access_sped_tabelas_user_1,Operador (Leitura),model_sped_classificacao_servico,group_user,1,0,0,0
+access_sped_tabelas_gerente_1,Gerente (Todas permissões),model_sped_classificacao_servico,group_manager,1,1,1,1
 access_sped_tabelas_user_2,Operador (Leitura),model_sped_categoria_trabalhador,group_user,1,0,0,0
 access_sped_tabelas_gerente_2,Gerente (Todas permissões),model_sped_categoria_trabalhador,group_manager,1,1,1,1
 access_sped_tabelas_user_3,Operador (Leitura),model_sped_classificacao_tributaria,group_user,1,0,0,0
@@ -45,3 +47,5 @@ access_sped_tabelas_user_23,Operador (Leitura),model_sped_fatores_meio_ambiente,
 access_sped_tabelas_gerente_23,Gerente (Todas permissões),model_sped_fatores_meio_ambiente,group_manager,1,1,1,1
 access_sped_tabelas_user_24,Operador (Leitura),model_sped_tributaria_fpas,group_user,1,0,0,0
 access_sped_tabelas_gerente_24,Gerente (Todas permissões),model_sped_tributaria_fpas,group_manager,1,1,1,1
+access_sped_tabelas_user_25,Operador (Leitura),model_sped_agente_causador,group_user,1,0,0,0
+access_sped_tabelas_gerente_25,Gerente (Todas permissões),model_sped_agente_causador,group_manager,1,1,1,1

@@ -32,6 +32,7 @@
         'views/menus.xml',
 
         # Tabelas
+        'views/classificacao_servico.xml',
         'views/classificacao_tributaria.xml',
         'views/codigo_aliquota_FPAS.xml',
         'views/categoria_trabalhador.xml',
@@ -58,6 +59,7 @@
         'views/inherited_res_company.xml',
         
         # Data
+        'data/classificacao_servico.xml',
         'data/classificacao_tributaria.xml',
         'data/natureza_lesao.xml',
         'data/tipo_lotacao_tributaria.xml',
