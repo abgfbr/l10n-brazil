@@ -1286,15 +1286,16 @@ class AccountInvoice(models.Model):
             ctx_nolang = ctx.copy()
             ctx_nolang.pop('lang', None)
 
-            move = account_move.with_context(ctx_nolang).create(move_vals)
+            # move = account_move.with_context(ctx_nolang).create(move_vals)
+            #
+            # # make the invoice point to that move
+            # vals = {
+            #     'move_id': move.id,
+            #     'period_id': period.id,
+            #     'move_name': move.name,
+            # }
+            # inv.with_context(ctx).write(vals)
 
-            # make the invoice point to that move
-            vals = {
-                'move_id': move.id,
-                'period_id': period.id,
-                'move_name': move.name,
-            }
-            inv.with_context(ctx).write(vals)
             # Pass invoice in context in method post: used if you want to
             # get the same
             # account move reference when creating the same invoice after
@@ -1472,6 +1473,12 @@ class AccountInvoice(models.Model):
 
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
+
+    fiscal_type = fields.Selection(
+        string='Tipo Fiscal',
+        selection=PRODUCT_FISCAL_TYPE,
+        related='invoice_id.fiscal_type',
+    )
 
     @api.one
     @api.depends('price_unit', 'discount', 'invoice_line_tax_id', 'quantity',
@@ -2217,7 +2224,13 @@ class AccountInvoiceLine(models.Model):
             return result
         product_obj = self.env['product.product'].browse(product)
         result['value']['name'] = product_obj.display_name
-        conta_result = result['value']['account_id'] if result['value']['account_id'] else False
+        # if 'account_id' in result['value']:
+        #     conta_result = result['value']['account_id'] if result['value']['account_id'] else False
+        # else:
+        #     conta_result = False
+
+        conta_result = result['value'].get('account_id')
+
         result = self.with_context(ctx)._fiscal_position_map(
             result, partner_id=partner_id, partner_invoice_id=partner_id,
             company_id=company_id, product_id=product,

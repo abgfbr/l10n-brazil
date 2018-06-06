@@ -497,6 +497,7 @@
                         <page string="General">
                             <group>
                                 <group>
+                                    <field name="fiscal_type" invisible="1" />
                                     <field name="product_id" domain="[('fiscal_type', '=', 'product')]" on_change="product_id_change(product_id, uos_id, quantity, name, parent.type, parent.partner_id, fiscal_position, price_unit, parent.currency_id, parent.company_id, context)" context_br="{'parent_fiscal_category_id': parent.fiscal_category_id, 'parent_fiscal_position': parent.fiscal_position}"/>
                                     <label for="quantity"/>
                                     <div>
