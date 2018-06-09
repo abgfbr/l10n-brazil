@@ -1296,6 +1296,14 @@ class AccountInvoice(models.Model):
             # }
             # inv.with_context(ctx).write(vals)
 
+            # make the invoice point to that move
+            vals = {
+                'move_id': move.id,
+                'period_id': period.id,
+                'move_name': move.name,
+            }
+            inv.with_context(ctx).write(vals)
+
             # Pass invoice in context in method post: used if you want to
             # get the same
             # account move reference when creating the same invoice after
@@ -1378,49 +1386,46 @@ class AccountInvoice(models.Model):
     #
     #     return move_lines_new
 
-    # Comentado por Wagner Pereira para não gerar Financeiro de NF de entrada com retenção (não balanceia o
-    # total da NF pois falta o lançamento financeiro das retenções).
-    #
-    # @api.multi
-    # def invoice_validate(self):
-    #     super(AccountInvoice, self).invoice_validate()
-    #     for invoice in self:
-    #         #
-    #         #  Geração dos lançamentos financeiros
-    #         #
-    #         # financial_create = self.filtered(
-    #         #     lambda invoice: invoice.revenue_expense)
-    #         # financial_create.action_financial_create(move_lines_new)
-    #
-    #         invoice.action_financial_create()
-    #
-    #         # invoice.financial_ids.write({
-    #         #     'document_number': invoice.name or
-    #         #                        invoice.move_id.name or '/'})
-    #         # invoice.financial_ids.action_confirm()
-    #
-    # def action_financial_create(self):
-    #     """ Cria o lançamento financeiro do documento fiscal
-    #     :return:
-    #     """
-    #     for documento in self:
-    #         if documento.state not in 'open':
-    #             continue
-    #
-    #         # if documento.emissao == TIPO_EMISSAO_PROPRIA and \
-    #         #     documento.entrada_saida == ENTRADA_SAIDA_ENTRADA:
-    #         #     continue
-    #
-    #         #
-    #         # Temporariamente, apagamos todos os lançamentos anteriores
-    #         #
-    #             documento.financial_ids.unlink()
-    #
-    #         for duplicata in documento.duplicata_ids:
-    #             dados = duplicata.prepara_financial_move()
-    #             financial_move = \
-    #                 self.env['financial.move'].create(dados)
-    #             financial_move.action_confirm()
+    @api.multi
+    def invoice_validate(self):
+        super(AccountInvoice, self).invoice_validate()
+        for invoice in self:
+            #
+            #  Geração dos lançamentos financeiros
+            #
+            # financial_create = self.filtered(
+            #     lambda invoice: invoice.revenue_expense)
+            # financial_create.action_financial_create(move_lines_new)
+            if invoice.payment_term:
+                invoice.action_financial_create()
+
+            # invoice.financial_ids.write({
+            #     'document_number': invoice.name or
+            #                        invoice.move_id.name or '/'})
+            # invoice.financial_ids.action_confirm()
+
+    def action_financial_create(self):
+        """ Cria o lançamento financeiro do documento fiscal
+        :return:
+        """
+        for documento in self:
+            if documento.state not in 'open':
+                continue
+
+            # if documento.emissao == TIPO_EMISSAO_PROPRIA and \
+            #     documento.entrada_saida == ENTRADA_SAIDA_ENTRADA:
+            #     continue
+
+            #
+            # Temporariamente, apagamos todos os lançamentos anteriores
+            #
+                documento.financial_ids.unlink()
+
+            for duplicata in documento.duplicata_ids:
+                dados = duplicata.prepara_financial_move()
+                financial_move = \
+                    self.env['financial.move'].create(dados)
+                financial_move.action_confirm()
 
     @api.onchange('payment_term', 'date_invoice', 'amount_net',
                   'amount_total', 'duplicata_ids')

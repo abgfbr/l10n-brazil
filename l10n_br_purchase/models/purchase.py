@@ -44,14 +44,14 @@ class PurchaseOrder(models.Model):
 
             for tax in taxes['taxes']:
                 tax_brw = self.env['account.tax'].browse(tax['id'])
-                if not tax_brw.tax_code_id.tax_discount:
-                    amount_tax += tax.get('amount', 0.0)
+                if tax_brw.tax_code_id.tax_discount:
+                    amount_tax += tax.get('amount')
 
         self.amount_untaxed = self.pricelist_id.currency_id.round(
-            amount_untaxed)
+            amount_untaxed - amount_tax)
         self.amount_tax = self.pricelist_id.currency_id.round(amount_tax)
         self.amount_total = self.pricelist_id.currency_id.round(
-            amount_untaxed + amount_tax)
+            amount_untaxed)
         self.amount_total += (amount_freight + amount_costs + amount_insurance)
 
     @api.model
