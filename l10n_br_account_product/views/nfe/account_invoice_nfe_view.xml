@@ -606,7 +606,7 @@
                                     <group string="Detalhes do PIS">
                                         <group>
                                             <field name="pis_manual" invisible="True"/>
-                                            <field name="pis_cst_id"/>
+                                            <field name="pis_cst_id" attrs="{'required': [('fiscal_type','=', 'product')]}"/>
                                             <!--attrs="{'required': [('product_type','in', ('product', 'service'))]}"-->
                                             <field name="pis_type"/>
                                             <field name="pis_base"/>
@@ -632,7 +632,7 @@
                                     <group string="Detalhes do COFINS">
                                         <group>
                                             <field name="cofins_manual" invisible="True"/>
-                                            <field name="cofins_cst_id"/>
+                                            <field name="cofins_cst_id" attrs="{'required': [('fiscal_type','=', 'product')]}"/>
                                             <!--attrs="{'required': [('product_type','in', ('product', 'service'))]}"-->
                                             <field name="cofins_type"/>
                                             <field name="cofins_base"/>
@@ -721,6 +721,7 @@
             <field name="view_mode">tree,form,calendar,graph</field>
             <field eval="False" name="view_id"/>
             <!--<field name="domain">[('fiscal_document_code', '=', '55')]</field>-->
+            <field name="domain"></field>
             <field name="context">{'default_type':'out_invoice', 'type':'out_invoice', 'journal_type': 'sale', 'fiscal_document_code': '55', 'fiscal_type': 'product'}</field>
             <field name="search_view_id" ref="l10n_br_account_product_nfe_search"/>
             <field name="help" type="html">
