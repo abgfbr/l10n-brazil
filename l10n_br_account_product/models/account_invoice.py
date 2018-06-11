@@ -1286,15 +1286,7 @@ class AccountInvoice(models.Model):
             ctx_nolang = ctx.copy()
             ctx_nolang.pop('lang', None)
 
-            # move = account_move.with_context(ctx_nolang).create(move_vals)
-            #
-            # # make the invoice point to that move
-            # vals = {
-            #     'move_id': move.id,
-            #     'period_id': period.id,
-            #     'move_name': move.name,
-            # }
-            # inv.with_context(ctx).write(vals)
+            move = account_move.with_context(ctx_nolang).create(move_vals)
 
             # make the invoice point to that move
             vals = {
