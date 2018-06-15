@@ -28,7 +28,7 @@
             <field name="inherit_id" ref="l10n_br_account.l10n_br_account_position_form"/>
             <field name="arch" type="xml">
                 <field name="fiscal_category_fiscal_type" position="after">
-                    <field name="cfop_id" colspan="4" domain="[('type', '=', type), ('internal_type', '=', 'normal')]"/>
+                    <field name="cfop_id" colspan="4" domain="[('internal_type', '=', 'normal')]"/>
                     <field name="ind_final"/>
                 </field>
                 <xpath expr="/form/notebook/page/field[@name='tax_ids']/tree/field[@name='tax_code_src_id']" position="before">

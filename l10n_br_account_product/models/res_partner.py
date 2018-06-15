@@ -128,7 +128,7 @@ class AccountFiscalPosition(models.Model):
                 # FIXME se tiver com o admin pegar impostos de outras empresas
             product_ncm_tax_def = product_fc.sale_tax_definition_line
         else:
-            if self.env.context.get('fiscal_type', 'product') == 'product':
+            if self.env.context.get('fiscal_type', 'product') in ('product', 'service'):
                 company_taxes = \
                     self.company_id.purchase_product_tax_definition_line
                 for tax_def in company_taxes:
