@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2018 ABGF - Luiz Felipe do Divino <luiz.divino@abgf.gov.br>
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+
+<openerp>
+    <data>
+
+        <record id="view_l10n_br_stock_move_account_company_form" model="ir.ui.view">
+            <field name="name">l10n_br_stock.res.company.form</field>
+            <field name="model">res.company</field>
+            <field name="inherit_id" ref="l10n_br_stock_account.view_l10n_br_stock_company_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//group[@string='Configurações de Estoque']" position="after">
+                    <group string="Contabilidade Movimentações de Estoque">
+                        <field name="active_stock_move_account" />
+                        <field name="account_move_template_id" attrs="{'required': [('active_stock_move_account', '=', True)]}"/>
+                        <field name="temporary_account_journal_id" attrs="{'required': [('active_stock_move_account', '=', True)]}"/>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</openerp>

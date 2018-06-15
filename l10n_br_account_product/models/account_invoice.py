@@ -2513,18 +2513,20 @@ class AccountInvoiceLine(models.Model):
             # contabilizado à parte
             #
             if self.invoice_id.type in ('in_invoice', 'out_refund'):
-                if (template_item.campo in
-                        ('icms_value', 'vr_icms_sn')
-                        and not self.credita_icms):
+                if template_item.campo in ('icms_value', 'vr_icms_sn') and \
+                        self.product_type == 'product' and not \
+                        self.credita_icms:
                     continue
                 elif template_item.campo == 'icms_st_value' and \
-                        not self.credita_icms_st:
+                        self.product_type == 'product' and not \
+                        self.credita_icms_st:
                     continue
                 elif template_item.campo == 'ipi_value' and \
-                        not self.credita_ipi:
+                        self.product_type == 'product' and not self.credita_ipi:
                     continue
-                elif template_item.campo in ('pis_value',
-                        'cofins_value') and not self.credita_pis_cofins:
+                elif template_item.campo in ('pis_value', 'cofins_value') and \
+                        self.product_type == 'product' and not \
+                        self.credita_pis_cofins:
                     continue
 
             valor = getattr(self, template_item.campo, 0)
