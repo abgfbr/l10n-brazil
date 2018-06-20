@@ -12,6 +12,7 @@ class StockTransferDetails(models.TransientModel):
     def do_detailed_transfer(self):
         super(StockTransferDetails, self).do_detailed_transfer()
 
-        self.picking_id.gerar_lancamento_recebimento_definitivo()
+        if self.company_id.active_stock_move_account:
+            self.picking_id.gerar_lancamento_recebimento_definitivo()
 
         return True
