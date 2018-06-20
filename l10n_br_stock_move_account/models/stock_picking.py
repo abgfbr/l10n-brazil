@@ -82,21 +82,21 @@ class StockPicking(models.Model):
     @api.multi
     def gera_movimentacao_contabil_transitoria(self):
         for stock in self:
-            if not self.temporary_journal_id:
-                self.temporary_journal_id = \
-                    self.company_id.temporary_account_journal_id.id
+            if not stock.temporary_journal_id:
+                stock.temporary_journal_id = \
+                    stock.company_id.temporary_account_journal_id.id
 
-            if stock._validar_tipo_picking(self.temporary_journal_id):
-                move_template = self.company_id.account_move_template_id
+            if stock._validar_tipo_picking(stock.temporary_journal_id):
+                move_template = stock.company_id.account_move_template_id
                 account_move_lines = []
 
-                self.gera_account_move_line(
-                    account_move_lines, move_template, stock
+                stock.gera_account_move_line(
+                    account_move_lines, move_template
                 )
 
                 if account_move_lines:
                     move_vals = stock.get_account_move_stock_vals(
-                        account_move_lines, self.temporary_journal_id
+                        account_move_lines, stock.temporary_journal_id
                     )
 
                     move = self.env['account.move'].create(move_vals)
@@ -115,8 +115,8 @@ class StockPicking(models.Model):
         return move_vals
 
     @api.multi
-    def gera_account_move_line(self, account_move_lines, move_template, stock):
-        for line in stock.move_lines:
+    def gera_account_move_line(self, account_move_lines, move_template):
+        for line in self.move_lines:
             self._gerar_linhas_transicao_temporaria(
                 account_move_lines, line, move_template
             )
