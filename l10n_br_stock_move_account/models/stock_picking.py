@@ -191,66 +191,70 @@ class StockPicking(models.Model):
     @api.multi
     def gerar_lancamento_recebimento_definitivo(self):
         for stock in self:
+            if not stock.temporary_move_id:
+                return
+
             if not self.definitive_journal_id:
                 self.definitive_journal_id = \
                     self.company_id.definitive_account_journal_id.id
 
             if stock._validar_tipo_picking(self.definitive_journal_id):
-                if stock.temporary_move_id:
-                    template_id = \
-                        stock.company_id.account_move_definitive_template_id
-                    account_move_lines = []
+                template_id = \
+                    stock.company_id.account_move_definitive_template_id
+                account_move_lines = []
 
-                    for line in stock.temporary_move_id.line_id:
-                        for template_item in template_id.item_ids:
-                            account_debito = None
-                            if template_item.account_debito_id:
-                                account_debito = template_item.account_debito_id
-                            elif template_item.account_automatico_debito == \
-                                    ACCOUNT_AUTOMATICO_PRODUTO:
-                                product = line.product_id
-                                account_debito = product.property_account_income
+                for line in stock.temporary_move_id.line_id:
+                    for template_item in template_id.item_ids:
+                        account_debito = None
+                        if template_item.account_debito_id:
+                            account_debito = template_item.account_debito_id
+                        elif template_item.account_automatico_debito == \
+                                ACCOUNT_AUTOMATICO_PRODUTO:
+                            product = line.product_id
+                            account_debito = product.property_account_income
 
-                            if account_debito and line.credit:
-                                dados = {
-                                    'account_id': account_debito.id,
-                                    'name': line.name,
-                                    'debit': line.credit,
-                                    'partner_id': line.partner_id.id,
-                                }
-                                account_move_lines.append((0, 0, dados))
+                        if account_debito and line.credit:
+                            dados = {
+                                'account_id': account_debito.id,
+                                'name': line.name,
+                                'debit': line.credit,
+                                'partner_id': line.partner_id.id,
+                            }
+                            account_move_lines.append((0, 0, dados))
 
-                            account_credito = None
-                            if template_item.account_credito_id:
-                                account_credito = \
-                                    template_item.account_credito_id
+                        account_credito = None
+                        if template_item.account_credito_id:
+                            account_credito = \
+                                template_item.account_credito_id
 
-                            elif template_item.account_automatico_credito == \
-                                    ACCOUNT_AUTOMATICO_PRODUTO:
-                                product = self.env['product.product'].search([('name', '=', line.name)])
+                        elif template_item.account_automatico_credito == \
+                                ACCOUNT_AUTOMATICO_PRODUTO:
+                            product = self.env['product.product'].search(
+                                [('name', '=', line.name)]
+                            )
 
-                                if not product.property_account_expense:
-                                    raise Warning(
-                                        'É preciso configurar as contas de '
-                                        'despesa/receita do(s) produto(s)!'
-                                    )
-                                account_credito = \
-                                    product.property_account_expense
+                            if not product.property_account_expense:
+                                raise Warning(
+                                    'É preciso configurar as contas de '
+                                    'despesa/receita do(s) produto(s)!'
+                                )
+                            account_credito = \
+                                product.property_account_expense
 
-                            if account_credito and line.debit:
-                                dados = {
-                                    'account_id': account_credito.id,
-                                    'name': line.name,
-                                    'credit': line.debit,
-                                    'partner_id': line.partner_id.id,
-                                }
-                                account_move_lines.append((0, 0, dados))
+                        if account_credito and line.debit:
+                            dados = {
+                                'account_id': account_credito.id,
+                                'name': line.name,
+                                'credit': line.debit,
+                                'partner_id': line.partner_id.id,
+                            }
+                            account_move_lines.append((0, 0, dados))
 
-                    if account_move_lines:
-                        move_vals = stock.get_account_move_stock_vals(
-                            account_move_lines, stock.definitive_journal_id
-                        )
+                if account_move_lines:
+                    move_vals = stock.get_account_move_stock_vals(
+                        account_move_lines, stock.definitive_journal_id
+                    )
 
-                        move = self.env['account.move'].create(move_vals)
+                    move = self.env['account.move'].create(move_vals)
 
-                        stock.definitive_move_id = move
+                    stock.definitive_move_id = move
