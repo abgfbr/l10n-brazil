@@ -407,6 +407,7 @@ class SpedEfdReinf(models.Model):
                 values = {
                     'tipo': 'efdreinf',
                     'registro': 'R-2010',
+                    'ambiente': self.company_id.tpAmb,
                     'company_id': self.company_id.id,
                     'evento': 'evtServTom',
                     'origem': ('sped.efdreinf.estabelecimento,%s' % estabelecimento.id),
@@ -424,6 +425,7 @@ class SpedEfdReinf(models.Model):
             values = {
                 'tipo': 'efdreinf',
                 'registro': 'R-2099',
+                'ambiente': self.company_id.tpAmb,
                 'company_id': self.company_id.id,
                 'evento': 'evtFechamento',
                 'origem': ('sped.efdreinf,%s' % efdreinf.id),
