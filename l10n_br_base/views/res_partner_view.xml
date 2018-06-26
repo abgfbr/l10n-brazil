@@ -53,9 +53,9 @@
                 <field name="street2" position="replace"/>
                 <field name="zip" position="replace"/>
                 <field name="street" position="replace">
-                    <field name="zip" placeholder="CEP" style="width:50%" attrs="{'required': [('employee', '=', True)]}" />
-                    <field name="street" placeholder="Logradouro" attrs="{'required': [('employee', '=', True)]}" />
-                    <field name="number" placeholder="Número" attrs="{'required': [('employee', '=', True)]}" />
+                    <field name="zip" placeholder="CEP" style="width:50%" />
+                    <field name="street" placeholder="Logradouro" />
+                    <field name="number" placeholder="Número" />
                     <field name="street2" placeholder="Complemento"/>
                     <field name="district" placeholder="Bairro"/>
                 </field>
@@ -63,14 +63,14 @@
                     <attribute name="domain">[('country_id','=',country_id)]</attribute>
                     <attribute name="style">width:100%</attribute>
                     <attribute name="options">{'no_create': True, 'no_edit': True}</attribute>
-                    <attribute name="attrs">{'required': [('employee', '=', True)]}</attribute>
+                    <!--<attribute name="attrs">{'required': [('employee', '=', True)]}</attribute>-->
                 </field>
                 <field name="country_id" position="replace"/>
                 <field name="state_id" position="before">
-                    <field name="country_id" placeholder="País" options="{'no_create': True, 'no_edit': True}" attrs="{'required': [('employee', '=', True)]}" />
+                    <field name="country_id" placeholder="País" options="{'no_create': True, 'no_edit': True}" />
                 </field>
                 <field name="state_id" position="after">
-                    <field name="l10n_br_city_id" placeholder="Cidade" options="{'no_create': True, 'no_edit': True}" attrs="{'required': [('employee', '=', True)]}" />
+                    <field name="l10n_br_city_id" placeholder="Cidade" options="{'no_create': True, 'no_edit': True}" />
                 </field>
                 <field name="city" position="replace">
                     <field name="city" invisible="1" />
