@@ -383,7 +383,7 @@ class SpedEsocialHrContrato(models.Model, SpedRegistroIntermediario):
         LocalTrabGeral = pysped.esocial.leiaute.S2200_LocalTrabGeral_2()
         LocalTrabGeral.tpInsc.valor = '1'
         LocalTrabGeral.nrInsc.valor = limpa_formatacao(
-            self.hr_contract_id.company_id.cnpj_cpf)
+            self.hr_contract_id.company_id.cnpj_cpf)[0:8]
         # LocalTrabGeral.descComp.valor = ''  # TODO Criar no contrato
         S2200.evento.vinculo.infoContrato.localTrabalho.localTrabGeral.append(
             LocalTrabGeral)
