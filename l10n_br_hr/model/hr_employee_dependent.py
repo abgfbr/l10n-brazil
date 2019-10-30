@@ -34,7 +34,7 @@ class HrEmployeeDependent(models.Model):
                                         required=True,
                                         comodel_name='hr.dependent.type')
     pension_benefits = fields.Float(string='Allowance value')
-    dependent_verification = fields.Boolean(string='IRPF (é dependente)')
+    dependent_verification = fields.Boolean(string="É Dependente (IRRF) ?")
     health_verification = fields.Boolean(string='Healthcare plan')
     dependent_gender = fields.Selection(string='Gender', selection=[
         ('m', 'Male'),

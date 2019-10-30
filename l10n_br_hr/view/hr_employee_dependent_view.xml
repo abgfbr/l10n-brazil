@@ -20,7 +20,7 @@
                                 <field name="dependent_gender"/>
                             </group>
                             <group name="dados_dependente_2">
-                                <field name="dependent_verification"/>
+                                <field name="dependent_verification" string="É Dependente (IRRF) ?"/>
                                 <field name="inc_trab"/>
                                 <field name="cnpj_cpf" string="CPF" required="1"/>
                                 <field name="inscr_est" string="RG"/>
