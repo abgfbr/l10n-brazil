@@ -176,6 +176,26 @@ class SpedHrRescisaoAutonomo(models.Model, SpedRegistroIntermediario):
         self.sped_s2399_registro_inclusao = sped_registro_id
         return sped_registro_id
 
+    def get_registro_para_retificar(self, sped_registro):
+        """
+        Identificar o registro para retificar
+        :return:
+        """
+        # Se tiver registro de retificação com erro ou nao possuir nenhuma
+        # retificação ainda, retornar o registro que veio no parametro
+        retificacao_com_erro = sped_registro.retificacao_ids.filtered(
+            lambda x: x.situacao in ['1', '3'])
+        if retificacao_com_erro or not sped_registro.retificacao_ids:
+            return sped_registro
+
+        # Do contrario navegar ate as retificacoes com sucesso e efetuar a
+        # verificacao de erro novamente
+        else:
+            registro_com_sucesso = sped_registro.retificacao_ids.filtered(
+                lambda x: x.situacao not in ['1', '3'])
+
+            return self.get_registro_para_retificar(registro_com_sucesso[0])
+
     @api.multi
     def popula_xml(self, ambiente='2', operacao='I'):
         """
@@ -206,7 +226,7 @@ class SpedHrRescisaoAutonomo(models.Model, SpedRegistroIntermediario):
             indRetif = '2'
 
             registro_para_retificar = self.get_registro_para_retificar(
-                self.sped_s2299_registro_inclusao)
+                self.sped_s2399_registro_inclusao)
 
             S2399.evento.ideEvento.nrRecibo.valor = \
                 registro_para_retificar.recibo
@@ -286,6 +306,41 @@ class SpedHrRescisaoAutonomo(models.Model, SpedRegistroIntermediario):
             # relacionando as classes
             dm_dev.ideEstabLot.append(ide_estab_lot)
             verba_rescisoria.dmDev.append(dm_dev)
+
+            # Preencher outros vinculos
+            outros_vinculos = \
+                self.sped_hr_rescisao_id.contract_id.contribuicao_inss_ids
+
+            periodo_rescisao = '{:02}/{}'.format(
+                self.sped_hr_rescisao_id.mes_do_ano,
+                self.sped_hr_rescisao_id.ano
+            )
+
+            for vinculo in outros_vinculos:
+                if not periodo_rescisao == vinculo.period_id.code:
+                    continue
+                info_mv = pysped.esocial.leiaute.S2399_InfoMV_2()
+
+                remun_outr_empr = \
+                    pysped.esocial.leiaute.S2399_RemunOutrEmpr_2()
+                remun_outr_empr.tpInsc.valor = \
+                    vinculo.tipo_inscricao_vinculo
+                remun_outr_empr.nrInsc.valor = limpa_formatacao(
+                    vinculo.cnpj_cpf_vinculo)
+                remun_outr_empr.codCateg.valor = \
+                    vinculo.cod_categ_vinculo
+                remun_outr_empr.vlrRemunOE.valor = \
+                    vinculo.valor_remuneracao_vinculo
+
+                info_mv.remunOutrEmpr.append(remun_outr_empr)
+
+                if vinculo.valor_alicota_vinculo >= 642.33:
+                    info_mv.indMV.valor = '3'
+                else:
+                    info_mv.indMV.valor = '2'
+
+                verba_rescisoria.infoMV.append(info_mv)
+
             S2399.evento.infoTSVTermino.verbasResc.append(verba_rescisoria)
 
         return S2399, validacao
