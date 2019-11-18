@@ -2093,7 +2093,10 @@ class AccountInvoiceLine(models.Model):
 
     def _amount_tax_retissqn(self, tax=None):
         result = {
+            'issqn_base': tax.get('total_base', 0.0),
+            'issqn_percent': tax.get('percent', 0.0) * 100,
             'issqn_wh_value': tax.get('amount', 0.0),
+            'issqn_value': tax.get('amount', 0.0),
         }
         return result
 
