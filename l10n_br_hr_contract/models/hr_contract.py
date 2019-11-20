@@ -77,6 +77,7 @@ class HrContractLaborRegime(models.Model):
 
 class HrContractSalaryUnit(models.Model):
     _name = 'hr.contract.salary.unit'
+    _order = "code"
 
     name = fields.Char(string='Salary unit')
     code = fields.Char(string='Code')
@@ -85,24 +86,8 @@ class HrContractSalaryUnit(models.Model):
     def name_get(self):
         result = []
         for record in self:
-            name = record['name']
-            if name == 'Monthly':
-                name = 'Por mês'
-            elif name == 'Biweekly':
-                name = 'Por 15 dias'
-            elif name == 'Weekly':
-                name = 'Por semana'
-            elif name == 'Daily':
-                name = 'Por dia'
-            elif name == 'Hourly':
-                name = 'Por hora'
-            elif name == 'Task':
-                name = 'Por tarefa'
-            elif name == 'Others':
-                name = 'Outros'
-            elif record['code']:
-                name = record['code'] + ' - ' + name
-            result.append((record['id'], name))
+            name = '{} - {}'.format(record.code, record.name)
+            result.append((record.id, name))
         return result
 
 class HrContractResignationCause(models.Model):
@@ -135,21 +120,24 @@ class HrContract(models.Model):
 
     admission_type_id = fields.Many2one(
         string='Admission type',
-        comodel_name='hr.contract.admission.type')
+        comodel_name='hr.contract.admission.type',
+    )
+
     labor_bond_type_id = fields.Many2one(
         string='Labor bond type',
-        comodel_name='hr.contract.labor.bond.type')
+        comodel_name='hr.contract.labor.bond.type',
+    )
 
     labor_regime_id = fields.Many2one(
         string='Labor regime',
         comodel_name='hr.contract.labor.regime',
-        help = 'e-Social: S2300 - tpRegPrev',
+        help = 'e-Social: S2200/s2300 - tpRegTrab',
     )
 
     salary_unit = fields.Many2one(
         string='Salary Unity',
         comodel_name='hr.contract.salary.unit',
-        help='e-Social: S2300 - tpRegPrev',
+        help='e-Social: S2200/2300 - undSalFixo',
     )
 
     weekly_hours = fields.Float(string='Weekly hours')
