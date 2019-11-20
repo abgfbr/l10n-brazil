@@ -13,6 +13,9 @@ class LinhaTotalizador(object):
         self.nome = ''
         self.base = ''
         self.desconto = ''
+        self.valor_esperado = 0.00
+        self.valor_descontado = 0.00
+        self.situacao = ''
 
 
 def format_money_mask(value):
@@ -63,6 +66,8 @@ def totalizador_periodo(pool, cr, uid, localcontext, context):
 
     total_base = 0
     total_desconto = 0
+    total_remuneracao = 0
+    total_rescisao = 0
 
     for remuneracao_id in self.remuneracao_ids:
 
@@ -70,6 +75,9 @@ def totalizador_periodo(pool, cr, uid, localcontext, context):
 
         # Pegar ultimo registro de sucesso
         registro_sucesso = get_registro_sucesso(remuneracao_id.sped_registro)
+
+        if not registro_sucesso:
+            continue
         
         linha.nome = remuneracao_id.contract_ids[0].display_name
 
@@ -78,14 +86,33 @@ def totalizador_periodo(pool, cr, uid, localcontext, context):
         linha.base = format_money_mask(base)
         total_base += base
 
-        desconto = sum(registro_sucesso.origem.s5001_id.ideestablot_ids.filtered(
-            lambda x: x.tp_valor == '21').mapped('valor')) or 0.00
+        desconto = \
+            sum(registro_sucesso.origem.s5001_id.ideestablot_ids.filtered(
+                lambda x: x.tp_valor == '21').mapped('valor')) or 0.00
         linha.desconto = format_money_mask(desconto)
         total_desconto += desconto
 
+        if registro_sucesso.origem.s5001_id.infocpcalc_ids:
+            linha.valor_descontado = \
+                registro_sucesso.origem.s5001_id.infocpcalc_ids[0].vr_desc_seg
+
+            linha.valor_esperado = \
+                registro_sucesso.origem.s5001_id.infocpcalc_ids[0].vr_cp_seg
+
+        linha.situacao = \
+            'OK' if linha.valor_descontado == linha.valor_esperado else 'ERRO'
+
         contribuicao_mensal.append(linha)
 
-    for rescisao_id in self.desligamento_ids:
+        total_remuneracao += desconto
+
+    # Apenas rescisoes que nao tem 1200 no mes
+    funcionarios_1210 = self.remuneracao_ids.mapped('trabalhador_id.id')
+
+    desligamentos_filtered = self.desligamento_ids.filtered(
+        lambda x: x.sped_hr_rescisao_id.employee_id.id not in funcionarios_1210)
+
+    for rescisao_id in desligamentos_filtered:
 
         registro_sucesso = get_registro_sucesso(
             rescisao_id.sped_s2299_registro_inclusao)
@@ -94,19 +121,34 @@ def totalizador_periodo(pool, cr, uid, localcontext, context):
 
             linha = LinhaTotalizador()
 
-            linha.nome = rescisao_id.sped_hr_rescisao_id.contract_id.display_name
+            linha.nome = \
+                rescisao_id.sped_hr_rescisao_id.contract_id.display_name
 
             base = registro_sucesso.sped_s5001.ideestablot_ids.filtered(
-                lambda x: x.tp_valor == '11' and x.ind13 == indicador_13).valor or 0.00
+                lambda x: x.tp_valor == '11' and
+                          x.ind13 == indicador_13).valor or 0.00
             linha.base = format_money_mask(base)
             total_base += base
 
             desconto = registro_sucesso.sped_s5001.ideestablot_ids.filtered(
-                lambda x: x.tp_valor == '21' and x.ind13 == indicador_13).valor or 0.00
+                lambda x: x.tp_valor == '21' and
+                          x.ind13 == indicador_13).valor or 0.00
             linha.desconto = format_money_mask(desconto)
             total_desconto += desconto
 
+            if registro_sucesso.sped_s5001.infocpcalc_ids:
+                linha.valor_descontado = \
+                    registro_sucesso.sped_s5001.infocpcalc_ids[0].vr_desc_seg
+
+                linha.valor_esperado = \
+                    registro_sucesso.sped_s5001.infocpcalc_ids[0].vr_cp_seg
+
+            linha.situacao = 'OK' \
+                if linha.valor_descontado == linha.valor_esperado else 'ERRO'
+
             contribuicao_rescisao.append(linha)
+
+            total_rescisao += desconto
 
     data = {
         'object': self,
@@ -115,5 +157,7 @@ def totalizador_periodo(pool, cr, uid, localcontext, context):
         'contribuicao_rescisao': contribuicao_rescisao,
         'total_base': format_money_mask(total_base),
         'total_desconto': format_money_mask(total_desconto),
+        'total_remuneracao': format_money_mask(total_remuneracao),
+        'total_rescisao': format_money_mask(total_rescisao),
     }
     localcontext.update(data)
