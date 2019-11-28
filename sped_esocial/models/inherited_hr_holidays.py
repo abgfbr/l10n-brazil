@@ -12,7 +12,6 @@ class HrHolidays(models.Model):
     sped_esocial_afastamento_id = fields.Many2one(
         string='Evento e-Social',
         comodel_name='sped.esocial.afastamento.temporario',
-        ondelete='cascade',
     )
     esocial_evento_afastamento_id = fields.Many2one(
         string='Evento e-Social',
@@ -146,13 +145,29 @@ class HrHolidays(models.Model):
     def unlink(self):
         for record in self:
             if record.situacao_esocial == '4':
-                raise Warning(
+                raise ValidationError(
                     'Não é possível excluir um '
-                    'afastamento enviado para o e-Social!'
-                )
+                    'afastamento enviado para o e-Social!')
 
-            return super(HrHolidays, record).unlink()
+            # Excluir registro intermediario e sped.registros de afastamentos
+            record.sped_esocial_afastamento_id.unlink()
+        return super(HrHolidays, self).unlink()
 
     @api.multi
     def retorna_trabalhador(self):
         return self.contrato_id.employee_id
+
+    @api.multi
+    def holidays_refuse(self):
+        """
+        Excluir os registros caso existam no e-Social
+        """
+        self.sped_esocial_afastamento_id.unlink()
+        return super(HrHolidays, self).holidays_refuse()
+
+    @api.multi
+    def action_cancel_esocial(self):
+        """
+        Cancelar envio de registros ao e-Social
+        """
+        self.sped_esocial_afastamento_id.unlink()

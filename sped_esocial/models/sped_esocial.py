@@ -366,19 +366,23 @@ class SpedEsocial(models.Model):
             esocial.necessita_s1000 = necessita_s1000
             esocial.msg_empregador = msg_empregador
 
+    def is_empresa_ativa_no_esocial(self):
+        """
+        """
+        if self.company_id.esocial_periodo_inicial_id:
+            if self.company_id.esocial_periodo_inicial_id.date_start <= \
+                    self.periodo_id.date_start:
+                return True
+        return False
+
     @api.multi
     def importar_empregador(self):
         self.ensure_one()
-        empregadores = self.env['res.company'].search([
-            ('id', '=', self.company_id.id),
-        ])
-        emprs = []
-        for empregador in empregadores:
-            if empregador.esocial_periodo_inicial_id and \
-                    empregador.esocial_periodo_inicial_id.date_start <= self.periodo_id.date_start:
-                empregador.atualizar_empregador()
-                emprs.append(empregador.sped_empregador_id.id)
-        self.empregador_ids = [(6, 0, emprs)]
+
+        if self.is_empresa_ativa_no_esocial():
+            self.company_id.atualizar_empregador()
+            self.empregador_ids = \
+                [(6, 0, self.company_id.sped_empregador_id._ids)]
 
     #
     # Controle dos registros S-1005
@@ -688,7 +692,8 @@ class SpedEsocial(models.Model):
             if matriz.id not in empresas:
                 empresas.append(matriz.id)
 
-            # separa somente os trabalhadores com contrato válido neste período e nesta empresa matriz
+            # separa somente os trabalhadores com contrato válido neste
+            # período e nesta empresa matriz
             # trabalhadores_com_contrato = []
 
             remuneracao_dicionario = self._get_dicionario_remuneracao()
@@ -1256,7 +1261,7 @@ class SpedEsocial(models.Model):
 
         if self.empregador_ids:
             # Calcula os valores do fechamento
-            evt_remun = 'S' if self.remuneracao_ids or self.remuneracao_rpps_ids else 'N'
+            evt_remun = 'S' if self.remuneracao_ids or self.remuneracao_rpps_ids or self.desligamento_ids else 'N'
             evt_pgtos = 'S' if self.pagamento_ids else 'N'
             evt_aq_prod = 'N'
             evt_com_prod = 'N'
