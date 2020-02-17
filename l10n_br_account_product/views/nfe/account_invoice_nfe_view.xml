@@ -19,6 +19,7 @@
                     <field name="partner_id" operator="child_of"/>
                     <field name="user_id" string="Salesperson"/>
                     <field name="period_id" string="Period"/>
+                    <field name="amount_total" string="Valor" />
                     <separator/>
                     <filter domain="[('user_id','=',uid)]" help="My Invoices"/>
                     <group expand="0" string="Group By">
