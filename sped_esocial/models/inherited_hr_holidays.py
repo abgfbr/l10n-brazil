@@ -123,23 +123,24 @@ class HrHolidays(models.Model):
 
     @api.multi
     def _gerar_tabela_intermediaria(self):
-        if self.holiday_status_id.esocial_evento_afastamento_id:
-            if not self.sped_esocial_afastamento_id:
-                if self.env.user.company_id.eh_empresa_base:
-                    matriz = self.env.user.company_id.id
-                else:
-                    matriz = self.env.user.company_id.matriz.id
+        if self.contrato_id.sped_s2200_id:
+            if self.holiday_status_id.esocial_evento_afastamento_id:
+                if not self.sped_esocial_afastamento_id:
+                    if self.env.user.company_id.eh_empresa_base:
+                        matriz = self.env.user.company_id.id
+                    else:
+                        matriz = self.env.user.company_id.matriz.id
 
-                self.sped_esocial_afastamento_id = \
-                    self.env['sped.esocial.afastamento.temporario'].create({
-                        'company_id': matriz,
-                        'hr_holiday_id': self.id,
-                    })
+                    self.sped_esocial_afastamento_id = \
+                        self.env['sped.esocial.afastamento.temporario'].create({
+                            'company_id': matriz,
+                            'hr_holiday_id': self.id,
+                        })
 
-            # Processa cada tipo de operação do S-2230
-            # O que realmente precisará ser feito é tratado no método do
-            #  registro intermediário
-            self.sped_esocial_afastamento_id.gerar_registro()
+                # Processa cada tipo de operação do S-2230
+                # O que realmente precisará ser feito é tratado no método do
+                #  registro intermediário
+                self.sped_esocial_afastamento_id.gerar_registro()
 
     @api.multi
     def unlink(self):
