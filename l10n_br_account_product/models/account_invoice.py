@@ -871,7 +871,6 @@ class AccountInvoice(models.Model):
     def action_cancel_draft(self):
         result = super(AccountInvoice, self).action_cancel_draft()
         self.write({
-            'internal_number': False,
             'nfe_access_key': False,
             'nfe_status': False,
             'nfe_date': False,
@@ -890,36 +889,37 @@ class AccountInvoice(models.Model):
 
         for invoice in self:
             if invoice.issuer == '0':
-                sequence_obj = self.env['ir.sequence']
-                sequence = sequence_obj.browse(
-                    invoice.document_serie_id.internal_sequence_id.id)
-                invalid_number = self.env[
-                    'l10n_br_account.invoice.invalid.number'].search(
-                    [('number_start', '<=', sequence.number_next),
-                     ('number_end', '>=', sequence.number_next),
-                     ('document_serie_id', '=', invoice.document_serie_id.id),
-                     ('state', '=', 'done')])
+                if not invoice.internal_number:
+                    sequence_obj = self.env['ir.sequence']
+                    sequence = sequence_obj.browse(
+                        invoice.document_serie_id.internal_sequence_id.id)
+                    invalid_number = self.env[
+                        'l10n_br_account.invoice.invalid.number'].search(
+                        [('number_start', '<=', sequence.number_next),
+                         ('number_end', '>=', sequence.number_next),
+                         ('document_serie_id', '=', invoice.document_serie_id.id),
+                         ('state', '=', 'done')])
 
-                if invalid_number:
-                    raise UserError(
-                        _(u'Número Inválido !'),
-                        _("O número: %s da série: %s, esta inutilizado") % (
-                            sequence.number_next,
-                            invoice.document_serie_id.name))
+                    if invalid_number:
+                        raise UserError(
+                            _(u'Número Inválido !'),
+                            _("O número: %s da série: %s, esta inutilizado") % (
+                                sequence.number_next,
+                                invoice.document_serie_id.name))
 
-                seq_number = sequence_obj.get_id(
-                    invoice.document_serie_id.internal_sequence_id.id)
-                date_time_invoice = (invoice.date_hour_invoice or
-                                     fields.datetime.now())
-                date_in_out = invoice.date_in_out or fields.datetime.now()
-                self.write(
-                    {'internal_number': seq_number,
-                     'serie_nfe': invoice.document_serie_id.code,
-                     'number': seq_number,
-                     'date_hour_invoice': date_time_invoice,
-                     'date_in_out': date_in_out
-                     }
-                )
+                    seq_number = sequence_obj.get_id(
+                        invoice.document_serie_id.internal_sequence_id.id)
+                    date_time_invoice = (invoice.date_hour_invoice or
+                                         fields.datetime.now())
+                    date_in_out = invoice.date_in_out or fields.datetime.now()
+                    self.write(
+                        {'internal_number': seq_number,
+                         'serie_nfe': invoice.document_serie_id.code,
+                         'number': seq_number,
+                         'date_hour_invoice': date_time_invoice,
+                         'date_in_out': date_in_out
+                         }
+                    )
         return True
 
     @api.onchange('type')
@@ -1499,6 +1499,30 @@ class AccountInvoice(models.Model):
             if record.payment_mode_id:
                 record.type_nf_payment = \
                     record.payment_mode_id.type_nf_payment
+
+    @api.multi
+    def unlink(self):
+        for record in self:
+            documents_with_greater_internal_number = \
+                self.env["account.invoice"].search([
+                    ("id", ">", record.id),
+                    ("internal_number", "!=", False),
+                    ("type", "in", ["out_invoice", "out_refund"])
+                ])
+
+            if documents_with_greater_internal_number:
+                raise UserError("Não é possível excluir esse documento porque "
+                              "existem documentos com númeração acima desta! "
+                              "Exclua estes documentos antes de excluir este!"
+                              )
+
+            if record.internal_number:
+                record.document_serie_id.internal_sequence_id.\
+                    number_next_actual -= 1
+
+            record.internal_number = False
+
+        return super(AccountInvoice, self).unlink()
 
 
 class AccountInvoiceLine(models.Model):
