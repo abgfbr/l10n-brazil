@@ -161,8 +161,10 @@ class SpedEsocialRemuneracao(models.Model, SpedRegistroIntermediario):
     def popula_xml(self, ambiente='2', operacao='na'):
         self.ensure_one()
 
-        convencao_coletiva_id = self.env['l10n.br.hr.acordo.coletivo'].search(
-            [('competencia_pagamento', '=', self.periodo_id.id)])
+        convencao_coletiva_id = False
+
+        # convencao_coletiva_id = self.env['l10n.br.hr.acordo.coletivo'].search(
+        #     [('competencia_pagamento', '=', self.periodo_id.id)])
 
         periodo_apuracao = self.periodo_id.code[3:7] + '-' + \
                 self.periodo_id.code[0:2]
