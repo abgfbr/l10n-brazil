@@ -167,8 +167,7 @@ class SpedReinfContribuinte(models.Model, SpedRegistroIntermediario):
             'S' if self.reinf_competencia_id.evt_com_prod else 'N'
         R2099.evento.infoFech.evtCPRB.valor = \
             'S' if self.reinf_competencia_id.evt_cprb else 'N'
-        # Disponível a partir de 21/05/2021
-        # R2099.evento.infoFech.evtAquis.valor = 'N'
+        R2099.evento.infoFech.evtAquis.valor = 'N'
         if fields.Date.today() <= '2018-08-31':
             R2099.evento.infoFech.evtPgtos.valor = \
                 'S' if self.reinf_competencia_id.evt_pgtos else 'N'
