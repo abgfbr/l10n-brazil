@@ -153,8 +153,6 @@ class SpedEsocialHrContrato(models.Model, SpedRegistroIntermediario):
         # Popula "trabalhador" (Dados do Trabalhador)
         S2200.evento.trabalhador.cpfTrab.valor = limpa_formatacao(
             self.hr_contract_id.employee_id.cpf)
-        S2200.evento.trabalhador.nisTrab.valor = limpa_formatacao(
-            self.hr_contract_id.employee_id.pis_pasep)
         S2200.evento.trabalhador.nmTrab.valor = self.hr_contract_id.employee_id.name
         sexo = ''
         if self.hr_contract_id.employee_id.gender == 'male':
@@ -184,26 +182,8 @@ class SpedEsocialHrContrato(models.Model, SpedRegistroIntermediario):
 
         # Popula trabalhador.nascimento
         S2200.evento.trabalhador.nascimento.dtNascto.valor = self.hr_contract_id.employee_id.birthday
-        if self.hr_contract_id.employee_id.naturalidade:
-            if self.hr_contract_id.employee_id.naturalidade.ibge_code and \
-                    self.hr_contract_id.employee_id.naturalidade.state_id.ibge_code:
-                S2200.evento.trabalhador.nascimento.codMunic.valor = \
-                    self.hr_contract_id.employee_id.naturalidade.state_id.ibge_code + \
-                    self.hr_contract_id.employee_id.naturalidade.ibge_code
-            S2200.evento.trabalhador.nascimento.uf.valor = self.hr_contract_id.employee_id.naturalidade.state_id.code
         S2200.evento.trabalhador.nascimento.paisNascto.valor = self.hr_contract_id.employee_id.pais_nascto_id.codigo
         S2200.evento.trabalhador.nascimento.paisNac.valor = self.hr_contract_id.employee_id.pais_nac_id.codigo
-        S2200.evento.trabalhador.nascimento.nmMae.valor = self.hr_contract_id.employee_id.mother_name or ''
-        S2200.evento.trabalhador.nascimento.nmPai.valor = self.hr_contract_id.employee_id.father_name or ''
-
-        # Popula trabalhador.documentos
-        # CTPS
-        if self.hr_contract_id.employee_id.ctps:
-            CTPS = pysped.esocial.leiaute.S2200_CTPS_2()  # Cria o registro
-            CTPS.nrCtps.valor = self.hr_contract_id.employee_id.ctps or ''
-            CTPS.serieCtps.valor = self.hr_contract_id.employee_id.ctps_series or ''
-            CTPS.ufCtps.valor = self.hr_contract_id.employee_id.ctps_uf_id.code or ''
-            S2200.evento.trabalhador.documentos.CTPS.append(CTPS)
 
         # Popula ideEvento
         S2200.tpInsc = '1'
@@ -220,8 +200,6 @@ class SpedEsocialHrContrato(models.Model, SpedRegistroIntermediario):
         # Popula "trabalhador" (Dados do Trabalhador)
         S2200.evento.trabalhador.cpfTrab.valor = limpa_formatacao(
             self.hr_contract_id.employee_id.cpf)
-        S2200.evento.trabalhador.nisTrab.valor = limpa_formatacao(
-            self.hr_contract_id.employee_id.pis_pasep)
         S2200.evento.trabalhador.nmTrab.valor = self.hr_contract_id.employee_id.name
         sexo = ''
         if self.hr_contract_id.employee_id.gender == 'male':
@@ -246,57 +224,6 @@ class SpedEsocialHrContrato(models.Model, SpedRegistroIntermediario):
         S2200.evento.trabalhador.grauInstr.valor = \
             self.hr_contract_id.employee_id.educational_attainment.code.zfill(2) or ''
         # S2200.evento.trabalhador.nmSoc =  # TODO separa
-
-        # # RIC  # TODO (Criar campos em l10n_br_hr)
-        # if self.hr_contract_id.employee_id.ric:
-        #     RIC = pysped.esocial.leiaute.S2200_RIC_2()
-        #     RIC.nrRic.valor = self.hr_contract_id.employee_id.ric
-        #     RIC.orgaoEmissor.valor = self.hr_contract_id.employee_id.ric_orgao_emissor
-        #     if self.hr_contract_id.employee_id.ric_dt_exped:
-        #         RIC.dtExped.valor = self.hr_contract_id.employee_id.ric_dt_exped
-        #     S2200.evento.trabalhador.documentos.RG.append(RIC)
-
-        # RG
-        if self.hr_contract_id.employee_id.rg:
-            RG = pysped.esocial.leiaute.S2200_RG_2()
-            RG.nrRg.valor = self.hr_contract_id.employee_id.rg or ''
-            RG.orgaoEmissor.valor = self.hr_contract_id.employee_id.organ_exp or ''
-            if self.hr_contract_id.employee_id.rg_emission:
-                RG.dtExped.valor = self.hr_contract_id.employee_id.rg_emission
-            S2200.evento.trabalhador.documentos.RG.append(RG)
-
-        # # RNE  # TODO (Criar campos em l10n_br_hr)
-        # if self.hr_contract_id.employee_id.rne:
-        #     RNE = pysped.esocial.leiaute.S2200_RNE_2()
-        #     RNE.nrRne.valor = self.hr_contract_id.employee_id.rne
-        #     RNE.orgaoEmissor.valor = self.hr_contract_id.employee_id.rne_orgao_emissor
-        #     if self.hr_contract_id.employee_id.rne_dt_exped:
-        #         RNE.dtExped.valor = self.hr_contract_id.employee_id.rne_dt_exped
-        #     S2200.evento.trabalhador.documentos.RNE.append(RNE)
-
-        # # OC  # TODO (Criar campos em l10n_br_hr)
-        # if self.hr_contract_id.employee_id.oc:
-        #     OC = pysped.esocial.leiaute.S2200_OC_2()
-        #     OC.nrOc.valor = self.hr_contract_id.employee_id.oc
-        #     OC.orgaoEmissor.valor = self.hr_contract_id.employee_id.oc_orgao_emissor
-        #     if self.hr_contract_id.employee_id.oc_dt_exped:
-        #         OC.dtExped.valor = self.hr_contract_id.employee_id.oc_dt_exped
-        #     if self.hr_contract_id.employee_id.oc_dt_valid:
-        #         OC.dtValid.valor = self.hr_contract_id.employee_id.oc_dt_valid
-        #     S2200.evento.trabalhador.documentos.OC.append(OC)
-
-        # CNH
-        if self.hr_contract_id.employee_id.driver_license:
-            CNH = pysped.esocial.leiaute.S2200_CNH_2()
-            CNH.nrRegCnh.valor = self.hr_contract_id.employee_id.driver_license
-            if self.hr_contract_id.employee_id.cnh_dt_exped:
-                CNH.dtExped.valor = self.hr_contract_id.employee_id.cnh_dt_exped
-            CNH.ufCnh.valor = self.hr_contract_id.employee_id.cnh_uf.code
-            CNH.dtValid.valor = self.hr_contract_id.employee_id.expiration_date
-            if self.hr_contract_id.employee_id.cnh_dt_pri_hab:
-                CNH.dtPriHab.valor = self.hr_contract_id.employee_id.cnh_dt_pri_hab
-            CNH.categoriaCnh.valor = self.hr_contract_id.employee_id.driver_categ
-            S2200.evento.trabalhador.documentos.CNH.append(CNH)
 
         # Popula trabalhador.endereco.brasil
         Brasil = pysped.esocial.leiaute.S2200_Brasil_2()
@@ -369,10 +296,7 @@ class SpedEsocialHrContrato(models.Model, SpedRegistroIntermediario):
         Contato = pysped.esocial.leiaute.S2200_Contato_2()
         Contato.fonePrinc.valor = limpa_formatacao(
             self.hr_contract_id.employee_id.address_home_id.phone or '')
-        Contato.foneAlternat.valor = limpa_formatacao(
-            self.hr_contract_id.employee_id.alternate_phone or '')
         Contato.emailPrinc.valor = self.hr_contract_id.employee_id.address_home_id.email or ''
-        Contato.emailAlternat.valor = self.hr_contract_id.employee_id.alternate_email or ''
         S2200.evento.trabalhador.contato.append(Contato)
 
         # Popula "vinculo"
@@ -395,9 +319,6 @@ class SpedEsocialHrContrato(models.Model, SpedRegistroIntermediario):
         S2200.evento.vinculo.cadIni.valor = cad_ini
         # S2200.evento.vinculo.cadIni.valor = self.hr_contract_id.cad_ini
 
-        if cad_ini != 'S':
-            S2200.evento.trabalhador.indPriEmpr.valor = 'S' if self.hr_contract_id.primeiro_emprego else 'N'
-
         # Popula vinculo.infoRegimeTrab
         if self.hr_contract_id.labor_regime_id.code == '1':
 
@@ -411,9 +332,12 @@ class SpedEsocialHrContrato(models.Model, SpedRegistroIntermediario):
             if self.hr_contract_id.partner_union.cnpj_cpf:
                 InfoCeletista.cnpjSindCategProf.valor = limpa_formatacao(
                     self.hr_contract_id.partner_union.cnpj_cpf)
-            InfoCeletista.FGTS.opcFGTS.valor = self.hr_contract_id.opc_fgts
-            if self.hr_contract_id.dt_opc_fgts:
-                InfoCeletista.FGTS.dtOpcFGTS.valor = self.hr_contract_id.dt_opc_fgts
+
+            if self.hr_contract_id.admission_type_id.code != 6 and self.hr_contract_id.category_id.code == 104:
+                fgts = pysped.esocial.leiaute.S2200_FGTS_2()
+                fgts.dtOpcFGTS.valor = self.hr_contract_id.dt_opc_fgts
+                InfoCeletista.FGTS.append(fgts)
+
             S2200.evento.vinculo.infoRegimeTrab.infoCeletista.append(InfoCeletista)
 
         elif self.hr_contract_id.labor_regime_id.code == '2':
@@ -422,24 +346,30 @@ class SpedEsocialHrContrato(models.Model, SpedRegistroIntermediario):
             InfoEstatutario = pysped.esocial.leiaute.S2200_InfoEstatutario_2()
 
         # Popula vinculo.infoContrato
-        S2200.evento.vinculo.infoContrato.codCargo.valor = self.hr_contract_id.job_id.codigo
+        S2200.evento.vinculo.infoContrato.nmCargo.valor = self.hr_contract_id.job_id.name
+        S2200.evento.vinculo.infoContrato.CBOCargo.valor = self.hr_contract_id.job_id.cbo_id.code
         # S2200.evento.vinculo.infoContrato.codFuncao.valor =   # TODO Quando lidar com Estatutários
+        S2200.evento.vinculo.infoContrato.acumCargo.valor = 'N'
         S2200.evento.vinculo.infoContrato.codCateg.valor = self.hr_contract_id.category_id.code  # TODO Migrar esse campo para
         # relacionar com tabela 1 do eSocial
         # S2200.evento.vinculo.infoContrato.codCarreira.valor =   # TODO Quando lidar com Estatutários
         # S2200.evento.vinculo.infoContrato.dtIngrCarr.valor =   # TODO Quando lidar com Estatutários
 
         # Popula vinculo.infoContrato.remuneracao
-        S2200.evento.vinculo.infoContrato.vrSalFx.valor = formata_valor(
+        remuneracao = pysped.esocial.leiaute.S2200_Remuneracao_2()
+        remuneracao.vrSalFx.valor = formata_valor(
             self.hr_contract_id.wage)
-        S2200.evento.vinculo.infoContrato.undSalFixo.valor = self.hr_contract_id.salary_unit.code
-        S2200.evento.vinculo.infoContrato.dscSalVar.valor = self.hr_contract_id.dsc_sal_var or ''
+        remuneracao.undSalFixo.valor = self.hr_contract_id.salary_unit.code
+        remuneracao.dscSalVar.valor = self.hr_contract_id.dsc_sal_var or ''
+        S2200.evento.vinculo.infoContrato.remuneracao.append(remuneracao)
 
         # Popula vinculo.infoContrato.duracao
-        S2200.evento.vinculo.infoContrato.tpContr.valor = self.hr_contract_id.tp_contr
+        duracao =  pysped.esocial.leiaute.S2200_Duracao_2()
+        duracao.tpContr.valor = self.hr_contract_id.tp_contr
         if self.hr_contract_id.tp_contr == '2':
-            S2200.evento.vinculo.infoContrato.dtTerm.valor = self.hr_contract_id.date_end
-            S2200.evento.vinculo.infoContrato.clauAssec.valor = self.hr_contract_id.clau_assec
+            duracao.dtTerm.valor = self.hr_contract_id.date_end
+            duracao.clauAssec.valor = self.hr_contract_id.clau_assec
+        S2200.evento.vinculo.infoContrato.duracao.append(duracao)
 
         # Popula vinculo.infoContrato.localTrabalho
         LocalTrabGeral = pysped.esocial.leiaute.S2200_LocalTrabGeral_2()
@@ -447,33 +377,20 @@ class SpedEsocialHrContrato(models.Model, SpedRegistroIntermediario):
         LocalTrabGeral.nrInsc.valor = limpa_formatacao(
             self.hr_contract_id.company_id.cnpj_cpf)
         # LocalTrabGeral.descComp.valor = ''  # TODO Criar no contrato
-        S2200.evento.vinculo.infoContrato.localTrabalho.localTrabGeral.append(
-            LocalTrabGeral)
+        localTrabalho = pysped.esocial.leiaute.S2200_LocalTrabalho_2()
+        localTrabalho.localTrabGeral.append(LocalTrabGeral)
+        S2200.evento.vinculo.infoContrato.localTrabalho.append(localTrabalho)
 
         # Popula vinculo.infoContrato.horContratual (Campos)
         HorContratual = pysped.esocial.leiaute.S2200_HorContratual_2()
         HorContratual.qtdHrsSem.valor = formata_valor(self.hr_contract_id.weekly_hours)
-        HorContratual.tpJornada.valor = self.hr_contract_id.tp_jornada
-        if self.hr_contract_id.tp_jornada == '9':
-            HorContratual.dscTpJorn.valor = self.hr_contract_id.dsc_tp_jorn
+        HorContratual.tpJornada.valor = '4'
+        HorContratual.dscJorn.valor = self.hr_contract_id.dsc_tp_jorn
         HorContratual.tmpParc.valor = self.hr_contract_id.tmp_parc
-
-        # Popula vinculo.horContratual.horario
-        if self.hr_contract_id.working_hours:
-            for horario in self.hr_contract_id.working_hours.attendance_ids:
-                Horario = pysped.esocial.leiaute.S2200_Horario_2()
-                Horario.dia.valor = horario.diadasemana
-                Horario.codHorContrat.valor = horario.turno_id.cod_hor_contrat
-                HorContratual.horario.append(Horario)
+        HorContratual.horNoturno.valor = 'N'
 
         # Popula vinculo.infoContrato.horContratual (Efetivamente)
         S2200.evento.vinculo.infoContrato.horContratual.append(HorContratual)
-
-        # Popula vinculo.infoContrato.filiacaoSindical
-        FiliacaoSindical = pysped.esocial.leiaute.S2200_FiliacaoSindical_2()
-        FiliacaoSindical.cnpjSindTrab.valor = limpa_formatacao(
-            self.hr_contract_id.partner_union.cnpj_cpf or '')
-        S2200.evento.vinculo.infoContrato.filiacaoSindical.append(FiliacaoSindical)
 
         # Popula vinculo.infoContrato.observacoes
         if self.hr_contract_id.notes:

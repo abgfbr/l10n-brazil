@@ -302,7 +302,7 @@ class SpedHrRescisao(models.Model, SpedRegistroIntermediario):
 
         cod_funcionario = True if rescisao_id.contract_id.category_id.code != '410' else False
         rubricas_convencao_coletiva = {}
-
+        adiantamento_13 = 0
         for rubrica_line in \
                 rescisao_id.line_ids + rescisao_complementar_id.line_ids:
             # if rubrica_line.salary_rule_id.category_id.id in (
@@ -326,6 +326,24 @@ class SpedHrRescisao(models.Model, SpedRegistroIntermediario):
                                     rubrica_line.reference <= data_apuracao) \
                             and rubrica_line.salary_rule_id.category_id.code ==\
                             'PROVENTO' and cod_funcionario else False
+
+                        if rubrica_line.code == 'DESCONTO_ADIANTAMENTO_13':
+                            det_verbas = pysped.esocial.leiaute.S2299_DetVerbas_2()
+                            det_verbas.codRubr.valor = 'ADIANTADOPROP13'
+                            det_verbas.ideTabRubr.valor = 'ADPROP13'
+                            det_verbas.vrRubr.valor = str(rubrica_line.total)
+                            ide_estab_lot.detVerbas.append(det_verbas)
+                            continue
+
+                        if rubrica_line.code == 'ADIANTADOPROP13':
+                            det_verbas = pysped.esocial.leiaute.S2299_DetVerbas_2()
+                            det_verbas.codRubr.valor = \
+                                rubrica_line.salary_rule_id.codigo
+                            det_verbas.ideTabRubr.valor = \
+                                rubrica_line.salary_rule_id.identificador
+                            det_verbas.vrRubr.valor = adiantamento_13
+                            ide_estab_lot.detVerbas.append(det_verbas)
+                            continue
 
                         if condicao_pagamento_anterior:
                             rubricas_convencao_coletiva[rubrica_line.id] = rubrica_line
