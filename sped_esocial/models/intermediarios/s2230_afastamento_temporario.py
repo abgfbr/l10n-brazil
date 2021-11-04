@@ -161,8 +161,6 @@ class SpedAfastamentoTemporario(models.Model, SpedRegistroIntermediario):
         # Popula ideVinculo
         S2230.evento.ideVinculo.cpfTrab.valor = limpa_formatacao(
             holiday_id.contrato_id.employee_id.cpf)
-        S2230.evento.ideVinculo.nisTrab.valor = limpa_formatacao(
-            holiday_id.contrato_id.employee_id.pis_pasep)
         S2230.evento.ideVinculo.matricula.valor = \
             holiday_id.contrato_id.matricula
 
@@ -176,6 +174,11 @@ class SpedAfastamentoTemporario(models.Model, SpedRegistroIntermediario):
             codigo_afastamento = holiday_id.holiday_status_id.\
                 esocial_evento_afastamento_id.codigo
             inicio_afastamento.codMotAfast.valor = codigo_afastamento
+
+            if holiday_id.holiday_status_id.esocial_evento_afastamento_id.codigo == '15':
+                periodo_aquisitivo = pysped.esocial.leiaute.S2230_PerAquis_2()
+                periodo_aquisitivo.dtInicio.valor = holiday_id.parent_id.controle_ferias_ids.inicio_aquisitivo
+                inicio_afastamento.perAquis.append(periodo_aquisitivo)
 
             bloco_inicio.append(inicio_afastamento)
 

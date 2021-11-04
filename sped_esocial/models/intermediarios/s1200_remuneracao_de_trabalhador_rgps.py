@@ -214,7 +214,6 @@ class SpedEsocialRemuneracao(models.Model, SpedRegistroIntermediario):
 
         # Popula ideTrabalhador (Dados do Trabalhador)
         S1200.evento.ideTrabalhador.cpfTrab.valor = limpa_formatacao(self.trabalhador_id.cpf)
-        S1200.evento.ideTrabalhador.nisTrab.valor = limpa_formatacao(self.trabalhador_id.pis_pasep)
 
         for contrato in self.trabalhador_id.contract_ids:
             if contrato.contribuicao_inss_ids:
@@ -347,9 +346,9 @@ class SpedEsocialRemuneracao(models.Model, SpedRegistroIntermediario):
                                 itens_remun.ideTabRubr.valor = line.salary_rule_id.identificador
                                 if line.quantity and float(line.quantity) != 1:
                                     itens_remun.qtdRubr.valor = float(line.quantity)
-                                    itens_remun.vrUnit.valor = formata_valor(line.amount)
                                 if line.rate and line.rate != 100:
                                     itens_remun.fatorRubr.valor = line.rate
+                                itens_remun.indApurIR.valor = 0
                                 itens_remun.vrRubr.valor = formata_valor(line.total)
                                 remun_per_apur.itensRemun.append(itens_remun)
 
@@ -441,10 +440,10 @@ class SpedEsocialRemuneracao(models.Model, SpedRegistroIntermediario):
                             itens_remun.ideTabRubr.valor = line.salary_rule_id.identificador
                             if line.quantity and float(line.quantity) != 1:
                                 itens_remun.qtdRubr.valor = float(line.quantity)
-                                itens_remun.vrUnit.valor = formata_valor(line.amount)
                             if line.rate and line.rate != 100:
                                 itens_remun.fatorRubr.valor = line.rate
                             itens_remun.vrRubr.valor = formata_valor(line.total)
+                            itens_remun.indApurIR.valor = 0
 
                             ide_estab_lot.remunPerAnt.itensRemun.append(itens_remun)
 
@@ -529,11 +528,10 @@ class SpedEsocialRemuneracao(models.Model, SpedRegistroIntermediario):
                                 rubricas_convencao_coletiva[line_holerite].salary_rule_id.identificador
                             if rubricas_convencao_coletiva[line_holerite].quantity and float(rubricas_convencao_coletiva[line_holerite].quantity) != 1:
                                 itens_remun.qtdRubr.valor = float(rubricas_convencao_coletiva[line_holerite].quantity)
-                                itens_remun.vrUnit.valor = \
-                                    formata_valor(rubricas_convencao_coletiva[line_holerite].amount)
                             if rubricas_convencao_coletiva[line_holerite].rate and rubricas_convencao_coletiva[line_holerite].rate != 100:
                                 itens_remun.fatorRubr.valor = rubricas_convencao_coletiva[line_holerite].rate
                             itens_remun.vrRubr.valor = formata_valor(rubricas_convencao_coletiva[line_holerite].total)
+                            itens_remun.indApurIR.valor = 0
                             ide_estab_lot.remunPerAnt.itensRemun.append(
                                 itens_remun)
 

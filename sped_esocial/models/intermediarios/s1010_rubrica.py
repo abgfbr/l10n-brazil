@@ -307,8 +307,6 @@ class SpedEsocialRubrica(models.Model, SpedRegistroIntermediario):
             self.rubrica_id.tp_rubr
         S1010.evento.infoRubrica.dadosRubrica.codIncFGTS.valor = \
             self.rubrica_id.cod_inc_fgts
-        S1010.evento.infoRubrica.dadosRubrica.codIncSIND.valor = \
-            self.rubrica_id.cod_inc_sind
 
         # Preencher codIncCP
         if self.rubrica_id.cod_inc_cp == '0':

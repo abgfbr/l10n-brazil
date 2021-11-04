@@ -790,6 +790,30 @@
         <field name="descricao">Valor correspondente ao desconto da contribuição destinada ao custeio do sistema confederativo</field>
     </record>
 
+    <record id="tab03_9241" model="sped.natureza_rubrica">
+        <field name="codigo">9241</field>
+        <field name="nome">Alimentação em ticket ou cartão, vinculada ao PAT - Desconto</field>
+        <field name="descricao">Desconto referente à participação do trabalhador no custo de alimentação concedida sob a forma de ticket ou cartão, por empresa vinculada ao Programa de Alimentação do Trabalhador - PAT</field>
+    </record>
+
+    <record id="tab03_9242" model="sped.natureza_rubrica">
+        <field name="codigo">9242</field>
+        <field name="nome">Alimentação em ticket ou cartão, não vinculada ao PAT - Desconto</field>
+        <field name="descricao">Desconto referente à participação do trabalhador no custo de alimentação concedida sob a forma de ticket ou cartão, por empresa não vinculada ao PAT</field>
+    </record>
+
+    <record id="tab03_9243" model="sped.natureza_rubrica">
+        <field name="codigo">9243</field>
+        <field name="nome">Cesta básica ou refeição, vinculada ao PAT - Desconto</field>
+        <field name="descricao">Desconto referente à participação do trabalhador no custo de alimentação concedida sob a forma de cesta básica ou refeição, por empresa vinculada ao PAT</field>
+    </record>
+
+    <record id="tab03_9244" model="sped.natureza_rubrica">
+        <field name="codigo">9244</field>
+        <field name="nome">Cesta básica ou refeição, não vinculada ao PAT - Desconto</field>
+        <field name="descricao">Desconto referente à participação do trabalhador no custo de alimentação concedida sob a forma de cesta básica ou refeição, por empresa não vinculada ao PAT</field>
+    </record>
+
     <record id="tab03_9250" model="sped.natureza_rubrica">
         <field name="codigo">9250</field>
         <field name="nome">Seguro de vida - desconto</field>
