@@ -302,7 +302,10 @@ class SpedHrRescisao(models.Model, SpedRegistroIntermediario):
 
         cod_funcionario = True if rescisao_id.contract_id.category_id.code != '410' else False
         rubricas_convencao_coletiva = {}
-        adiantamento_13 = 0
+        
+        prop13_value = (rescisao_id.line_ids + rescisao_complementar_id.line_ids).filtered(lambda line: line.code == 'PROP13').total if (rescisao_id.line_ids + rescisao_complementar_id.line_ids).filtered(lambda line: line.code == 'PROP13') else 0
+        adiantamento_13_value = (rescisao_id.line_ids + rescisao_complementar_id.line_ids).filtered(lambda line: line.code == 'DESCONTO_ADIANTAMENTO_13').total if (rescisao_id.line_ids + rescisao_complementar_id.line_ids).filtered(lambda line: line.code == 'DESCONTO_ADIANTAMENTO_13') else 0 
+
         for rubrica_line in \
                 rescisao_id.line_ids + rescisao_complementar_id.line_ids:
             # if rubrica_line.salary_rule_id.category_id.id in (
@@ -313,6 +316,22 @@ class SpedHrRescisao(models.Model, SpedRegistroIntermediario):
                 # if rubrica_line.salary_rule_id.code != 'PENSAO_ALIMENTICIA':
                 #     if rubrica_line.total > 0:
                 #
+                total = rubrica_line.total
+
+                if rubrica_line.code == 'DESCONTO_ADIANTAMENTO_13':
+                    det_verbas = pysped.esocial.leiaute.S2299_DetVerbas_2()
+                    det_verbas.codRubr.valor = 'ADIANTADOPROP13'
+                    det_verbas.ideTabRubr.valor = 'ADPROP13'
+                    det_verbas.vrRubr.valor = str(rubrica_line.total)
+                    ide_estab_lot.detVerbas.append(det_verbas)
+                    continue
+
+                if rubrica_line.code == 'PROP13':
+                    if (prop13_value - adiantamento_13_value) <= 0:
+                        continue
+                    else:
+                        total -= adiantamento_13_value
+
                 data_apuracao, eh_periodo = \
                     self.validar_referencia_periodo_linha(
                         rubrica_line, periodo_apuracao,
@@ -358,7 +377,7 @@ class SpedHrRescisao(models.Model, SpedRegistroIntermediario):
                                 det_verbas.vrUnit.valor = float(rubrica_line.amount)
                             if rubrica_line.rate and rubrica_line.rate != 100:
                                 det_verbas.fatorRubr.valor = rubrica_line.rate
-                            det_verbas.vrRubr.valor = str(rubrica_line.total)
+                            det_verbas.vrRubr.valor = str(total)
 
                             ide_estab_lot.detVerbas.append(det_verbas)
 

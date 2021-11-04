@@ -10,7 +10,7 @@ class SpedEfdReinf(models.Model):
     _name = 'sped.efdreinf'
     _description = u'Eventos Periódicos EFD/Reinf'
     _rec_name = 'nome'
-    _order = "nome DESC"
+    _order = "periodo_id DESC, company_id"
     _sql_constraints = [
         ('periodo_company_unique', 'unique(periodo_id, company_id)', 'Este período já existe para esta empresa !')
     ]
