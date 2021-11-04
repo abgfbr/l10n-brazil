@@ -126,8 +126,8 @@ class SpedEsocialCondicaoAmbienteTrabalho(models.Model, SpedRegistroIntermediari
 
         S2240.evento.ideVinculo.cpfTrab.valor = limpa_formatacao(
             self.hr_condicao_ambiente_trabalho_id.contract_id.employee_id.cpf)
-        S2240.evento.ideVinculo.nisTrab.valor = limpa_formatacao(
-            self.hr_condicao_ambiente_trabalho_id.contract_id.employee_id.pis_pasep)
+        #S2240.evento.ideVinculo.nisTrab.valor = limpa_formatacao(
+        #    self.hr_condicao_ambiente_trabalho_id.contract_id.employee_id.pis_pasep)
         if self.hr_condicao_ambiente_trabalho_id.contract_id.sped_s2200_id:
             S2240.evento.ideVinculo.matricula.valor = \
                 self.hr_condicao_ambiente_trabalho_id.contract_id.matricula
@@ -140,79 +140,129 @@ class SpedEsocialCondicaoAmbienteTrabalho(models.Model, SpedRegistroIntermediari
 
         for ambiente in self.hr_condicao_ambiente_trabalho_id.hr_ambiente_ids:
             info_amb = pysped.esocial.leiaute.S2240_InfoAmb_2()
-            info_amb.codAmb.valor = ambiente.cod_ambiente
+            #info_amb.codAmb.valor = ambiente.cod_ambiente
+            info_amb.localAmb.valor = ambiente.local_ambiente
+            info_amb.dscSetor.valor = ambiente.desc_ambiente[0:100]
+            info_amb.tpInsc.valor = ambiente.tipo_inscricao.codigo
+            info_amb.nrInsc.valor = ambiente.num_inscricao
 
             S2240.evento.infoExpRisco.infoAmb.append(info_amb)
 
         S2240.evento.infoExpRisco.infoAtiv.dscAtivDes.valor = \
             self.hr_condicao_ambiente_trabalho_id.hr_atividade_id.desc_atividade
-        for cod_atividade in self.hr_condicao_ambiente_trabalho_id.hr_atividade_id.cod_atividade_ids:
-            atividade_periculosidade = \
-                pysped.esocial.leiaute.S2240_AtivPericInsal_2()
-            atividade_periculosidade.codAtiv.valor = cod_atividade.codigo
+        # for cod_atividade in self.hr_condicao_ambiente_trabalho_id.hr_atividade_id.cod_atividade_ids:
+        #     atividade_periculosidade = \
+        #         pysped.esocial.leiaute.S2240_AtivPericInsal_2()
+        #     atividade_periculosidade.codAtiv.valor = cod_atividade.codigo
+        #
+        #     S2240.evento.infoExpRisco.infoAtiv.ativPericInsal.append(
+        #         atividade_periculosidade)
 
-            S2240.evento.infoExpRisco.infoAtiv.ativPericInsal.append(
-                atividade_periculosidade)
-
-        for fator_risco in \
+        for agente_nociso in \
                 self.hr_condicao_ambiente_trabalho_id.hr_fator_risco_ids:
-            fatrisc = pysped.esocial.leiaute.S2240_FatRisco_2()
+            ag_noc = pysped.esocial.leiaute.S2240_agNoc_2()
 
-            fatrisc.codFatRis.valor = fator_risco.cod_fator_risco_id.codigo
-            if fator_risco.dsc_fat_risco:
-                fatrisc.dscFatRisc.valor = fator_risco.dsc_fat_risco
-            fatrisc.tpAval.valor = fator_risco.tp_avaliacao
-            if fator_risco.intensidade_concentracao:
-                fatrisc.intConc.valor = \
-                    fator_risco.intensidade_concentracao
-            if fator_risco.limite_tolerancia:
-                fatrisc.limTol.valor = \
-                    fator_risco.limite_tolerancia
-            if fator_risco.unidade_medida:
-                fatrisc.unMed.valor = \
-                    fator_risco.unidade_medida
-            if fator_risco.tec_medicao:
-                fatrisc.tecMedicao.valor = \
-                    fator_risco.tec_medicao
-            fatrisc.insalubridade.valor = \
-                fator_risco.insalubridade
-            fatrisc.periculosidade.valor = \
-                fator_risco.periculosidade
-            if self.hr_condicao_ambiente_trabalho_id.contract_id.sped_s2200_id and self.hr_condicao_ambiente_trabalho_id.contract_id.tp_reg_prev == '1' and not self.hr_condicao_ambiente_trabalho_id.contract_id.category_id.code == '104':
-                fatrisc.aposentEsp.valor = \
-                    fator_risco.aposentadoria_especial
-            if self.hr_condicao_ambiente_trabalho_id.contract_id.sped_s2300_id and self.hr_condicao_ambiente_trabalho_id.contract_id.category_id.code in ['201', '202', '731', '734', '738']:
-                fatrisc.aposentEsp.valor = \
-                    fator_risco.aposentadoria_especial
+            ag_noc.codAgNoc.valor = agente_nociso.cod_fator_risco_id.codigo
+            if agente_nociso.dsc_fat_risco:
+                ag_noc.dscAgNoc.valor = agente_nociso.dsc_fat_risco
+            ag_noc.tpAval.valor = agente_nociso.tp_avaliacao
+            if agente_nociso.intensidade_concentracao:
+                ag_noc.intConc.valor = agente_nociso.intensidade_concentracao
+            if agente_nociso.limite_tolerancia:
+                ag_noc.limTol.valor = agente_nociso.limite_tolerancia
+            if agente_nociso.unidade_medida:
+                ag_noc.unMed.valor = agente_nociso.unidade_medida
+            if agente_nociso.tec_medicao:
+                ag_noc.tecMedicao.valor = agente_nociso.tec_medicao
 
-            fatrisc.epcEpi.utilizEPC.valor = fator_risco.epc_id.utilizacao_epc
-            if fator_risco.epc_id.eficiencia_epc:
-                fatrisc.epcEpi.eficEpc.valor = fator_risco.epc_id.eficiencia_epc
-            fatrisc.epcEpi.utilizEPI.valor = fator_risco.epc_id.utilizacao_epi
+            ag_noc.epcEpi.utilizEPC.valor = agente_nociso.epc_id.utilizacao_epc
+            if agente_nociso.epc_id.eficiencia_epc:
+                ag_noc.epcEpi.eficEpc.valor = agente_nociso.epc_id.eficiencia_epc
+            ag_noc.epcEpi.utilizEPI.valor = agente_nociso.epc_id.utilizacao_epi
 
-            for epi in fator_risco.epc_id.epi_ids:
-                epi_tag = pysped.esocial.leiaute.S2240_Epi_2()
+            #arrumar codigo
+            # for epi in agente_nociso.epc_id.epi_ids:
+            #     if epi.eficiencia_epi:
+            #         fatrisc.epcEpi.eficEpi.valor = epi.eficiencia_epi
+            #
+            # for epi in agente_nociso.epc_id.epi_ids:
+            #     epi_tag = pysped.esocial.leiaute.S2240_Epi_2()
+            #
+            #     epi_tag.caEPI.valor = epi.certificado_aprovacao
+            #     epi_tag.dscEPI.valor = epi.desc_epi
+            #     epi_tag.eficEpi.valor = epi.eficiencia_epi
+            #     epi_tag.medProtecao.valor = epi.med_protecao_coletiva
+            #     epi_tag.condFuncto.valor = epi.cond_funcionamento
+            #     epi_tag.usoInint.valor = epi.uso_ininterrupto
+            #     epi_tag.przValid.valor = epi.prazo_validade_certificado_epi
+            #     epi_tag.periodicTroca.valor = epi.periodicidade_troca
+            #     epi_tag.higienizacao.valor = epi.higienizacao
+            #
+            #     fatrisc.epcEpi.epi.append(epi_tag)
 
-                epi_tag.caEPI.valor = epi.certificado_aprovacao
-                epi_tag.dscEPI.valor = epi.desc_epi
-                epi_tag.eficEpi.valor = epi.eficiencia_epi
-                epi_tag.medProtecao.valor = epi.med_protecao_coletiva
-                epi_tag.condFuncto.valor = epi.cond_funcionamento
-                epi_tag.usoInint.valor = epi.uso_ininterrupto
-                epi_tag.przValid.valor = epi.prazo_validade_certificado_epi
-                epi_tag.periodicTroca.valor = epi.periodicidade_troca
-                epi_tag.higienizacao.valor = epi.higienizacao
+            S2240.evento.infoExpRisco.agNoc.append(ag_noc)
 
-                fatrisc.epcEpi.epi.append(epi_tag)
 
-            S2240.evento.infoExpRisco.fatRisco.append(fatrisc)
+
+        # for fator_risco in \
+        #         self.hr_condicao_ambiente_trabalho_id.hr_fator_risco_ids:
+        #     fatrisc = pysped.esocial.leiaute.S2240_FatRisco_2()
+        #
+        #     fatrisc.codFatRis.valor = fator_risco.cod_fator_risco_id.codigo
+        #     if fator_risco.dsc_fat_risco:
+        #         fatrisc.dscFatRisc.valor = fator_risco.dsc_fat_risco
+        #     fatrisc.tpAval.valor = fator_risco.tp_avaliacao
+        #     if fator_risco.intensidade_concentracao:
+        #         fatrisc.intConc.valor = \
+        #             fator_risco.intensidade_concentracao
+        #     if fator_risco.limite_tolerancia:
+        #         fatrisc.limTol.valor = \
+        #             fator_risco.limite_tolerancia
+        #     if fator_risco.unidade_medida:
+        #         fatrisc.unMed.valor = \
+        #             fator_risco.unidade_medida
+        #     if fator_risco.tec_medicao:
+        #         fatrisc.tecMedicao.valor = \
+        #             fator_risco.tec_medicao
+        #     fatrisc.insalubridade.valor = \
+        #         fator_risco.insalubridade
+        #     fatrisc.periculosidade.valor = \
+        #         fator_risco.periculosidade
+        #     if self.hr_condicao_ambiente_trabalho_id.contract_id.sped_s2200_id and self.hr_condicao_ambiente_trabalho_id.contract_id.tp_reg_prev == '1' and not self.hr_condicao_ambiente_trabalho_id.contract_id.category_id.code == '104':
+        #         fatrisc.aposentEsp.valor = \
+        #             fator_risco.aposentadoria_especial
+        #     if self.hr_condicao_ambiente_trabalho_id.contract_id.sped_s2300_id and self.hr_condicao_ambiente_trabalho_id.contract_id.category_id.code in ['201', '202', '731', '734', '738']:
+        #         fatrisc.aposentEsp.valor = \
+        #             fator_risco.aposentadoria_especial
+        #
+        #     fatrisc.epcEpi.utilizEPC.valor = fator_risco.epc_id.utilizacao_epc
+        #     if fator_risco.epc_id.eficiencia_epc:
+        #         fatrisc.epcEpi.eficEpc.valor = fator_risco.epc_id.eficiencia_epc
+        #     fatrisc.epcEpi.utilizEPI.valor = fator_risco.epc_id.utilizacao_epi
+        #
+        #     for epi in fator_risco.epc_id.epi_ids:
+        #         epi_tag = pysped.esocial.leiaute.S2240_Epi_2()
+        #
+        #         epi_tag.caEPI.valor = epi.certificado_aprovacao
+        #         epi_tag.dscEPI.valor = epi.desc_epi
+        #         epi_tag.eficEpi.valor = epi.eficiencia_epi
+        #         epi_tag.medProtecao.valor = epi.med_protecao_coletiva
+        #         epi_tag.condFuncto.valor = epi.cond_funcionamento
+        #         epi_tag.usoInint.valor = epi.uso_ininterrupto
+        #         epi_tag.przValid.valor = epi.prazo_validade_certificado_epi
+        #         epi_tag.periodicTroca.valor = epi.periodicidade_troca
+        #         epi_tag.higienizacao.valor = epi.higienizacao
+        #
+        #         fatrisc.epcEpi.epi.append(epi_tag)
+        #
+        #     S2240.evento.infoExpRisco.fatRisco.append(fatrisc)
 
         for responsavel in self.hr_condicao_ambiente_trabalho_id.hr_responsavel_ambiente_ids:
             resp_reg = pysped.esocial.leiaute.S2240_RespReg_2()
 
             resp_reg.cpfResp.valor = responsavel.cpf_responsavel
-            resp_reg.nisResp.valor = responsavel.nis_responsavel
-            resp_reg.nmResp.valor = responsavel.nome
+            #resp_reg.nisResp.valor = responsavel.nis_responsavel
+            #resp_reg.nmResp.valor = responsavel.nome
             resp_reg.ideOC.valor = responsavel.identificacao_ordem_classe
             if responsavel.descricao_ordem_classe:
                 resp_reg.dscOC.valor = responsavel.descricao_ordem_classe
