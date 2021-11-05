@@ -165,7 +165,8 @@ class SpedEsocialCondicaoAmbienteTrabalho(models.Model, SpedRegistroIntermediari
             ag_noc.codAgNoc.valor = agente_nociso.cod_fator_risco_id.codigo
             if agente_nociso.dsc_fat_risco:
                 ag_noc.dscAgNoc.valor = agente_nociso.dsc_fat_risco
-            ag_noc.tpAval.valor = agente_nociso.tp_avaliacao
+            if agente_nociso.cod_fator_risco_id.codigo != "09.01.001":
+                ag_noc.tpAval.valor = agente_nociso.tp_avaliacao
             if agente_nociso.intensidade_concentracao:
                 ag_noc.intConc.valor = agente_nociso.intensidade_concentracao
             if agente_nociso.limite_tolerancia:
@@ -175,10 +176,11 @@ class SpedEsocialCondicaoAmbienteTrabalho(models.Model, SpedRegistroIntermediari
             if agente_nociso.tec_medicao:
                 ag_noc.tecMedicao.valor = agente_nociso.tec_medicao
 
-            ag_noc.epcEpi.utilizEPC.valor = agente_nociso.epc_id.utilizacao_epc
-            if agente_nociso.epc_id.eficiencia_epc:
-                ag_noc.epcEpi.eficEpc.valor = agente_nociso.epc_id.eficiencia_epc
-            ag_noc.epcEpi.utilizEPI.valor = agente_nociso.epc_id.utilizacao_epi
+            if agente_nociso.cod_fator_risco_id.codigo != "09.01.001":
+                ag_noc.epcEpi.utilizEPC.valor = agente_nociso.epc_id.utilizacao_epc
+                if agente_nociso.epc_id.eficiencia_epc:
+                    ag_noc.epcEpi.eficEpc.valor = agente_nociso.epc_id.eficiencia_epc
+                ag_noc.epcEpi.utilizEPI.valor = agente_nociso.epc_id.utilizacao_epi
 
             #arrumar codigo
             # for epi in agente_nociso.epc_id.epi_ids:
