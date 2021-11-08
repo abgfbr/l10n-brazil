@@ -165,24 +165,11 @@ class SpedEsocialFechamento(models.Model, SpedRegistroIntermediario):
         S1299.evento.ideEmpregador.tpInsc.valor = '1'
         S1299.evento.ideEmpregador.nrInsc.valor = limpa_formatacao(self.company_id.cnpj_cpf)[0:8]
 
-        # Popula ideRespInf (Responsável pelas Informações)
-        S1299.evento.ideRespInf.nmResp.valor = self.company_id.esocial_nm_ctt
-        S1299.evento.ideRespInf.cpfResp.valor = limpa_formatacao(self.company_id.esocial_cpf_ctt)
-        S1299.evento.ideRespInf.telefone.valor = limpa_formatacao(self.company_id.esocial_fone_fixo)
-        if self.company_id.esocial_email:
-            S1299.evento.ideRespInf.email.valor = self.company_id.esocial_email
-
         # Popula infoFech (Informações do Fechamento)
         S1299.evento.infoFech.evtRemun.valor = self.evt_remun
-        S1299.evento.infoFech.evtPgtos.valor = self.evt_pgtos
-        S1299.evento.infoFech.evtAqProd.valor = self.evt_aq_prod
         S1299.evento.infoFech.evtComProd.valor = self.evt_com_prod
         S1299.evento.infoFech.evtContratAvNP.valor = self.evt_contrat_av_np
         S1299.evento.infoFech.evtInfoComplPer.valor = self.evt_infocompl_per
-        if self.comp_sem_movto:
-            S1299.evento.infoFech.compSemMovto.valor = \
-                self.comp_sem_movto.code[3:7] + '-' + \
-                self.comp_sem_movto.code[0:2]
 
         return S1299, validacao
 
