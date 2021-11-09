@@ -126,8 +126,6 @@ class SpedEsocialSaudeTrabalhador(models.Model, SpedRegistroIntermediario):
 
         S2220.evento.ideVinculo.cpfTrab.valor = limpa_formatacao(
             self.hr_saude_trabalhador_id.contract_id.employee_id.cpf)
-        S2220.evento.ideVinculo.nisTrab.valor = limpa_formatacao(
-            self.hr_saude_trabalhador_id.contract_id.employee_id.pis_pasep)
         if self.hr_saude_trabalhador_id.contract_id.sped_s2200_id:
             S2220.evento.ideVinculo.matricula.valor = \
                 self.hr_saude_trabalhador_id.contract_id.matricula
@@ -155,12 +153,6 @@ class SpedEsocialSaudeTrabalhador(models.Model, SpedRegistroIntermediario):
 
             S2220.evento.exMedOcup.aso.exame.append(exame)
 
-        if self.hr_saude_trabalhador_id.cpf_medico:
-            S2220.evento.exMedOcup.aso.medico.cpfMed.valor = \
-                self.hr_saude_trabalhador_id.cpf_medico
-        if self.hr_saude_trabalhador_id.nis_medico:
-                    S2220.evento.exMedOcup.aso.medico.nisMed.valor = \
-                        self.hr_saude_trabalhador_id.nis_medico
         S2220.evento.exMedOcup.aso.medico.nmMed.valor = \
             self.hr_saude_trabalhador_id.nome_medico
         S2220.evento.exMedOcup.aso.medico.nrCRM.valor = \
