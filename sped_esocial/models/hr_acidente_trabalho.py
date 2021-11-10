@@ -34,6 +34,12 @@ TP_LOCAL = [
     ('9', 'Outros'),
 ]
 
+TIPO_ACIDENTE = [
+    ('1', u'Típico'),
+    ('2', u'Doença'),
+    ('3', u'Trajeto')
+]
+
 
 class HrComunicacaoAcidenteTrabalho(models.Model):
     _name = 'hr.comunicacao.acidente.trabalho'
@@ -75,9 +81,9 @@ class HrComunicacaoAcidenteTrabalho(models.Model):
         string=u'Data do Acidente',
         help=u'Nome Layout: dtAcid - Data do Acidente.',
     )
-    tipo_acidente = fields.Many2one(
+    tipo_acidente = fields.Selection(
         string=u'Tipo do Acidente',
-        comodel_name='sped.codificacao_acidente_trabalho',
+        selection=TIPO_ACIDENTE
     )
     horas_trab_antes_acidente = fields.Char(
         string=u'Horas Trabalhadas Antes',
@@ -247,12 +253,13 @@ class HrComunicacaoAcidenteTrabalho(models.Model):
         string='Intermediário do e-Social',
         comodel_name='sped.hr.comunicacao.acidente.trabalho',
     )
+
     @api.model
     def _compute_name(self):
         for record in self:
             record.name = '{} - {} - {}'.format(
-                record.data_acidente, record.contract_id.name,
-                record.tipo_acidente.nome
+                record.data_acidente, record.contract_id.nome_contrato,
+                dict(self._fields['tipo_acidente'].selection).get(record.tipo_acidente)
             )
 
     @api.multi
