@@ -126,8 +126,6 @@ class SpedEsocialComunicacaoAcidenteTrabalho(models.Model, SpedRegistroIntermedi
 
         S2210.evento.ideVinculo.cpfTrab.valor = limpa_formatacao(
             self.hr_comunicacao_acidente_trabalho_id.contract_id.employee_id.cpf)
-        S2210.evento.ideVinculo.nisTrab.valor = limpa_formatacao(
-            self.hr_comunicacao_acidente_trabalho_id.contract_id.employee_id.pis_pasep)
         if self.hr_comunicacao_acidente_trabalho_id.contract_id.sped_s2200_id:
             S2210.evento.ideVinculo.matricula.valor = \
                 self.hr_comunicacao_acidente_trabalho_id.contract_id.matricula
@@ -136,9 +134,10 @@ class SpedEsocialComunicacaoAcidenteTrabalho(models.Model, SpedRegistroIntermedi
                 self.hr_comunicacao_acidente_trabalho_id.contract_id.sped.categoria_trabalhador
 
         S2210.evento.cat.dtAcid.valor = self.hr_comunicacao_acidente_trabalho_id.data_acidente.split(' ')[0]
-        S2210.evento.cat.tpAcid.valor = self.hr_comunicacao_acidente_trabalho_id.tipo_acidente.codigo
+        S2210.evento.cat.tpAcid.valor = self.hr_comunicacao_acidente_trabalho_id.tipo_acidente
         S2210.evento.cat.hrAcid.valor = self.hr_comunicacao_acidente_trabalho_id.data_acidente.split(' ')[1].replace(':', '')[:4]
-        S2210.evento.cat.hrsTrabAntesAcid.valor = self.hr_comunicacao_acidente_trabalho_id.horas_trab_antes_acidente
+        if self.hr_comunicacao_acidente_trabalho_id.tipo_acidente == '1':
+            S2210.evento.cat.hrsTrabAntesAcid.valor = self.hr_comunicacao_acidente_trabalho_id.horas_trab_antes_acidente
         S2210.evento.cat.tpCat.valor = self.hr_comunicacao_acidente_trabalho_id.tipo_cat
         S2210.evento.cat.indCatObito.valor = self.hr_comunicacao_acidente_trabalho_id.ind_cat_obito
         if self.hr_comunicacao_acidente_trabalho_id.data_obito:
@@ -151,8 +150,6 @@ class SpedEsocialComunicacaoAcidenteTrabalho(models.Model, SpedRegistroIntermedi
         S2210.evento.cat.localAcidente.tpLocal.valor = self.hr_comunicacao_acidente_trabalho_id.tipo_local
         if self.hr_comunicacao_acidente_trabalho_id.desc_local:
             S2210.evento.cat.localAcidente.dscLocal.valor = self.hr_comunicacao_acidente_trabalho_id.desc_local
-        if self.hr_comunicacao_acidente_trabalho_id.cod_ambiente:
-            S2210.evento.cat.localAcidente.codAmb.valor = self.hr_comunicacao_acidente_trabalho_id.cod_ambiente
         S2210.evento.cat.localAcidente.tpLograd.valor = self.hr_comunicacao_acidente_trabalho_id.tipo_logradouro.codigo
         S2210.evento.cat.localAcidente.dscLograd.valor = self.hr_comunicacao_acidente_trabalho_id.desc_logradouro
         S2210.evento.cat.localAcidente.nrLograd.valor = self.hr_comunicacao_acidente_trabalho_id.num_logradouro
@@ -168,7 +165,7 @@ class SpedEsocialComunicacaoAcidenteTrabalho(models.Model, SpedRegistroIntermedi
             S2210.evento.cat.localAcidente.uf.valor = self.hr_comunicacao_acidente_trabalho_id.uf_id.code
         if self.hr_comunicacao_acidente_trabalho_id.country_id:
             S2210.evento.cat.localAcidente.pais.valor = self.hr_comunicacao_acidente_trabalho_id.country_id.bc_code
-        if self.hr_comunicacao_acidente_trabalho_id.cod_postal:
+        if self.hr_comunicacao_acidente_trabalho_id.tipo_local == '2' and self.hr_comunicacao_acidente_trabalho_id.cod_postal:
             S2210.evento.cat.localAcidente.codPostal.valor = self.hr_comunicacao_acidente_trabalho_id.cod_postal
 
         identificacao_local = pysped.esocial.leiaute.S2210_IdeLocalAcid_2()
@@ -198,8 +195,6 @@ class SpedEsocialComunicacaoAcidenteTrabalho(models.Model, SpedRegistroIntermedi
         for atestado in self.hr_comunicacao_acidente_trabalho_id.atestado_medico_id:
             atestado_tag = pysped.esocial.leiaute.S2210_Atestado_2()
 
-            if atestado.cod_cnes:
-                atestado_tag.codCNES.valor = atestado.cod_cnes
             atestado_tag.dtAtendimento.valor = atestado.data_atendimento.split(' ')[0]
             atestado_tag.hrAtendimento.valor = atestado.data_atendimento.split(' ')[1].replace(':', '')[:4]
             atestado_tag.indInternacao.valor = atestado.indicativo_internacao
@@ -221,12 +216,13 @@ class SpedEsocialComunicacaoAcidenteTrabalho(models.Model, SpedRegistroIntermedi
 
             S2210.evento.cat.atestado.append(atestado_tag)
 
-        if self.hr_comunicacao_acidente_trabalho_id.num_recibo_cat_original:
-            catOrigem = pysped.esocial.leiaute.S2210_CatOrigem_2()
+        if self.hr_comunicacao_acidente_trabalho_id != '3':
+            if self.hr_comunicacao_acidente_trabalho_id.num_recibo_cat_original:
+                catOrigem = pysped.esocial.leiaute.S2210_CatOrigem_2()
 
-            catOrigem.nrRecCatOrig.valor = self.hr_comunicacao_acidente_trabalho_id.num_recibo_cat_original
+                catOrigem.nrRecCatOrig.valor = self.hr_comunicacao_acidente_trabalho_id.num_recibo_cat_original
 
-            S2210.evento.cat.catOrigem.append(catOrigem)
+                S2210.evento.cat.catOrigem.append(catOrigem)
 
         return S2210, validacao
 
@@ -234,7 +230,7 @@ class SpedEsocialComunicacaoAcidenteTrabalho(models.Model, SpedRegistroIntermedi
     def retorno_sucesso(self, evento):
         self.ensure_one()
 
-        self.hr_turnos_trabalho_id.precisa_atualizar = False
+        self.hr_comunicacao_acidente_trabalho_id.precisa_atualizar = False
 
     @api.multi
     def transmitir(self):
