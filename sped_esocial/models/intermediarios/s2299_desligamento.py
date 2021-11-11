@@ -247,8 +247,6 @@ class SpedHrRescisao(models.Model, SpedRegistroIntermediario):
         employee_id = self.sped_hr_rescisao_id.contract_id.employee_id
         S2299.evento.ideVinculo.cpfTrab.valor = \
             limpa_formatacao(employee_id.cpf)
-        S2299.evento.ideVinculo.nisTrab.valor = \
-            limpa_formatacao(employee_id.pis_pasep)
 
         S2299.evento.ideVinculo.matricula.valor = \
             self.sped_hr_rescisao_id.contract_id.matricula
@@ -283,7 +281,6 @@ class SpedHrRescisao(models.Model, SpedRegistroIntermediario):
         if rescisao_id.contract_id.numero_processo:
             infoDeslig.nrProcTrab.valor = \
                 rescisao_id.contract_id.numero_processo
-        infoDeslig.indCumprParc.valor = '4'
         verba_rescisoria = pysped.esocial.leiaute.S2299_VerbasResc_2()
 
         ide_dm_dev = pysped.esocial.leiaute.S2299_DmDev_2()
@@ -320,6 +317,7 @@ class SpedHrRescisao(models.Model, SpedRegistroIntermediario):
 
                 if rubrica_line.code == 'DESCONTO_ADIANTAMENTO_13':
                     det_verbas = pysped.esocial.leiaute.S2299_DetVerbas_2()
+                    det_verbas.indApurIR.valor = '0'
                     det_verbas.codRubr.valor = 'ADIANTADOPROP13'
                     det_verbas.ideTabRubr.valor = 'ADPROP13'
                     det_verbas.vrRubr.valor = str(rubrica_line.total)
@@ -348,6 +346,7 @@ class SpedHrRescisao(models.Model, SpedRegistroIntermediario):
 
                         if rubrica_line.code == 'DESCONTO_ADIANTAMENTO_13':
                             det_verbas = pysped.esocial.leiaute.S2299_DetVerbas_2()
+                            det_verbas.indApurIR.valor = '0'
                             det_verbas.codRubr.valor = 'ADIANTADOPROP13'
                             det_verbas.ideTabRubr.valor = 'ADPROP13'
                             det_verbas.vrRubr.valor = str(rubrica_line.total)
@@ -356,6 +355,7 @@ class SpedHrRescisao(models.Model, SpedRegistroIntermediario):
 
                         if rubrica_line.code == 'ADIANTADOPROP13':
                             det_verbas = pysped.esocial.leiaute.S2299_DetVerbas_2()
+                            det_verbas.indApurIR.valor = '0'
                             det_verbas.codRubr.valor = \
                                 rubrica_line.salary_rule_id.codigo
                             det_verbas.ideTabRubr.valor = \
@@ -368,6 +368,7 @@ class SpedHrRescisao(models.Model, SpedRegistroIntermediario):
                             rubricas_convencao_coletiva[rubrica_line.id] = rubrica_line
                         else:
                             det_verbas = pysped.esocial.leiaute.S2299_DetVerbas_2()
+                            det_verbas.indApurIR.valor = '0'
                             det_verbas.codRubr.valor = \
                                 rubrica_line.salary_rule_id.codigo
                             det_verbas.ideTabRubr.valor = \
@@ -435,6 +436,7 @@ class SpedHrRescisao(models.Model, SpedRegistroIntermediario):
                         line].reference == periodo_data:
                         itens_remun = \
                             pysped.esocial.leiaute.S2299_DetVerbas_2()
+                        itens_remun.indApurIR.valor = '0'
                         itens_remun.codRubr.valor = \
                             rubricas_convencao_coletiva[
                                 line].salary_rule_id.codigo
