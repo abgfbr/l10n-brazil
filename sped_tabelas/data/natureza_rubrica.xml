@@ -969,6 +969,12 @@
         <field name="nome">Outros valores informativos</field>
         <field name="descricao">Outros valores informativos, que não sejam vencimentos nem descontos</field>
     </record>
+        
+    <record id="tab03_1806" model="sped.natureza_rubrica">
+        <field name="codigo">1806</field>
+        <field name="nome">Alimentação em ticket ou cartão, vinculada ao PAT</field>
+        <field name="descricao">Alimentação concedida sob a forma de ticket ou cartão, por empresa vinculada ao Programa de Alimentação do Trabalhador - PAT</field>
+    </record>
 
     </data>
 </openerp>
