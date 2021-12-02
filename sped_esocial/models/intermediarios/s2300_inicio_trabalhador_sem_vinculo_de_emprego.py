@@ -430,7 +430,8 @@ class SpedEsocialHrContrato(models.Model, SpedRegistroIntermediario):
         # InfoTSVInicio.InfoComplementares.CargoFuncao
         if self.hr_contract_id.category_id.code not in ['901','903','904','905']:
             CargoFuncao = pysped.esocial.leiaute.S2300_CargoFuncao_2()
-            CargoFuncao.codCargo.valor = self.hr_contract_id.job_id.codigo
+            #CargoFuncao.codCargo.valor = self.hr_contract_id.job_id.codigo
+            CargoFuncao.nmFuncao.valor = self.hr_contract_id.job_id.nome
             # CargoFuncao.codFuncao.valor = ''
             InfoComplementares.cargoFuncao.append(CargoFuncao)
 
