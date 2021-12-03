@@ -200,8 +200,8 @@ class SpedEsocialHrContrato(models.Model, SpedRegistroIntermediario):
         #
         S2300.evento.trabalhador.cpfTrab.valor = \
             limpa_formatacao(self.hr_contract_id.employee_id.cpf)
-        #S2300.evento.trabalhador.nisTrab.valor = \
-            #limpa_formatacao(self.hr_contract_id.employee_id.pis_pasep)
+        S2300.evento.trabalhador.nisTrab.valor = \
+            limpa_formatacao(self.hr_contract_id.employee_id.pis_pasep)
         S2300.evento.trabalhador.nmTrab.valor = \
             self.hr_contract_id.employee_id.name
 
@@ -431,7 +431,13 @@ class SpedEsocialHrContrato(models.Model, SpedRegistroIntermediario):
         if self.hr_contract_id.category_id.code not in ['901','903','904','905']:
             CargoFuncao = pysped.esocial.leiaute.S2300_CargoFuncao_2()
             #CargoFuncao.codCargo.valor = self.hr_contract_id.job_id.codigo
+            #alteracoes Eder - 03-12-2022
+            CargoFuncao.nmCargo.valor = self.hr_contract_id.job_id.sped_cargo_id.name
+            CargoFuncao.CBOCargo.valor = self.hr_contract_id.job_id.cbo_id.codigo
             CargoFuncao.nmFuncao.valor = self.hr_contract_id.job_id.name
+            CargoFuncao.CBOFuncao.valor = self.hr_contract_id.job_id.cbo_id.codigo
+
+
             # CargoFuncao.codFuncao.valor = ''
             InfoComplementares.cargoFuncao.append(CargoFuncao)
 
