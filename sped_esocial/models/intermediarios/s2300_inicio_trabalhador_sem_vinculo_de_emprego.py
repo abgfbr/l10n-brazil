@@ -418,6 +418,7 @@ class SpedEsocialHrContrato(models.Model, SpedRegistroIntermediario):
         data_inicio_esocial = data_inicio_esocial + relativedelta(months=3)
         cad_ini = 'S' if data_inicio_contrato < data_inicio_esocial else 'N'
         S2300.evento.infoTSVInicio.cadIni.valor = cad_ini
+        S2300.evento.infoTSVInicio.matricula.valor = self.hr_contract_id.matricula
 
         S2300.evento.infoTSVInicio.codCateg.valor = self.hr_contract_id.category_id.code
         S2300.evento.infoTSVInicio.dtInicio.valor = self.hr_contract_id.date_start
