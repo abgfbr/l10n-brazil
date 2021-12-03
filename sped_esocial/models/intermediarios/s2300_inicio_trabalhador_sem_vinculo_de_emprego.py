@@ -433,8 +433,8 @@ class SpedEsocialHrContrato(models.Model, SpedRegistroIntermediario):
             #CargoFuncao.codCargo.valor = self.hr_contract_id.job_id.codigo
             #alteracoes Eder - 03-12-2022
 
-            CargoFuncao.CBOCargo.valor = self.hr_contract_id.job_id.cbo_id.codigo
-            CargoFuncao.CBOFuncao.valor = self.hr_contract_id.job_id.cbo_id.codigo
+            CargoFuncao.CBOCargo.valor = self.hr_contract_id.job_id.cbo_id.code
+            CargoFuncao.CBOFuncao.valor = self.hr_contract_id.job_id.cbo_id.code
             CargoFuncao.nmCargo.valor = self.hr_contract_id.job_id.name
             CargoFuncao.nmFuncao.valor = self.hr_contract_id.job_id.name
 
