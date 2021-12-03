@@ -197,7 +197,7 @@ class SpedEsocialHrContrato(models.Model, SpedRegistroIntermediario):
 
         #
         # Popula "trabalhador" (Dados do Trabalhador)
-        # 
+        #
         S2300.evento.trabalhador.cpfTrab.valor = \
             limpa_formatacao(self.hr_contract_id.employee_id.cpf)
         S2300.evento.trabalhador.nisTrab.valor = \
@@ -432,11 +432,11 @@ class SpedEsocialHrContrato(models.Model, SpedRegistroIntermediario):
             CargoFuncao = pysped.esocial.leiaute.S2300_CargoFuncao_2()
             #CargoFuncao.codCargo.valor = self.hr_contract_id.job_id.codigo
             #alteracoes Eder - 03-12-2022
-            CargoFuncao.nmCargo.valor = self.hr_contract_id.job_id.sped_cargo_id.name
-            CargoFuncao.CBOCargo.valor = self.hr_contract_id.job_id.cbo_id.codigo
-            CargoFuncao.nmFuncao.valor = self.hr_contract_id.job_id.name
-            CargoFuncao.CBOFuncao.valor = self.hr_contract_id.job_id.cbo_id.codigo
 
+            CargoFuncao.CBOCargo.valor = self.hr_contract_id.job_id.cbo_id.codigo
+            CargoFuncao.CBOFuncao.valor = self.hr_contract_id.job_id.cbo_id.codigo
+            CargoFuncao.nmCargo.valor = self.hr_contract_id.job_id.name
+            CargoFuncao.nmFuncao.valor = self.hr_contract_id.job_id.name
 
             # CargoFuncao.codFuncao.valor = ''
             InfoComplementares.cargoFuncao.append(CargoFuncao)
