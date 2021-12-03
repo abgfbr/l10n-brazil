@@ -200,8 +200,8 @@ class SpedEsocialHrContrato(models.Model, SpedRegistroIntermediario):
         #
         S2300.evento.trabalhador.cpfTrab.valor = \
             limpa_formatacao(self.hr_contract_id.employee_id.cpf)
-        S2300.evento.trabalhador.nisTrab.valor = \
-            limpa_formatacao(self.hr_contract_id.employee_id.pis_pasep)
+        #S2300.evento.trabalhador.nisTrab.valor = \
+            #limpa_formatacao(self.hr_contract_id.employee_id.pis_pasep)
         S2300.evento.trabalhador.nmTrab.valor = \
             self.hr_contract_id.employee_id.name
 
