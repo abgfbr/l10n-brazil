@@ -197,7 +197,7 @@ class SpedEsocialHrContrato(models.Model, SpedRegistroIntermediario):
 
         #
         # Popula "trabalhador" (Dados do Trabalhador)
-        #
+        # 
         S2300.evento.trabalhador.cpfTrab.valor = \
             limpa_formatacao(self.hr_contract_id.employee_id.cpf)
         S2300.evento.trabalhador.nisTrab.valor = \
