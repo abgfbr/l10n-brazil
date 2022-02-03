@@ -193,8 +193,6 @@ class SpedAlteracaoContrato(models.Model, SpedRegistroIntermediario):
         # Popula ideVinculo (Identificador do Trabalhador e do Vínculo)
         S2206.evento.ideVinculo.cpfTrab.valor = limpa_formatacao(
             contrato_id.employee_id.cpf)
-        S2206.evento.ideVinculo.nisTrab.valor = limpa_formatacao(
-            contrato_id.employee_id.pis_pasep)
         S2206.evento.ideVinculo.matricula.valor = contrato_id.matricula
 
         # Popula altContratual (Informações do Contrato de Trabalho)
@@ -205,7 +203,6 @@ class SpedAlteracaoContrato(models.Model, SpedRegistroIntermediario):
         # Popula vinculo (Informações do vínculo trabalhista)
         vinculo = pysped.esocial.leiaute.S2206_Vinculo_2()
         vinculo.tpRegPrev.valor = contrato_id.tp_reg_prev
-        alteracao_contratual.vinculo.append(vinculo)
 
         # Popula infoRegimeTrab (Informações do regime trabalhista)
         info_celetista = pysped.esocial.leiaute.S2206_InfoCeletista_2()
@@ -218,11 +215,13 @@ class SpedAlteracaoContrato(models.Model, SpedRegistroIntermediario):
         info_regime_trab = pysped.esocial.leiaute.S2206_InfoRegimeTrab_2()
         info_regime_trab.infoCeletista.append(info_celetista)
 
-        alteracao_contratual.infoRegimeTrab.append(info_regime_trab)
+        vinculo.infoRegimeTrab.append(info_regime_trab)
 
         # Popula infoContrato (Informações do Contrato de Trabalho)
-        info_contrato = alteracao_contratual.infoContrato
-        info_contrato.codCargo.valor = contrato_id.job_id.codigo
+        info_contrato = vinculo.infoContrato
+        info_contrato.nmCargo.valor = contrato_id.job_id.name
+        info_contrato.CBOCargo.valor = contrato_id.job_id.cbo_id.code
+        info_contrato.acumCargo.valor = 'N'
 
         info_contrato.codCateg.valor = contrato_id.category_id.code
 
@@ -251,26 +250,14 @@ class SpedAlteracaoContrato(models.Model, SpedRegistroIntermediario):
         # Contratual do Trabalhador)
         horario_contratual = pysped.esocial.leiaute.S2206_HorContratual_2()
         horario_contratual.qtdHrsSem.valor = int(contrato_id.weekly_hours)
-        horario_contratual.tpJornada.valor = contrato_id.tp_jornada
+        horario_contratual.tpJornada.valor = '4'
+        horario_contratual.dscJorn.valor = contrato_id.dsc_tp_jorn
+        horario_contratual.horNoturno.valor = 'N'
         horario_contratual.tmpParc.valor = contrato_id.tmp_parc
-
-        for horario in contrato_id.working_hours.attendance_ids:
-            horario_dia_semana = pysped.esocial.leiaute.S2206_Horario_2()
-            horario_dia_semana.dia.valor = horario.diadasemana
-            horario_dia_semana.codHorContrat.valor = \
-                horario.turno_id.cod_hor_contrat
-
-            horario_contratual.horario.append(horario_dia_semana)
 
         info_contrato.horContratual.append(horario_contratual)
 
-        if contrato_id.partner_union:
-            filiacao_sindical = \
-                pysped.esocial.leiaute.S2206_FiliacaoSindical_2()
-            filiacao_sindical.cnpjSindTrab.valor = limpa_formatacao(
-                contrato_id.partner_union.cnpj_cpf)
-
-            info_contrato.filiacaoSindical.append(filiacao_sindical)
+        alteracao_contratual.vinculo.append(vinculo)
 
         return S2206, validacao
 
