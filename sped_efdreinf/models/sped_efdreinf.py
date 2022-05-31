@@ -549,3 +549,12 @@ class SpedEfdReinf(models.Model):
 
         # Recalcula os registros
         self.compute_registro_ids()
+
+    @api.multi
+    def enviar_fechamento(self):
+        self.sped_r2099_registro.sped_inclusao.transmitir_lote()
+
+    @api.multi
+    def consultar_fechamento(self):
+        self.sped_r2099_registro.sped_inclusao.consulta_lote()
+
