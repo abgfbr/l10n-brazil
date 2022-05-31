@@ -315,7 +315,7 @@ class SpedHrRescisao(models.Model, SpedRegistroIntermediario):
                 #
                 total = rubrica_line.total
 
-                if rubrica_line.code == 'DESCONTO_ADIANTAMENTO_13':
+                if rubrica_line.code == 'DESCONTO_ADIANTAMENTO_13' and rubrica_line.total > 0:
                     det_verbas = pysped.esocial.leiaute.S2299_DetVerbas_2()
                     det_verbas.indApurIR.valor = '0'
                     det_verbas.codRubr.valor = 'ADIANTADOPROP13'

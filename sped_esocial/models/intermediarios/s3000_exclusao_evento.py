@@ -115,7 +115,7 @@ class SpedEsocialExclusao(models.Model, SpedRegistroIntermediario):
             ide_trabalhador = pysped.esocial.leiaute.S3000_IdeTrabalhador_2()
             trabalhador = self.sped_registro_id.origem.retorna_trabalhador()
             ide_trabalhador.cpfTrab.valor = limpa_formatacao(trabalhador.cpf)
-            if self.sped_registro_id.registro not in ['S-1210', 'S-2190']:
+            if self.sped_registro_id.registro not in ['S-1210', 'S-2190', 'S-2206']:
                 ide_trabalhador.nisTrab.valor = limpa_formatacao(trabalhador.pis_pasep)
             S3000.evento.infoExclusao.ideTrabalhador.append(ide_trabalhador)
 

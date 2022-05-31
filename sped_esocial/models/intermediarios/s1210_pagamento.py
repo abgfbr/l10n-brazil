@@ -206,7 +206,6 @@ class SpedEsocialPagamento(models.Model, SpedRegistroIntermediario):
 
         data_pagamento = ''
         for payslip in folhas_ordenadas or self.payslip_autonomo_ids:
-
             info_pgto = pysped.esocial.leiaute.S1210_InfoPgto_2()
 
             # Identifica o tpPgto dependendo do campo tipo_de_folha e tp_reg_prev
@@ -227,8 +226,7 @@ class SpedEsocialPagamento(models.Model, SpedRegistroIntermediario):
                     tipo = '3'
             if payslip.contract_id.tp_reg_prev == '2':
                 tipo = '5'
-            if payslip.tipo_de_folha == 'ferias':
-                tipo = '7'
+            
             info_pgto.tpPgto.valor = tipo
 
             # Esocial recusa 2 pagamentos no mesmo dia do mesmo tipo

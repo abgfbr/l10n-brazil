@@ -142,9 +142,6 @@ class SpedEmpregador(models.Model, SpedRegistroIntermediario):
         S2205.evento.alteracao.dtAlteracao.valor = fields.Datetime.now()
 
         dados_trabalhador = S2205.evento.alteracao.dadosTrabalhador
-        dados_trabalhador.nisTrab.valor = limpa_formatacao(
-            empregado_id.pis_pasep
-        )
         dados_trabalhador.nmTrab.valor = empregado_id.name
         if empregado_id.gender == 'male':
             dados_trabalhador.sexo.valor = 'M'
@@ -155,21 +152,7 @@ class SpedEmpregador(models.Model, SpedRegistroIntermediario):
             dados_trabalhador.estCiv.valor = ESTADO_CIVIL[empregado_id.marital]
         dados_trabalhador.grauInstr.valor = \
             empregado_id.educational_attainment.code
-        
-        # Popula nascimento (Informações do nascimento)
-        dados_trabalhador.nascimento.dtNascto.valor = empregado_id.birthday
-        if empregado_id.naturalidade:
-            dados_trabalhador.nascimento.codMunic.valor = \
-                empregado_id.naturalidade.state_id.ibge_code + \
-                empregado_id.naturalidade.ibge_code
-            dados_trabalhador.nascimento.uf.valor = \
-                empregado_id.naturalidade.state_id.code
-        dados_trabalhador.nascimento.paisNascto.valor = \
-            empregado_id.pais_nascto_id.codigo
-        dados_trabalhador.nascimento.paisNac.valor = \
-            empregado_id.pais_nac_id.codigo
-        dados_trabalhador.nascimento.nmMae.valor = empregado_id.mother_name
-        dados_trabalhador.nascimento.nmPai.valor = empregado_id.father_name
+        dados_trabalhador.paisNac.valor = 105
 
         # Popula documentos (Informações dos documentos pessoais)
         if empregado_id.ctps:
@@ -177,14 +160,14 @@ class SpedEmpregador(models.Model, SpedRegistroIntermediario):
             ctps.nrCtps.valor = empregado_id.ctps
             ctps.serieCtps.valor = empregado_id.ctps_series
             ctps.ufCtps.valor = empregado_id.ctps_uf_id.code
-            dados_trabalhador.documentos.CTPS.append(ctps)
+            
 
         # Popula RIC (Registro de Identificação Civil)
         rg = pysped.esocial.leiaute.S2205_RG_2()
         rg.nrRg.valor = empregado_id.rg
         rg.orgaoEmissor.valor = empregado_id.organ_exp
         rg.dtExped.valor = empregado_id.rg_emission
-        dados_trabalhador.documentos.RIC.append(rg)
+        
 
         # Popula CNH (Carteira Nacional de Habilitação)
         if self.hr_employee_id.driver_license:
@@ -197,7 +180,7 @@ class SpedEmpregador(models.Model, SpedRegistroIntermediario):
             if self.hr_employee_id.cnh_dt_pri_hab:
                 CNH.dtPriHab.valor = self.hr_employee_id.cnh_dt_pri_hab
             CNH.categoriaCnh.valor = self.hr_employee_id.driver_categ
-            dados_trabalhador.documentos.CNH.append(CNH)
+            
 
         # Popula endereco (Informações do endereço do Trabalhador)
         endereco_brasil = dados_trabalhador.endereco.brasil

@@ -143,6 +143,19 @@ class SpedEsocialRemuneracao(models.Model, SpedRegistroIntermediario):
             sped_registro = self.env['sped.registro'].create(values)
             self.sped_registro = sped_registro
 
+    def verificar_rubricas_ferias_holerite_ferias(self, rubrica):
+        rubricas_ferias = [
+            self.env['hr.salary.rule'].search([('code', '=', 'BASE_INSS_COMPETENCIA_ATUAL')]).id,
+            self.env['hr.salary.rule'].search([('code', '=', 'INSS_COMPETENCIA_ATUAL')]).id,
+            self.env['hr.salary.rule'].search([('code', '=', 'ADIANTAMENTO_13')]).id,
+        ]
+
+        if rubrica.id in rubricas_ferias:
+            return True
+
+        return False
+
+
     def verificar_rubricas_ferias_holerite(self, rubrica):
         rubricas_ferias = [
             self.env.ref('sped_tabelas.tab03_1020').id,
@@ -276,8 +289,7 @@ class SpedEsocialRemuneracao(models.Model, SpedRegistroIntermediario):
         remuneracoes_ids = self.payslip_ids or self.payslip_autonomo_ids
         for payslip in remuneracoes_ids:
             rubricas_convencao_coletiva = {}
-            if payslip.tipo_de_folha == 'ferias':
-                continue
+            
             dm_dev = pysped.esocial.leiaute.S1200_DmDev_2()
             dm_dev.ideDmDev.valor = payslip.number
             dm_dev.codCateg.valor = payslip.contract_id.category_id.code  # TODO Integrar com a tabela 01 do e-Social
@@ -293,7 +305,7 @@ class SpedEsocialRemuneracao(models.Model, SpedRegistroIntermediario):
                 remun_per_apur = pysped.esocial.leiaute.S1200_RemunPerApur_2()
 
                 # Só preencher matricula de EMPREGADO com vinculo
-                if payslip.contract_id.evento_esocial == 's2200':
+                if payslip.contract_id.evento_esocial == 's2200' or payslip.contract_id.id == 259:
                     remun_per_apur.matricula.valor = payslip.contract_id.matricula
 
             # Somente para quando a empresa for do Simples
@@ -312,14 +324,19 @@ class SpedEsocialRemuneracao(models.Model, SpedRegistroIntermediario):
                         self.validar_referencia_periodo_linha(
                             line, periodo_apuracao, periodo_apuracao_inverso)
 
-                    if not eh_periodo:
+                    if payslip.tipo_de_folha == 'ferias':
+                        if self.verificar_rubricas_ferias_holerite_ferias(
+                                line.salary_rule_id):
+                            continue
+
+                    if not eh_periodo and not payslip.tipo_de_folha == 'ferias':
                         if self.verificar_rubricas_ferias_holerite(
                                 line.salary_rule_id):
                             continue
 
                     if line.salary_rule_id.cod_inc_irrf_calculado not in \
                             ['31', '32', '33', '34', '35', '51', '52', '53', '54', '55', '81', '82', '83']:
-                        if line.salary_rule_id.cod_inc_irrf_calculado == '13' \
+                        if not payslip.tipo_de_folha == 'ferias' and  line.salary_rule_id.cod_inc_irrf_calculado == '13' \
                                 and not eh_periodo:
                             continue
 
@@ -351,6 +368,11 @@ class SpedEsocialRemuneracao(models.Model, SpedRegistroIntermediario):
                                 itens_remun.indApurIR.valor = 0
                                 itens_remun.vrRubr.valor = formata_valor(line.total)
                                 remun_per_apur.itensRemun.append(itens_remun)
+
+            if payslip.contract_id.sped_s2300_id and not payslip.contract_id.category_id.code in ['723'] and  payslip.contract_id.labor_bond_type_id.id != 15:
+                info_compl_cont = pysped.esocial.leiaute.S1200_InfoComplCont_2()
+                info_compl_cont.codCBO.valor = payslip.contract_id.job_id.cbo_id.code
+                dm_dev.infoComplCont.append(info_compl_cont)
 
             # # Popula dmDev.infoPerApur.ideEstabLot.remunPerApur.infoSaudeColet  # TODO Quando tivermos plano de saúde
             # #                                                                   # coletívo
