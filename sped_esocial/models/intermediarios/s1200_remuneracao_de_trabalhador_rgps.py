@@ -288,6 +288,8 @@ class SpedEsocialRemuneracao(models.Model, SpedRegistroIntermediario):
 
         remuneracoes_ids = self.payslip_ids or self.payslip_autonomo_ids
         for payslip in remuneracoes_ids:
+            if payslip.tipo_de_folha == 'decimo_terceiro' and payslip.mes_do_ano < 12:
+                continue
             rubricas_convencao_coletiva = {}
             
             dm_dev = pysped.esocial.leiaute.S1200_DmDev_2()
@@ -368,6 +370,22 @@ class SpedEsocialRemuneracao(models.Model, SpedRegistroIntermediario):
                                 itens_remun.indApurIR.valor = 0
                                 itens_remun.vrRubr.valor = formata_valor(line.total)
                                 remun_per_apur.itensRemun.append(itens_remun)
+
+            if payslip.tipo_de_folha == 'normal' and payslip.mes_do_ano < 12:
+                holerite_adiantamento_13 = self.payslip_ids.filtered(lambda payslip: payslip.tipo_de_folha == 'decimo_terceiro')
+                if holerite_adiantamento_13:
+                    adiantamento_13 = holerite_adiantamento_13.line_resume_ids.filtered(lambda line: line.code == u'PRIMEIRA_PARCELA_13')
+                    if adiantamento_13:
+                        itens_remun = pysped.esocial.leiaute.S1200_ItensRemun_2()
+                        itens_remun.codRubr.valor = adiantamento_13.salary_rule_id.codigo
+                        itens_remun.ideTabRubr.valor = adiantamento_13.salary_rule_id.identificador
+                        if adiantamento_13.quantity and float(adiantamento_13.quantity) != 1:
+                            itens_remun.qtdRubr.valor = float(adiantamento_13.quantity)
+                        if adiantamento_13.rate and line.rate != 100:
+                            itens_remun.fatorRubr.valor = adiantamento_13.rate
+                        itens_remun.indApurIR.valor = 0
+                        itens_remun.vrRubr.valor = formata_valor(adiantamento_13.total)
+                        remun_per_apur.itensRemun.append(itens_remun)
 
             if payslip.contract_id.sped_s2300_id and not payslip.contract_id.category_id.code in ['723'] and  payslip.contract_id.labor_bond_type_id.id != 15:
                 info_compl_cont = pysped.esocial.leiaute.S1200_InfoComplCont_2()

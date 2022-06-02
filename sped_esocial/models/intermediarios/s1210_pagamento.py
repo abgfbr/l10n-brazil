@@ -194,8 +194,18 @@ class SpedEsocialPagamento(models.Model, SpedRegistroIntermediario):
              for tipo in  ['decimo_terceiro', 'rescisao']]
         )
 
-        for payslip in self.payslip_ids:
+        adiantamento_13_total = 0.00
 
+        for payslip in self.payslip_ids:
+            if payslip.tipo_de_folha == 'decimo_terceiro' and payslip.mes_do_ano < 12:
+                holerite_adiantamento_13 = self.payslip_ids.filtered(
+                    lambda payslip: payslip.tipo_de_folha == 'decimo_terceiro')
+                if holerite_adiantamento_13:
+                    adiantamento_13 = holerite_adiantamento_13.line_resume_ids.filtered(
+                        lambda line: line.code == u'PRIMEIRA_PARCELA_13')
+                    if adiantamento_13:
+                        adiantamento_13_total = adiantamento_13.total
+                continue
             if pagamento_obsoleto and payslip.tipo_de_folha == 'decimo_terceiro':
                 continue
 
@@ -250,7 +260,7 @@ class SpedEsocialPagamento(models.Model, SpedRegistroIntermediario):
             else:
                 info_pgto.perRef.valor = self.periodo_id.code[3:7]
             info_pgto.ideDmDev.valor = payslip.number
-            info_pgto.vrLiq.valor = formata_valor(payslip.total_folha)
+            info_pgto.vrLiq.valor = formata_valor(payslip.total_folha + adiantamento_13_total)
             # # Se nao for férias
             # if tipo != '7':
             #     # Popula detPgtoFl
