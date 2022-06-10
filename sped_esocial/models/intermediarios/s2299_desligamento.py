@@ -328,7 +328,17 @@ class SpedHrRescisao(models.Model, SpedRegistroIntermediario):
                     if (prop13_value - adiantamento_13_value) <= 0:
                         continue
                     else:
+                        salario = rescisao_id.line_resume_ids.filtered(
+                            lambda line: line.code == u'SALARIO')
+                        horas_nao_trabalhadas = rescisao_id.line_resume_ids.filtered(
+                            lambda line: line.code == u'HORAS_NAO_TRABALHADAS')
+
                         total -= adiantamento_13_value
+
+                        if horas_nao_trabalhadas:
+                            valor_devido = salario.total - horas_nao_trabalhadas.total
+                            if valor_devido < 0:
+                                total -= abs(valor_devido)
 
                 data_apuracao, eh_periodo = \
                     self.validar_referencia_periodo_linha(
