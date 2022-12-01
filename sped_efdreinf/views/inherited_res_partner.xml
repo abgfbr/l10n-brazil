@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<openerp>
+    <data>
+
+        <record model="ir.ui.view" id="sped_res_partner">
+            <field name="name">Adiciona EFD/Reinf na Empresa Parceira</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="l10n_br_account.l10n_br_account_view_partner_form" />
+            <field name="arch" type="xml">
+                <field name="suframa" position="after">
+                    <field name="reinf_natureza_remuneracao_id"/>
+                </field>
+            </field>
+        </record>
+
+    </data>
+</openerp>

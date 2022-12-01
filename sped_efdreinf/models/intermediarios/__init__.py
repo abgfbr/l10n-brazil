@@ -5,3 +5,5 @@
 from . import r1000_informacoes_contribuinte
 from . import r2098_reabertura_eventos_periodicos
 from . import r2099_fechamento_eventos_periodicos
+from . import r4099_abertura_eventos_4000
+from . import r4099_fechamento_eventos_4000

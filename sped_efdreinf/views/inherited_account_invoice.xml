@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<openerp>
+    <data>
+
+        <record model="ir.ui.view" id="sped_account_invoice">
+            <field name="name">Adiciona EFD/Reinf na Nota Fiscal</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="l10n_br_account_product.l10n_br_account_product_nfe_form" />
+            <field name="arch" type="xml">
+                <field name="type_nf_payment" position="after">
+                    <field name="data_pagamento" required="1"/>
+                </field>
+            </field>
+        </record>
+
+    </data>
+</openerp>

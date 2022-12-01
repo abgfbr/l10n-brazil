@@ -52,6 +52,11 @@ class SpedEfdReinf(models.Model):
         comodel_name='sped.efdreinf.estabelecimento',
         inverse_name='efdreinf_id',
     )
+    estabelecimento_4020_ids = fields.One2many(
+        string='Prestador(es) de Serviço 4020',
+        comodel_name='sped.efdreinf.estabelecimento.4020',
+        inverse_name='efdreinf_id',
+    )
     situacao = fields.Selection(
         string='Situação',
         selection=[
@@ -276,6 +281,40 @@ class SpedEfdReinf(models.Model):
         readonly=True,
     )
 
+    # Registro R-4099
+    sped_r4099_abertura_registro = fields.Many2one(
+        string='Registro R-4099',
+        comodel_name='sped.efdreinf.abertura.eventos.4000',
+    )
+    situacao_abertura_r4099 = fields.Selection(
+        string='Situação R-4099 Abertura',
+        selection=[
+            ('1', 'Pendente'),
+            ('2', 'Transmitida'),
+            ('3', 'Erro(s)'),
+            ('4', 'Sucesso'),
+            ('5', 'Precisa Retificar'),
+        ],
+        related='sped_r4099_abertura_registro.situacao',
+        readonly=True,
+    )
+    sped_r4099_registro = fields.Many2one(
+        string='Registro R-4099',
+        comodel_name='sped.efdreinf.fechamento.eventos.4000',
+    )
+    situacao_r4099 = fields.Selection(
+        string='Situação R-4099',
+        selection=[
+            ('1', 'Pendente'),
+            ('2', 'Transmitida'),
+            ('3', 'Erro(s)'),
+            ('4', 'Sucesso'),
+            ('5', 'Precisa Retificar'),
+        ],
+        related='sped_r4099_registro.situacao',
+        readonly=True,
+    )
+
     @api.multi
     def unlink(self):
         for efdreinf in self:
@@ -364,8 +403,18 @@ class SpedEfdReinf(models.Model):
 
         # Limpar dados anteriores que não tenham registro SPED
         for estabelecimento in self.estabelecimento_ids:
-            if not estabelecimento.sped_r2010_registro:
+            if not estabelecimento.sped_r2010_registro or \
+                    estabelecimento.sped_r2010_registro.situacao not in \
+                    ['4', '5', '6']:
+                estabelecimento.sped_r2010_registro.unlink()
                 estabelecimento.unlink()
+
+        for estabelecimento_4020 in self.estabelecimento_4020_ids:
+            if not estabelecimento_4020.sped_r4020_registro or \
+                    estabelecimento_4020.sped_r4020_registro.situacao not in \
+                    ['4', '5', '6']:
+                estabelecimento_4020.sped_r4020_registro.unlink()
+                estabelecimento_4020.unlink()
 
         empresas = self.env['res.company'].search([])
 
@@ -408,6 +457,38 @@ class SpedEfdReinf(models.Model):
                         }
                         estabelecimento_id = self.env['sped.efdreinf.estabelecimento'].create(vals)
                         self.estabelecimento_ids = [(4, estabelecimento_id.id)]
+
+                    estabelecimento_4020_id = self.env[
+                        'sped.efdreinf.estabelecimento.4020'].search(domain)
+
+                    # Cria o registro 4020 se ele não existir
+                    if not estabelecimento_4020_id:
+                        vals = {
+                            'efdreinf_id': self.id,
+                            'estabelecimento_id': empresa.id,
+                            'prestador_id': prestador_id.id,
+                            'periodo_id': self.periodo_id.id,
+                        }
+                        estabelecimento_4020_id = self.env[
+                            'sped.efdreinf.estabelecimento.4020'].create(vals)
+                        self.estabelecimento_4020_ids = [
+                            (4, estabelecimento_4020_id.id)]
+
+                    nf_domain_400 = [
+                        ('estabelecimento_id', '=', estabelecimento_4020_id.id),
+                        ('nfs_id', "=", nf.id)
+                    ]
+                    nf_estabelecimento_4020_id = \
+                        self.env['sped.efdreinf.nfs.4020'].search(nf_domain_400)
+                    if not nf_estabelecimento_4020_id:
+                        vals = {
+                            'estabelecimento_id': estabelecimento_4020_id.id,
+                            'nfs_id': nf.id
+                        }
+                        nf_estabelecimento_4020_id = \
+                            self.env['sped.efdreinf.nfs.4020'].create(vals)
+                        estabelecimento_4020_id.nfs_ids = \
+                            [(4, nf_estabelecimento_4020_id.id)]
 
     def get_fornecedores_notas_entrada(self, data_hora_final,
                                        data_hora_inicial):
@@ -467,6 +548,44 @@ class SpedEfdReinf(models.Model):
             self.sped_r2099_registro.criar_registro()
 
     @api.multi
+    def criar_r4099(self):
+        self.ensure_one()
+
+        for efdreinf in self:
+            # Se o registro intermediário do R-4099 não existe, criá-lo
+            if not self.sped_r4099_registro:
+                self.sped_r4099_registro = \
+                    self.env[
+                        'sped.efdreinf.fechamento.eventos.4000'].create({
+                        'company_id': self.company_id.id,
+                        'periodo_id': self.periodo_id.id,
+                        'reinf_competencia_id': self.id,
+                    })
+
+            # Processa cada tipo de operação do R-4099
+            # O que realmente precisará ser feito é tratado no método do registro intermediário
+            self.sped_r4099_registro.criar_registro()
+
+    @api.multi
+    def criar_4099_abertura(self):
+        self.ensure_one()
+
+        for efdreinf in self:
+            # Se o registro intermediário do R-4099 não existe, criá-lo
+            if not self.sped_r4099_abertura_registro:
+                self.sped_r4099_abertura_registro = \
+                    self.env[
+                        'sped.efdreinf.abertura.eventos.4000'].create({
+                        'company_id': self.company_id.id,
+                        'periodo_id': self.periodo_id.id,
+                        'reinf_competencia_id': self.id,
+                    })
+
+            # Processa cada tipo de operação do R-4099
+            # O que realmente precisará ser feito é tratado no método do registro intermediário
+            self.sped_r4099_abertura_registro.criar_registro()
+
+    @api.multi
     def criar_r2098(self):
         self.ensure_one()
 
@@ -487,6 +606,31 @@ class SpedEfdReinf(models.Model):
             self.sped_r2098_registro.criar_registro()
 
     @api.multi
+    def criar_r4020(self):
+        self.ensure_one()
+
+        for estabelecimento in self.estabelecimento_4020_ids:
+            if not estabelecimento.sped_r4020_registro:
+                values = {
+                    'tipo': 'efdreinf',
+                    'registro': 'R-4020',
+                    'ambiente': self.company_id.tpAmb,
+                    'company_id': self.company_id.id,
+                    'evento': 'evtRetPJ',
+                    'origem': (
+                            'sped.efdreinf.estabelecimento.4020,%s' %
+                            estabelecimento.id
+                    ),
+                    'origem_intermediario': (
+                            'sped.efdreinf.estabelecimento.4020,%s' %
+                            estabelecimento.id
+                    ),
+                }
+
+                sped_r4020_registro = self.env['sped.registro'].create(values)
+                estabelecimento.sped_r4020_registro = sped_r4020_registro
+
+    @api.multi
     def executa_analise(self):
         for efdreinf in self:
 
@@ -494,6 +638,7 @@ class SpedEfdReinf(models.Model):
             efdreinf.importar_movimento()
             efdreinf.estabelecimento_ids.calcular_valores_impostos()
             efdreinf.criar_r2010()
+            efdreinf.criar_r4020()
 
             # Calcula os registros para transmitir
             efdreinf.compute_registro_ids()
@@ -549,6 +694,25 @@ class SpedEfdReinf(models.Model):
 
         # Recalcula os registros
         self.compute_registro_ids()
+
+    @api.multi
+    def importar_fechamentos_4000(self):
+        self.ensure_one()
+
+        # Verifica se o registro R-2099 já existe, cria ou atualiza
+        if not self.sped_r4099_registro:
+            self.criar_r4099()
+
+        # if self.sped_r4098_registro.sped_inclusao:
+        #     self.sped_r4098_registro.sped_inclusao = False
+
+    @api.multi
+    def importar_reabertura_4000(self):
+        self.ensure_one()
+
+        # Verifica se o registro R-2099 já existe, cria ou atualiza
+        if not self.sped_r4099_abertura_registro:
+            self.criar_4099_abertura()
 
     @api.multi
     def enviar_fechamento(self):
