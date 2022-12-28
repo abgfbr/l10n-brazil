@@ -204,7 +204,7 @@ class SpedEfdReinfEstab4020(models.Model, SpedRegistroIntermediario):
 
         R4020.evento.ideEstab.ideBenef.cnpjBenef.valor = limpa_formatacao(
             self.prestador_id.cnpj_cpf)
-        R4020.evento.ideEstab.ideBenef.isenImun = '1'
+        R4020.evento.ideEstab.ideBenef.isenImun.valor = 1
 
         R4020_idePgto = pysped.efdreinf.leiaute.R4020_IdePgto_2()
         R4020_idePgto.natRend.valor = \
@@ -220,6 +220,8 @@ class SpedEfdReinfEstab4020(models.Model, SpedRegistroIntermediario):
             R4020_infoPgto.retencoes.append(R4020_retencoes)
 
             R4020_idePgto.infoPgto.append(R4020_infoPgto)
+
+        R4020.evento.ideEstab.ideBenef.idePgto.append(R4020_idePgto)
 
         return R4020, validacao
 
