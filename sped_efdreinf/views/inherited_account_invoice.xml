@@ -8,7 +8,7 @@
             <field name="inherit_id" ref="l10n_br_account_product.l10n_br_account_product_nfe_form" />
             <field name="arch" type="xml">
                 <field name="type_nf_payment" position="after">
-                    <field name="data_pagamento" required="1"/>
+                    <field name="data_pagamento" attrs="{'required': [('type', '=', 'in_invoice')]}"/>
                 </field>
             </field>
         </record>
