@@ -717,7 +717,10 @@ class SpedEsocial(models.Model):
                 # Se algum contrato tiver data de término menor que a data inicial do período, tira ele
                 # adiciona o trabalhador na lista de trabalhadores_com_contrato
                 for contrato in contratos:
-                    if not contrato.date_end or contrato.date_end >= periodo.date_stop:
+                    if not contrato.date_end or \
+                            contrato.date_end >= periodo.date_stop or \
+                            contrato.category_id.id == self.env.ref(
+                            "l10n_br_hr_payroll.hr_contract_category_701").id:
                         contratos_validos.append(contrato.id)
 
                 # Se tiver algum contrato válido, cria o registro s1200
@@ -1047,7 +1050,6 @@ class SpedEsocial(models.Model):
             # separa somente os trabalhadores com contrato válido neste período e nesta empresa matriz
             # servidores_com_contrato = []
             for beneficiario in beneficiarios:
-
                 # Localiza os contratos válidos deste beneficiário
                 domain = [
                     ('employee_id', '=', beneficiario.id),
@@ -1063,7 +1065,10 @@ class SpedEsocial(models.Model):
                 # Se algum contrato tiver data de término menor que a data inicial do período, tira ele
                 # adiciona o beneficiario na lista de beneficiarios_com_contrato
                 for contrato in contratos:
-                    if not contrato.date_end or contrato.date_end <= periodo.date_stop:
+                    if not contrato.date_end or \
+                            contrato.date_end <= periodo.date_stop or \
+                            contrato.category_id.id == self.env.ref(
+                            "l10n_br_hr_payroll.hr_contract_category_701").id:
                         contratos_validos.append(contrato.id)
 
                 # Se tiver algum contrato válido, cria o registro s1210
@@ -1107,7 +1112,7 @@ class SpedEsocial(models.Model):
                         domain_payslip_autonomo = [
                             ('company_id', 'in', empresas),
                             ('contract_id', 'in', contratos_validos),
-                            ('mes_do_ano', '=', 13),
+                            ('mes_do_ano', '=', mes),
                             ('ano', '=', ano),
                             # ('state', 'in', ['verify', 'done']),
                             ('tipo_de_folha', 'in',

@@ -102,6 +102,7 @@ class AccountMove(models.Model):
     @api.multi
     def button_cancel(self):
         for record in self:
+            record.verifica_status_periodo()
             record.state = 'cancel'
             for line in record.line_id:
                 line.state = 'cancel'
@@ -110,9 +111,11 @@ class AccountMove(models.Model):
     @api.multi
     def button_return(self):
         for record in self:
+            record.verifica_status_periodo()
             record.retornar_rascunho()
 
     def retornar_rascunho(self):
+        self.verifica_status_periodo()
         self.state = 'draft'
         for line in self.line_id:
             line.state = 'draft'
