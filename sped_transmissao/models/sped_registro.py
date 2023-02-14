@@ -433,6 +433,7 @@ class SpedRegistro(models.Model):
         for lote in self.lote_ids:
             if lote.situacao == '2':
                 lote_consultar = lote
+                break
 
         # Executa a consulta
         if lote_consultar:

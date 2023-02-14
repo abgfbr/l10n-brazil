@@ -282,10 +282,12 @@ class SpedLote(models.Model, ):
             processador.nrInsc = limpa_formatacao(self.company_id.cnpj_cpf)
             processo = processador.consultar_lote(self.protocolo)
 
-        # Guarda os dados de retorno do Lote
-        self.cd_resposta = processo.resposta.cdResposta     # TODO Incluir no processador do REINF as mesmas
-        self.desc_resposta = processo.resposta.descResposta # variáveis da resposta do eSocial para equalizar
+        if self.tipo == 'efdreinf':
+            self.cd_resposta = processo.resposta.status.cdResposta.valor  # TODO Incluir no processador do REINF as mesmas
+            self.desc_resposta = processo.resposta.status.descResposta.valor  # variáveis da resposta do eSocial para equalizar
         if self.tipo == 'esocial':
+            self.cd_resposta = processo.resposta.cdResposta.valor  # TODO Incluir no processador do REINF as mesmas
+            self.desc_resposta = processo.resposta.descResposta.valor  # variáveis da resposta do eSocial para equalizar
             self.dh_recepcao = processo.resposta.dhRecepcao   # o tratamento da resposta
             self.versao_aplicativo_recepcao = processo.resposta.versaoAplicativoRecepcao
             self.versao_aplicativo_processamento = processo.resposta.versaoAplicativoProcessamentoLote
@@ -327,30 +329,27 @@ class SpedLote(models.Model, ):
         self.consulta_xml_id = anexo_id
 
         # Lote Aguardando Processamento (nada mais a fazer no momento)
-        if processo.resposta.cdResposta == '101':
+        if self.cd_resposta == '101':
             return
 
         # O Lote foi rejeitado (nada mais a fazer)
-        if int(processo.resposta.cdResposta) > 400:
+        if int(self.cd_resposta) > 400:
             self.situacao = '3'
             return
         
         if self.tipo == 'esocial':
             eventos = processo.resposta.lista_eventos
-            if processo.resposta.cdResposta == '201':
+            if self.cd_resposta == '201':
                 self.situacao = '4'
             else:
                 self.situacao = '2'
         elif self.tipo == 'efdreinf':
-            eventos = [processo.resposta.evento]
-            if processo.resposta.cdResposta == '0':
-                self.situacao = '4'
-            elif processo.resposta.cdResposta == '1':
+            # eventos = processo.resposta.eventos
+            eventos = processo.resposta.retornoEventos
+            if self.cd_resposta == '1':
                 self.situacao = '3'
-            elif processo.resposta.cdResposta == '2':
-                self.situacao = '2'
-            elif processo.resposta.cdResposta == '3':
-                self.situacao = '1'
+            elif self.cd_resposta in ['2', '3']:
+                self.situacao = '4'
 
         # Processar os eventos
         for evento in eventos:
@@ -359,12 +358,10 @@ class SpedLote(models.Model, ):
             id = evento.Id.valor
 
             registro = False
-            if self.tipo == 'esocial':
-                registro = self.env['sped.registro'].search([('id_evento', '=', id)])
-                if not registro:
-                    raise ValidationError("ID %s não encontrado !" % id)
-            elif self.tipo == 'efdreinf':
-                registro = self.transmissao_ids[0]
+
+            registro = self.env['sped.registro'].search([('id_evento', '=', id)])
+            if not registro:
+                raise ValidationError("ID %s não encontrado !" % id)
 
             # Se o registro não foi encontrado, pula
             if not registro:
@@ -379,9 +376,9 @@ class SpedLote(models.Model, ):
                 descricao_retorno = evento.descricao_retorno
                 ocorrencias = evento.lista_ocorrencias
             elif self.tipo == 'efdreinf':
-                codigo_retorno = evento.ideRecRetorno.ideStatus.cdRetorno.valor
-                descricao_retorno = evento.ideRecRetorno.ideStatus.descRetorno.valor
-                ocorrencias = evento.ideRecRetorno.ideStatus.regOcorrs
+                codigo_retorno = evento.ideStatus.cdRetorno.valor
+                descricao_retorno = evento.ideStatus.descRetorno.valor
+                ocorrencias = evento.ideStatus.regOcorrs
 
             registro.cd_retorno = codigo_retorno
             registro.desc_retorno = descricao_retorno
@@ -421,6 +418,7 @@ class SpedLote(models.Model, ):
             elif self.tipo == 'efdreinf':
                 if registro.cd_retorno == '0':
                     registro.situacao = '4'
+                    registro.recibo = evento.nrRecArqBase.valor
                 elif registro.cd_retorno == '1':
                     registro.situacao = '3'
                 elif registro.cd_retorno == '2':
@@ -526,8 +524,11 @@ class SpedLote(models.Model, ):
 
         # Guarda os dados de retorno do Lote
         if self.tipo == 'efdreinf':   # Estes campos somente existem no retorno EFD/Reinf
-            self.cd_resposta = processo.resposta.cdRetorno
-            self.desc_resposta = processo.resposta.descRetorno
+            self.cd_resposta = processo.resposta.status_code
+            self.desc_resposta = processo.resposta.status.descResposta.valor
+            self.dh_recepcao = processo.resposta.dadosRegistroOcorrenciaLote.dhRecepcao.valor
+            self.versao_aplicativo_recepcao = processo.resposta.dadosRegistroOcorrenciaLote.versaoAplicativoRecepcao.valor
+            self.protocolo = processo.resposta.dadosRegistroOcorrenciaLote.protocoloEnvio.valor
         elif self.tipo == 'esocial':  # Estes campos somente existem no retorno e-Social
             self.cd_resposta = processo.resposta.cdResposta
             self.desc_resposta = processo.resposta.descResposta
@@ -552,85 +553,12 @@ class SpedLote(models.Model, ):
 
         # Processa o status do retorno (valores de retorno são muito diferentes do eSocial e EFD/Reinf
         if self.tipo == 'efdreinf':
-
-            # Popula o status do lote
-            if self.cd_resposta == '0':
-
-                # Se for o envio do fechamento, precisa marcar para consultar o retorno do lote ao invés de
-                # interpretar que os registros foram enviados com sucesso ou não.
-                fechamento = False
+            if self.cd_resposta in ['201', '202']:
+                self.situacao = '2'  # Transmitida
                 for registro in self.transmissao_ids:
-                    if registro.registro == 'R-2099':  # Fechamento
-                        fechamento = True
-                if fechamento:
-                    self.situacao = '2'
-                else:
-                    self.situacao = '4'
-
-            elif self.cd_resposta == '1':
-                self.situacao = '3'
-            elif self.cd_resposta == '2':
-                self.situacao = '2'
-            else:
-                self.situacao = '1'
-
-            # Popula o resultado da transmissão de cada evento (transmissão sincrona somente no EFD/Reinf)
-            for evento in processo.resposta.eventos:
-
-                # Localiza o registro original pelo Id
-                id = evento.evtTotal.infoRecEv.idEv.valor
-
-                registro = self.env['sped.registro'].search([('id_evento', '=', id)])
-                if not registro:
-                    raise ValidationError("ID %s não encontrado !" % id)
-
-                # Popula o status, protocolo e recibo
-                if registro.limpar_db:
-                    registro.cd_retorno = False
-                    registro.desc_retorno = False
-                else:
-                    registro.cd_retorno = evento.evtTotal.ideRecRetorno.ideStatus.cdRetorno.valor
-                    registro.desc_retorno = evento.evtTotal.ideRecRetorno.ideStatus.descRetorno.valor
-                    registro.recibo = evento.evtTotal.infoTotal.nrRecArqBase.valor
-                    registro.protocolo = evento.evtTotal.infoRecEv.nrProtEntr.valor
-                    # Grava o protocolo no Lote para consulta
-                    self.protocolo = evento.evtTotal.infoRecEv.nrProtEntr.valor
-                
-                # Limpa as ocorrências do registro
-                for ocorrencia in registro.ocorrencia_ids:
-                    ocorrencia.unlink()
-
-                # Popula as novas ocorrências do registro (se houver)
-                for ocorrencia in evento.evtTotal.ideRecRetorno.ideStatus.regOcorrs:
-                    vals = {
-                        'transmissao_id': registro.id,
-                        'tipo': ocorrencia.tpOcorr.valor,
-                        'local': ocorrencia.localErroAviso.valor,
-                        'codigo': ocorrencia.codResp.valor,
-                        'descricao': ocorrencia.dscResp.valor,
-                    }
-                    registro.ocorrencia_ids.create(vals)
-
-                # Popula o status do registro
-                if registro.cd_retorno == '0':
-                    registro.situacao = '4'
-                elif registro.cd_retorno == '1':
-                    registro.situacao = '3'
-                elif registro.cd_retorno == '2':
                     registro.situacao = '2'
-                else:
-                    registro.situacao = '1'
-
-                # Atualiza o XML de Retorno (retorno do evento síncrono)
-                if registro.retorno_xml_id:
-                    retorno = registro.retorno_xml_id
-                    registro.retorno_xml_id = False
-                    retorno.unlink()
-                retorno_xml = evento.xml
-                retorno_xml_nome = registro.id_evento + '-retorno.xml'
-                anexo_id = self._grava_anexo(retorno_xml_nome, retorno_xml)
-                registro.retorno_xml_id = anexo_id
-
+            else:
+                self.situacao = '3'
         elif self.tipo == 'esocial':
 
             # Popula situação do lote

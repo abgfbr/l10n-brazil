@@ -144,12 +144,13 @@ class SpedEfdReinfEstab4020(models.Model, SpedRegistroIntermediario):
         if self.prestador_id.reinf_natureza_remuneracao_id.ret_csll:
             R4020_retencoes.vlrBaseCSLL.valor = total_nfe
             R4020_retencoes.vlrCSLL.valor = formata_valor(nfs.csll_value_wh)
-        if self.prestador_id.reinf_natureza_remuneracao_id.ret_cofins:
-            R4020_retencoes.vlrBaseCofins.valor = total_nfe
-            R4020_retencoes.vlrCofins.valor = formata_valor(nfs.cofins_value_wh)
-        if self.prestador_id.reinf_natureza_remuneracao_id.ret_pp:
-            R4020_retencoes.vlrBasePP.valor = total_nfe
-            R4020_retencoes.vlrPP.valor = formata_valor(nfs.pis_value_wh)
+        if not self.prestador_id.reinf_natureza_remuneracao_id.ret_agreg:
+            if self.prestador_id.reinf_natureza_remuneracao_id.ret_cofins:
+                R4020_retencoes.vlrBaseCofins.valor = total_nfe
+                R4020_retencoes.vlrCofins.valor = formata_valor(nfs.cofins_value_wh)
+            if self.prestador_id.reinf_natureza_remuneracao_id.ret_pp:
+                R4020_retencoes.vlrBasePP.valor = total_nfe
+                R4020_retencoes.vlrPP.valor = formata_valor(nfs.pis_value_wh)
 
     @api.multi
     def popula_xml(self, ambiente='2', operacao='I'):

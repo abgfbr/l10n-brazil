@@ -117,6 +117,10 @@ class SpedReinfContribuinte4000(models.Model):
         if self.company_id.cttemail:
             R4099.evento.ideRespInf.email.valor = self.company_id.cttemail
 
-        R4099.evento.infoFech.fechRet.valor = '1'
+        R4099.evento.infoFech.fechRet.valor = '0'
 
         return R4099, validacao
+
+    @api.multi
+    def retorno_sucesso(self, evento):
+        self.ensure_one()
