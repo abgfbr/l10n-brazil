@@ -41,7 +41,7 @@ class ResCompany(models.Model):
         "('fiscal_type','=','product')]")
     nfe_version = fields.Selection([
         ('1.10', '1.10'), ('2.00', '2.00'),
-        ('3.10', '3.10'), ('4.00', '4.00')],
+        ('3.10', '3.10'), ('4.00', '4.00'), ('abrasfdf', 'Serviço DF')],
         u'Versão NFe', required=True, default='4.00')
     nfe_import_folder = fields.Char('Pasta de Importação', size=254)
     nfe_export_folder = fields.Char('Pasta de Exportação', size=254)
