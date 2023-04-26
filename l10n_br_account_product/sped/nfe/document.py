@@ -2,7 +2,7 @@
 # Copyright (C) 2013  Renato Lima - Akretion
 # License AGPL-3 - See http://www.gnu.org/licenses/agpl-3.0.html
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from unicodedata import normalize
 
 from openerp import pooler
@@ -11,6 +11,11 @@ from openerp.tools.translate import _
 
 from openerp.addons.l10n_br_account.sped.document import FiscalDocument
 from openerp.addons.l10n_br_base.tools.misc import punctuation_rm
+try:
+    from pybrasil.valor.decimal import Decimal
+except:
+    from decimal import Decimal
+    import locale
 
 
 class NFe200(FiscalDocument):
@@ -1001,3 +1006,154 @@ class NFe400(NFe310):
             raise UserError(
                 _(u'Erro!'), _(u"Biblioteca PySPED não instalada!"))
         return AutXML_400()
+
+
+class NFSeDF(NFe200):
+    def __init__(self):
+        super(NFSeDF, self).__init__()
+        self.nfse = None
+
+    def get_NFe(self):
+        return self._get_NFRef()
+
+    def _get_NFRef(self):
+        try:
+            from pysped.nfe.leiaute import NFSe_400
+        except ImportError:
+            raise UserError(
+                _(u'Erro!'), _(u"Biblioteca PySPED não instalada!"))
+
+        return NFSe_400()
+
+    def get_xml(self, cr, uid, ids, nfe_environment, context=None):
+        """"""
+        result = []
+        for nfse in self._serializer(cr, uid, ids, nfe_environment, context):
+            result.append({'key': nfse.Id.valor, 'nfse': nfse})
+        return result
+
+    def _serializer(self, cr, uid, ids, nfe_environment, context=None):
+
+        pool = pooler.get_pool(cr.dbname)
+        nfse = []
+
+        if not context:
+            context = {'lang': 'pt_BR'}
+
+        for invoice in pool.get('account.invoice').browse(cr, uid, ids,
+                                                          context):
+
+            company = pool.get('res.partner').browse(
+                cr, uid, invoice.company_id.partner_id.id, context)
+
+            self.nfse = self._get_NFRef()
+
+            today = datetime.today()
+            first_day = today.replace(day=1)
+            last_month_last_day = first_day - timedelta(days=1)
+
+            self.nfse.infDeclaracaoPrestacaoServico.rps.numero.valor = invoice.internal_number
+            self.nfse.infDeclaracaoPrestacaoServico.rps.serie.valor = '3'
+            self.nfse.infDeclaracaoPrestacaoServico.rps.tipo.valor = 1
+            self.nfse.infDeclaracaoPrestacaoServico.rps.data_emissao_rps.valor = invoice.date_hour_invoice.split(" ")[0]
+            self.nfse.infDeclaracaoPrestacaoServico.rps.status.valor = 1
+            self.nfse.infDeclaracaoPrestacaoServico.rps.Id = invoice.internal_number
+
+            self.nfse.infDeclaracaoPrestacaoServico.competencia.valor = invoice.date_in_out.split(" ")[0]
+
+            self.nfse.infDeclaracaoPrestacaoServico.servico.valores.valor_servicos.valor = Decimal(invoice.amount_total)
+            self.nfse.infDeclaracaoPrestacaoServico.servico.valores.valor_deducoes.valor = Decimal(0)
+            self.nfse.infDeclaracaoPrestacaoServico.servico.valores.valor_pis.valor = Decimal(invoice.pis_value_wh)
+            self.nfse.infDeclaracaoPrestacaoServico.servico.valores.valor_cofins.valor = Decimal(invoice.cofins_value_wh)
+            self.nfse.infDeclaracaoPrestacaoServico.servico.valores.valor_inss.valor = Decimal(invoice.inss_value_wh)
+            self.nfse.infDeclaracaoPrestacaoServico.servico.valores.valor_inss.valor = Decimal(invoice.inss_value_wh)
+            self.nfse.infDeclaracaoPrestacaoServico.servico.valores.valor_ir.valor = Decimal(invoice.irrf_value_wh)
+            self.nfse.infDeclaracaoPrestacaoServico.servico.valores.valor_csll.valor = Decimal(invoice.csll_value_wh)
+            self.nfse.infDeclaracaoPrestacaoServico.servico.valores.outras_retencoes.valor = Decimal(0)
+            self.nfse.infDeclaracaoPrestacaoServico.servico.valores.valor_iss.valor = 0
+            self.nfse.infDeclaracaoPrestacaoServico.servico.valores.aliquota.valor = 0
+            self.nfse.infDeclaracaoPrestacaoServico.servico.valores.desconto_incondicionado.valor = Decimal(0)
+            self.nfse.infDeclaracaoPrestacaoServico.servico.valores.desconto_condicionado.valor = Decimal(0)
+
+            self.nfse.infDeclaracaoPrestacaoServico.servico.iss_retido.valor = 1 if invoice.issqn_value_wh else 2
+            if invoice.issqn_value_wh:
+                self.nfse.infDeclaracaoPrestacaoServico.servico.responsavel_retencao.valor = 1
+            self.nfse.infDeclaracaoPrestacaoServico.servico.item_lista_servico.valor = invoice.invoice_line[0].product_id.service_type_id.code
+            self.nfse.infDeclaracaoPrestacaoServico.servico.codigo_cnae.valor = invoice.company_id.cnae_main_id.code.replace('-', '').replace('/', '')
+            self.nfse.infDeclaracaoPrestacaoServico.servico.codigo_tributacao_municipio.valor = invoice.invoice_line[0].product_id.service_type_id.code.replace('.', '')
+            self.nfse.infDeclaracaoPrestacaoServico.servico.codigo_nbs.valor = ''
+            self.nfse.infDeclaracaoPrestacaoServico.servico.discriminacao.valor = invoice.invoice_line[0].fiscal_comment
+            self.nfse.infDeclaracaoPrestacaoServico.servico.codigo_municipio.valor = '{}{}'.format(invoice.company_id.l10n_br_city_id.state_id.ibge_code, invoice.company_id.l10n_br_city_id.ibge_code)
+            self.nfse.infDeclaracaoPrestacaoServico.servico.codigo_pais.valor = ''
+            self.nfse.infDeclaracaoPrestacaoServico.servico.exigibilidade_iss.valor = 1
+            self.nfse.infDeclaracaoPrestacaoServico.servico.municipio_incidencia.valor = '{}{}'.format(invoice.company_id.l10n_br_city_id.state_id.ibge_code, invoice.company_id.l10n_br_city_id.ibge_code)
+            self.nfse.infDeclaracaoPrestacaoServico.prestador.cpf_cnpj.cnpj.valor = invoice.company_id.cnpj_cpf.replace('.', '').replace('.', '').replace('/', '').replace('-', '')
+            self.nfse.infDeclaracaoPrestacaoServico.prestador.inscricao_municipal.valor = invoice.company_id.inscr_mun
+            self.nfse.infDeclaracaoPrestacaoServico.tomador_servico.identificacao_tomador.cnpj.valor = invoice.partner_id.cnpj_cpf.replace('.', '').replace('.', '').replace('/', '').replace('-', '')
+            self.nfse.infDeclaracaoPrestacaoServico.tomador_servico.razao_social.valor = invoice.partner_id.legal_name
+            self.nfse.infDeclaracaoPrestacaoServico.tomador_servico.endereco.endereco.valor = "{} {}".format(invoice.partner_id.tp_lograd.nome, invoice.partner_id.street)
+            self.nfse.infDeclaracaoPrestacaoServico.tomador_servico.endereco.numero.valor = invoice.partner_id.number
+            self.nfse.infDeclaracaoPrestacaoServico.tomador_servico.endereco.bairro.valor = invoice.partner_id.district
+            self.nfse.infDeclaracaoPrestacaoServico.tomador_servico.endereco.codigo_municipio.valor = '{}{}'.format(invoice.partner_id.l10n_br_city_id.state_id.ibge_code, invoice.partner_id.l10n_br_city_id.ibge_code)
+            self.nfse.infDeclaracaoPrestacaoServico.tomador_servico.endereco.uf.valor = invoice.partner_id.state_id.code
+            self.nfse.infDeclaracaoPrestacaoServico.tomador_servico.endereco.cep.valor = invoice.partner_id.zip.replace('-', '')
+            self.nfse.infDeclaracaoPrestacaoServico.Id = 'ID' + str(invoice.internal_number)
+            self.nfse.infDeclaracaoPrestacaoServico.optante_simples_nacional.valor = 2
+            self.nfse.infDeclaracaoPrestacaoServico.incentivo_fiscal.valor = 2
+            if invoice.fiscal_comment:
+                self.nfse.infDeclaracaoPrestacaoServico.informacoes_complementares.valor = invoice.fiscal_comment
+
+            self.nfse.Id.valor = 'ID' + str(invoice.internal_number)
+
+            nfse.append(self.nfse)
+
+        return nfse
+
+
+class NFSeDFCancelamento(NFe200):
+    def __init__(self):
+        super(NFSeDFCancelamento, self).__init__()
+        self.nfse = None
+
+    def get_NFe(self):
+        return self._get_NFRef()
+
+    def _get_NFRef(self):
+        try:
+            from pysped.nfe.leiaute import NFSeCancelamento_400
+        except ImportError:
+            raise UserError(
+                _(u'Erro!'), _(u"Biblioteca PySPED não instalada!"))
+
+        return NFSeCancelamento_400()
+
+    def get_xml(self, cr, uid, ids, nfe_environment, context=None):
+        """"""
+        result = []
+        nfse = self._serializer(cr, uid, ids, nfe_environment, context)
+        result.append({'key': nfse.Id.valor, 'nfse': nfse})
+
+        return result
+
+    def _serializer(self, cr, uid, ids, nfe_environment, context=None):
+
+        pool = pooler.get_pool(cr.dbname)
+
+        if not context:
+            context = {'lang': 'pt_BR'}
+
+        for invoice in pool.get('account.invoice').browse(cr, uid, ids,
+                                                          context):
+            nfse_cancelamento = self._get_NFRef()
+
+            nfse_cancelamento.InfPedidoCancelamento.IdentificacaoNfse.Numero.valor = invoice.internal_number
+            nfse_cancelamento.InfPedidoCancelamento.IdentificacaoNfse.CpfCnpj.Cnpj.valor = invoice.company_id.cnpj_cpf.replace('.', '').replace('.', '').replace('/', '').replace('-', '')
+            nfse_cancelamento.InfPedidoCancelamento.IdentificacaoNfse.InscricaoMunicipal.valor = invoice.company_id.inscr_mun
+            nfse_cancelamento.InfPedidoCancelamento.IdentificacaoNfse.CodigoMunicipio.valor = '{}{}'.format(invoice.company_id.l10n_br_city_id.state_id.ibge_code, invoice.company_id.l10n_br_city_id.ibge_code)
+            nfse_cancelamento.InfPedidoCancelamento.CodigoCancelamento.valor = '1'
+
+            nfse_cancelamento.InfPedidoCancelamento.Id = invoice.internal_number
+
+            nfse_cancelamento.Id.valor = 'ID' + str(invoice.internal_number)
+
+        return nfse_cancelamento
