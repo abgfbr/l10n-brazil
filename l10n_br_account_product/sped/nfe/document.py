@@ -1097,6 +1097,8 @@ class NFSeDF(NFe200):
             self.nfse.infDeclaracaoPrestacaoServico.tomador_servico.endereco.codigo_municipio.valor = '{}{}'.format(invoice.partner_id.l10n_br_city_id.state_id.ibge_code, invoice.partner_id.l10n_br_city_id.ibge_code)
             self.nfse.infDeclaracaoPrestacaoServico.tomador_servico.endereco.uf.valor = invoice.partner_id.state_id.code
             self.nfse.infDeclaracaoPrestacaoServico.tomador_servico.endereco.cep.valor = invoice.partner_id.zip.replace('-', '')
+            self.nfse.infDeclaracaoPrestacaoServico.tomador_servico.telefone.valor = invoice.partner_id.phone or ''
+            self.nfse.infDeclaracaoPrestacaoServico.tomador_servico.email.valor = invoice.partner_id.email or ''
             self.nfse.infDeclaracaoPrestacaoServico.Id = 'ID' + str(invoice.internal_number)
             self.nfse.infDeclaracaoPrestacaoServico.optante_simples_nacional.valor = 2
             self.nfse.infDeclaracaoPrestacaoServico.incentivo_fiscal.valor = 2
