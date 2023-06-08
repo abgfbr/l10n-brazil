@@ -61,6 +61,14 @@ class HrPaylisp(models.Model):
         column2='payslip_id',
     )
 
+    sped_remuneracao_sem_vinculo_id = fields.Many2many(
+        string=u'Sped Remuneração Sem Vinculo (Intermediario S-1202)',
+        comodel_name='sped.esocial.remuneracao.rpps',
+        relation='payslip_remuneracao_rpps_rel',
+        column1='remuneracao_rpps_id',
+        column2='payslip_id',
+    )
+
     sped_pagamento_id = fields.Many2many(
         string = u'Sped Pagamento (Intermediario S-1210)',
         comodel_name='sped.esocial.pagamento',
@@ -155,48 +163,94 @@ class HrPaylisp(models.Model):
             trabalhador = payslip.employee_id
             period_id = self.env['account.period'].find(payslip.date_from)
 
-            # Verifica se o registro S-1200 já existe, cria ou atualiza
-            domain_s1200 = [
-                ('company_id', '=', matriz.id),
-                ('trabalhador_id', '=', trabalhador.id),
-                ('periodo_id', '=', period_id.id),
-            ]
+            if self.contract_id.tp_reg_prev == '1':
+                # Verifica se o registro S-1200 já existe, cria ou atualiza
+                domain_s1200 = [
+                    ('company_id', '=', matriz.id),
+                    ('trabalhador_id', '=', trabalhador.id),
+                    ('periodo_id', '=', period_id.id),
+                ]
 
-            s1200 = self.env['sped.esocial.remuneracao'].search(domain_s1200)
-            if not s1200:
-                vals = {
-                    'company_id': matriz.id,
-                    'trabalhador_id': trabalhador.id,
-                    'contract_ids': [(6, 0, payslip.contract_id.ids)],
-                    'periodo_id': period_id.id,
-                }
+                s1200 = self.env['sped.esocial.remuneracao'].search(domain_s1200)
+                if not s1200:
+                    vals = {
+                        'company_id': matriz.id,
+                        'trabalhador_id': trabalhador.id,
+                        'contract_ids': [(6, 0, payslip.contract_id.ids)],
+                        'periodo_id': period_id.id,
+                    }
 
-                # Criar intermediario de acordo com o tipo de employee
-                if trabalhador.tipo != 'autonomo':
-                    vals.update(
-                        {'payslip_ids': [(6, 0, payslip.ids)]})
-                else:
-                    vals.update(
-                        {'payslip_autonomo_ids': [(6, 0, payslip.ids)]})
+                    # Criar intermediario de acordo com o tipo de employee
+                    if trabalhador.tipo != 'autonomo':
+                        vals.update(
+                            {'payslip_ids': [(6, 0, payslip.ids)]})
+                    else:
+                        vals.update(
+                            {'payslip_autonomo_ids': [(6, 0, payslip.ids)]})
 
 
-                # Relaciona o s1200 com o período do e-Social
-                sped_esocial = self.env['sped.esocial'].search([
-                    ('periodo_id','=',period_id.id)
-                ], limit=1)
+                    # Relaciona o s1200 com o período do e-Social
+                    sped_esocial = self.env['sped.esocial'].search([
+                        ('periodo_id','=',period_id.id)
+                    ], limit=1)
 
-                if sped_esocial:
+                    if sped_esocial:
 
-                    s1200 = self.env['sped.esocial.remuneracao'].create(vals)
+                        s1200 = self.env['sped.esocial.remuneracao'].create(vals)
 
-                    sped_esocial.remuneracao_ids = [(4, s1200.id)]
+                        sped_esocial.remuneracao_ids = [(4, s1200.id)]
 
-                else:
-                    raise ValidationError(
-                        "Nenhum período do esocial encontrado.")
+                    else:
+                        raise ValidationError(
+                            "Nenhum período do esocial encontrado.")
 
-                # Cria o registro de transmissão sped (se ainda não existir)
-                s1200.atualizar_esocial()
+                    # Cria o registro de transmissão sped (se ainda não existir)
+                    s1200.atualizar_esocial()
+            else:
+                # Verifica se o registro S-1200 já existe, cria ou atualiza
+                domain_s1202 = [
+                    ('company_id', '=', matriz.id),
+                    ('servidor_id', '=', trabalhador.id),
+                    ('periodo_id', '=', period_id.id),
+                ]
+
+                s1202 = self.env['sped.esocial.remuneracao.rpps'].search(
+                    domain_s1202)
+                if not s1202:
+                    vals = {
+                        'company_id': matriz.id,
+                        'servidor_id': trabalhador.id,
+                        'contract_ids': [(6, 0, payslip.contract_id.ids)],
+                        'periodo_id': period_id.id,
+                    }
+
+                    # Criar intermediario de acordo com o tipo de employee
+                    if trabalhador.tipo != 'autonomo':
+                        vals.update(
+                            {'payslip_ids': [(6, 0, payslip.ids)]})
+                    else:
+                        vals.update(
+                            {'payslip_autonomo_ids': [(6, 0, payslip.ids)]})
+
+                    # Relaciona o s1202 com o período do e-Social
+                    sped_esocial = self.env['sped.esocial'].search([
+                        ('periodo_id', '=', period_id.id)
+                    ], limit=1)
+
+                    if sped_esocial:
+
+                        s1202 = self.env['sped.esocial.remuneracao.rpps'].create(
+                            vals)
+
+                        sped_esocial.remuneracao_rpps_ids = [(4, s1202.id)]
+
+                    else:
+                        raise ValidationError(
+                            "Nenhum período do esocial encontrado.")
+
+                    # Cria o registro de transmissão sped (se ainda não existir)
+                    s1202.atualizar_esocial()
+                    payslip.sped_remuneracao_sem_vinculo_id = [(4, s1202.id)]
 
     @api.multi
     def ativar_pagamento(self):

@@ -435,9 +435,9 @@ class SpedEsocialHrContrato(models.Model, SpedRegistroIntermediario):
             #alteracoes Eder - 03-12-2022
 
             CargoFuncao.CBOCargo.valor = self.hr_contract_id.job_id.cbo_id.code
-            CargoFuncao.CBOFuncao.valor = self.hr_contract_id.job_id.cbo_id.code
-            CargoFuncao.nmCargo.valor = self.hr_contract_id.job_id.name
-            CargoFuncao.nmFuncao.valor = self.hr_contract_id.job_id.name
+            # CargoFuncao.CBOFuncao.valor = self.hr_contract_id.job_id.cbo_id.code
+            CargoFuncao.nmCargo.valor = self.hr_contract_id.job_id.cbo_id.name
+            # CargoFuncao.nmFuncao.valor = self.hr_contract_id.job_id.name
 
             # CargoFuncao.codFuncao.valor = ''
             InfoComplementares.cargoFuncao.append(CargoFuncao)
@@ -492,7 +492,7 @@ class SpedEsocialHrContrato(models.Model, SpedRegistroIntermediario):
             InfoTrabCedido.tpRegTrab.valor = \
                 self.hr_contract_id.labor_regime_id.code
             InfoTrabCedido.tpRegPrev.valor = self.hr_contract_id.tp_reg_prev
-            InfoTrabCedido.infOnus.valor = self.hr_contract_id.infOnus
+            # InfoTrabCedido.infOnus.valor = self.hr_contract_id.infOnus
             InfoComplementares.infoTrabCedido.append(InfoTrabCedido)
 
         # InfoTSVInicio.InfoComplementares.InfoEstagiario

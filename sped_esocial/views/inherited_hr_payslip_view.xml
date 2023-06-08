@@ -42,6 +42,8 @@
                         <group string="Registro Intermediário" groups="base.group_no_one">
                             <label for="sped_remuneracao_id"/>
                             <field name="sped_remuneracao_id" colspan="4" col="4"  nolabel="1"/>
+                            <label for="sped_remuneracao_sem_vinculo_id"/>
+                            <field name="sped_remuneracao_sem_vinculo_id" colspan="4" col="4"  nolabel="1"/>
                             <label for="sped_pagamento_id"/>
                             <field name="sped_pagamento_id" colspan="4" col="4" nolabel="1"/>
                         </group>
