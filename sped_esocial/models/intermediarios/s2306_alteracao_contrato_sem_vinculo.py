@@ -183,8 +183,10 @@ class SpedAlteracaoContratoAutonomo(models.Model, SpedRegistroIntermediario):
         # infoTSVAlteracao.InfoComplementares.CargoFuncao
         CargoFuncao = pysped.esocial.leiaute.S2306_CargoFuncao_2()
 
-        CargoFuncao.codCargo.valor = self.hr_contract_id.job_id.codigo
-        # CargoFuncao.codFuncao.valor = ''
+        CargoFuncao.CBOCargo.valor = self.hr_contract_id.job_id.cbo_id.code
+        CargoFuncao.CBOFuncao.valor = self.hr_contract_id.job_id.cbo_id.code
+        CargoFuncao.nmCargo.valor = self.hr_contract_id.job_id.cbo_id.name
+        CargoFuncao.nmFuncao.valor = self.hr_contract_id.job_id.cbo_id.name
 
         S2306.evento.infoTSVAlteracao.infoComplementares.cargoFuncao.append(CargoFuncao)
 
@@ -199,7 +201,26 @@ class SpedAlteracaoContratoAutonomo(models.Model, SpedRegistroIntermediario):
         if self.hr_contract_id.salary_unit.code in [6, 7]:
             Remuneracao.dscSalVar.valor = self.hr_contract_id.dsc_sal_var
 
-        S2306.evento.infoTSVAlteracao.infoComplementares.remuneracao.append(Remuneracao)
+        S2306.evento.infoTSVAlteracao.infoComplementares.remuneracao.append(
+            Remuneracao)
+
+        if self.hr_contract_id.category_id.code == '410':
+            InfoTrabCedido = pysped.esocial.leiaute.S2306_InfoTrabCedido_2()
+            InfoTrabCedido.cnpjCednt.valor = \
+                limpa_formatacao(self.hr_contract_id.cnpj_empregador_cedente)
+            InfoTrabCedido.categOrig.valor = \
+                self.hr_contract_id.assignor_category_id.code
+            InfoTrabCedido.matricCed.valor = \
+                self.hr_contract_id.matricula_cedente
+            InfoTrabCedido.dtAdmCed.valor = \
+                self.hr_contract_id.data_admissao_cedente
+            InfoTrabCedido.tpRegTrab.valor = \
+                self.hr_contract_id.labor_regime_id.code
+            InfoTrabCedido.tpRegPrev.valor = self.hr_contract_id.tp_reg_prev
+            # InfoTrabCedido.infOnus.valor = self.hr_contract_id.infOnus
+
+        S2306.evento.infoTSVAlteracao.infoComplementares.infoTrabCedido.append(
+            InfoTrabCedido)
 
         return S2306, validacao
 
