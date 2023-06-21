@@ -249,6 +249,18 @@ class HrSalaryRule(models.Model):
             ('91', '91-Incidência suspensa em decorrência de decisão judicial'),
         ],
     )
+    cod_inc_cprp = fields.Selection(
+        string='Cód.Incid.trib.RPPS',
+        selection=[
+            ('00', '00-Não é base de cálculo de contribuições devidas'),
+            ('11', '11-Mensal'),
+            ('12', '12-13º Salário'),
+            ('31', '31-Exclusiva do Empregador - mensal'),
+            ('32', '32-Exclusiva do Empregador - 13º salário'),
+            ('91', '91-Exclusiva do segurado - mensal'),
+            ('92', '92-Exclusiva do segurado - 13º salário'),
+        ]
+    )
 
     @api.onchange('ini_valid')
     def onchange_esocial_periodo_inicial_id(self):
