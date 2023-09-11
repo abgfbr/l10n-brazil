@@ -337,7 +337,7 @@ class SpedEsocialRemuneracao(models.Model, SpedRegistroIntermediario):
                             continue
 
                     if line.salary_rule_id.cod_inc_irrf_calculado not in \
-                            ['31', '32', '33', '34', '35', '51', '52', '53', '54', '55', '81', '82', '83']:
+                            ['33', '34', '35', '51', '52', '53', '54', '55', '81', '82', '83']:
                         if not payslip.tipo_de_folha == 'ferias' and  line.salary_rule_id.cod_inc_irrf_calculado == '13' \
                                 and not eh_periodo:
                             continue
