@@ -428,7 +428,7 @@ class SpedEfdReinf(models.Model):
                 data_hora_final, data_hora_inicial)
             for nf in nfs_busca:
 
-                if nf.company_id != empresa or nf.inss_value_wh == 0:
+                if nf.company_id != empresa:
                     continue
 
                 if nf.company_id == empresa:
@@ -446,17 +446,18 @@ class SpedEfdReinf(models.Model):
                     ]
                     estabelecimento_id = self.env['sped.efdreinf.estabelecimento'].search(domain)
 
-                    # Cria o registro se ele não existir
-                    if not estabelecimento_id:
-                        vals = {
-                            'efdreinf_id': self.id,
-                            'estabelecimento_id': empresa.id,
-                            'prestador_id': prestador_id.id,
-                            'periodo_id': self.periodo_id.id,
-                            'ind_cprb': ind_cprb,
-                        }
-                        estabelecimento_id = self.env['sped.efdreinf.estabelecimento'].create(vals)
-                        self.estabelecimento_ids = [(4, estabelecimento_id.id)]
+                    if nf.inss_value_wh != 0:
+                        # Cria o registro se ele não existir
+                        if not estabelecimento_id:
+                            vals = {
+                                'efdreinf_id': self.id,
+                                'estabelecimento_id': empresa.id,
+                                'prestador_id': prestador_id.id,
+                                'periodo_id': self.periodo_id.id,
+                                'ind_cprb': ind_cprb,
+                            }
+                            estabelecimento_id = self.env['sped.efdreinf.estabelecimento'].create(vals)
+                            self.estabelecimento_ids = [(4, estabelecimento_id.id)]
 
                     estabelecimento_4020_id = self.env[
                         'sped.efdreinf.estabelecimento.4020'].search(domain)
@@ -496,8 +497,8 @@ class SpedEfdReinf(models.Model):
         domain = [
             ('state', 'in', ['open', 'paid']),
             ('type', '=', 'in_invoice'),
-            ('date_hour_invoice', '>=', data_hora_inicial),
-            ('date_hour_invoice', '<=', data_hora_final),
+            ('date_due', '>=', data_hora_inicial),
+            ('date_due', '<=', data_hora_final),
         ]
         nfs_busca = self.env['account.invoice'].search(domain,
                                                        order='partner_id')
