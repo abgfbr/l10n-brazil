@@ -25,7 +25,12 @@ from . import sped_efdreinf
 from . import sped_efdreinf_nfs
 from . import sped_efdreinf_estabelecimento
 from . import sped_efdreinf_servico
+from . import sped_efdreinf_estabelecimento_4020
+from . import sped_efdreinf_nfs_4020
 
 from . import product_template
 from . import inherited_res_company
 from . import inherited_sped_transmissao
+from . import sped_efdreinf_natureza_rendimentos
+from . import inherited_res_partner
+from . import inherited_account_invoice

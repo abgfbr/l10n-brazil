@@ -155,6 +155,7 @@ class HrSalaryRule(models.Model):
         selection=[
             ('00', '00-Rendimento não tributável'),
             ('01', '01-Rendimento não tributável em função de acordos internacionais de bitributação'),
+            ('09', '09-Verba transitada pela folha de pagamento de natureza diversa de rendimento ou retenção/isenção/dedução de IR')
         ]
     )
     cod_inc_irrf_1 = fields.Selection(

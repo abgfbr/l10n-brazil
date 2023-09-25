@@ -11,3 +11,9 @@ access_r2098_operador,Operador R-2098(Leitura),model_sped_efdreinf_reabertura_ev
 access_r2098_gerente,Gerente R-2098(Escrita),model_sped_efdreinf_reabertura_eventos_periodicos,sped_tabelas.group_manager,1,1,1,1
 access_r2099_operador,Operador R-2099(Leitura),model_sped_efdreinf_fechamento_eventos_periodicos,sped_tabelas.group_user,1,0,0,0
 access_r2099_gerente,Gerente R-2099(Escrita),model_sped_efdreinf_fechamento_eventos_periodicos,sped_tabelas.group_manager,1,1,1,1
+access_r4020_operador,Operador R-4020(Leitura),model_sped_efdreinf_estabelecimento_4020,sped_tabelas.group_user,1,0,0,0
+access_r4020_gerente,Gerente R-4020(Escrita),model_sped_efdreinf_estabelecimento_4020,sped_tabelas.group_manager,1,1,1,1
+access_r4099_abertura_gerente,Gerente R-40299 Abertura(Escrita),model_sped_efdreinf_abertura_eventos_4000,account.group_account_user,1,1,1,1
+access_r4099_gerente,Gerente R-40299(Escrita),model_sped_efdreinf_fechamento_eventos_4000,account.group_account_user,1,1,1,1
+sped_efdreinf_sped_efdreinf_nfs_4020,sped_efdreinf.sped_efdreinf_nfs_4020,model_sped_efdreinf_nfs_4020,account.group_account_user,1,1,1,1
+access_natureza_rendimentos,access_natureza_rendimentos,model_sped_reinf_natureza_rendimentos,account.group_account_user,1,1,1,1

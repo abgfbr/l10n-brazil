@@ -29,6 +29,7 @@
     'website': 'http://www.abgf.gov.br',
     'depends': [
         'sped_transmissao',
+        'l10n_br_account',
         'l10n_br_account_product',
     ],
     'data': [
@@ -40,12 +41,16 @@
         'views/sped_efdreinf_view.xml',
         'views/inherited_product_template.xml',
         'views/inherited_res_company.xml',
+        'views/inherited_res_partner.xml',
+        'views/inherited_account_invoice.xml',
 
         # View/intermediários
         'views/intermediarios/r1000_informacoes_contribuinte_view.xml',
         'views/intermediarios/r2010_retencao_contribuicao_previdenciaria_servicos_tomados_view.xml',
         'views/intermediarios/r2098_reabertura_eventos_periodicos_view.xml',
         'views/intermediarios/r2099_fechamento_eventos_periodicos_view.xml',
+        'views/intermediarios/r4099_abertura_eventos_4000.xml',
+        'views/intermediarios/r4099_fechamento_eventos_4000.xml',
 
         # Segurança
         'security/ir.model.access.csv',
