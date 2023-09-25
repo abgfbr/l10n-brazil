@@ -17,14 +17,24 @@
                                 confirm="Confirma a transmissão dos registros deste período para o EFD/Reinf?"
                         />
                         <button name="importar_fechamentos" type="object" string="Fechar Período"
-                                attrs="{'invisible': ['|', ('id', '=', False), ('situacao', '=', '3')]}"
+                                attrs="{'invisible': ['|', ('id', '=', False), ('situacao_r2099', '=', '3')]}"
                                 class="oe_highlight"
                                 confirm="Tem certeza que desaja fechar este período?"
                         />
                         <button name="importar_reabertura" type="object" string="Reabrir Período"
-                                attrs="{'invisible': ['|', ('id', '=', False), ('situacao', '=', '1')]}"
+                                attrs="{'invisible': [('situacao_r2099', '!=', '3')]}"
                                 class="oe_highlight"
                                 confirm="Tem certeza que deseja reabrir este período?"
+                        />
+                        <button name="importar_fechamentos_4000" type="object" string="Fechar Período 4000"
+                                attrs="{'invisible': [('sped_r4099_registro', '!=', False)]}"
+                                class="oe_highlight"
+                                confirm="Tem certeza que desaja fechar os registros R-4000 deste período?"
+                        />
+                        <button name="importar_reabertura_4000" type="object" string="Reabrir Período 4000"
+                                attrs="{'invisible': [('situacao_r4099', '!=', '4')]}"
+                                class="oe_highlight"
+                                confirm="Tem certeza que deseja reabrir os registros R-4000 deste período?"
                         />
                         <field name="situacao" widget="statusbar" select="1"
                                nolabel="1"
@@ -215,6 +225,75 @@
                                         <field name="sped_r2099_registro" readonly="1"/>
                                         <field name="situacao_r2099" />
                                     </group>
+                                </group>
+                            </page>
+                            <page name="r4020" string="R-4020">
+                                <group>
+                                    <field name="estabelecimento_4020_ids" readonly="1" nolabel="1">
+                                        <tree>
+                                            <field name="nome" invisible="1" />
+                                            <field name="estabelecimento_id" />
+                                            <field name="prestador_id" />
+                                            <field name="vr_total_bruto" />
+                                            <field name="vr_total_base_retencao" />
+                                            <field name="vr_total_ret_princ" />
+                                            <field name="situacao_r4020" />
+                                            <field name="sped_r4020" invisible="1" />
+                                            <field name="sped_r4020_registro" invisible="1" />
+                                            <field name="nfs_ids" invisible="1" />
+                                        </tree>
+                                        <form>
+                                            <sheet>
+                                                <group colspan="4" col="4">
+                                                    <group colspan="2" col="2">
+                                                        <field name="estabelecimento_id" readonly="1" />
+                                                        <field name="prestador_id" readonly="1" />
+                                                        <field name="sped_r4020" invisible="1" />
+                                                        <field name="sped_r4020_registro" attrs="{'invisible': [('sped_r4020', '=', False)]}" />
+                                                    </group>
+                                                    <group colspan="2" col="2">
+                                                        <field name="vr_total_bruto" readonly="1" />
+                                                        <field name="vr_total_base_retencao" readonly="1" />
+                                                        <field name="vr_total_ret_princ" readonly="1" />
+                                                    </group>
+                                                    <group colspan="4" col="1" string="Notas Fiscais">
+                                                        <field name="nfs_ids" nolabel="1" readonly="1">
+                                                            <tree>
+                                                                <field name="nfs_id" invisible="1"/>
+                                                                <field name="serie" />
+                                                                <field name="num_docto" />
+                                                                <field name="dt_emissao_nf" />
+                                                                <field name="vr_bruto" />
+                                                            </tree>
+                                                            <form>
+                                                                <group colspan="4" col="4">
+                                                                    <group colspan="4" col="2">
+                                                                        <field name="nfs_id" readonly="1" />
+                                                                        <field name="serie" readonly="1" />
+                                                                        <field name="num_docto" invisible="1" />
+                                                                        <field name="dt_emissao_nf" readonly="1" />
+                                                                        <field name="vr_bruto" readonly="1" />
+                                                                    </group>
+                                                                </group>
+                                                            </form>
+                                                        </field>
+                                                    </group>
+                                                </group>
+                                            </sheet>
+                                        </form>
+                                    </field>
+                                </group>
+                            </page>
+                            <page name="r4099_abertura" string="R-4099 Abertura">
+                                <group>
+                                    <field name="sped_r4099_abertura_registro" />
+                                    <field name="situacao_abertura_r4099" />
+                                </group>
+                            </page>
+                            <page name="r4099_fechamento" string="R-4099 Fechamento">
+                                <group>
+                                    <field name="sped_r4099_registro" />
+                                    <field name="situacao_r4099" />
                                 </group>
                             </page>
                         </notebook>

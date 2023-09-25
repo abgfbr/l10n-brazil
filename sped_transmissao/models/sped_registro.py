@@ -217,6 +217,9 @@ class SpedRegistro(models.Model):
         string='Registro Retificado',
         comodel_name='sped.registro',
     )
+    efdreinf_id = fields.Many2one(
+        comodel_name='sped.efdreinf'
+    )
 
     @api.multi
     def _compute_pode_retificar(self):
@@ -430,6 +433,7 @@ class SpedRegistro(models.Model):
         for lote in self.lote_ids:
             if lote.situacao == '2':
                 lote_consultar = lote
+                break
 
         # Executa a consulta
         if lote_consultar:
