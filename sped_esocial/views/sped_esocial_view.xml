@@ -179,7 +179,7 @@
                                                     </field>
                                                 </group>
                                             </page>
-                                            <page name="s1202" string="S-1202" invisible="1">  <!-- Por enquanto não se envia o S-1202 -->
+                                            <page name="s1202" string="S-1202">  <!-- Por enquanto não se envia o S-1202 -->
                                                 <group colspan="4" col="4">
                                                     <separator string="Remuneração de Servidor vinculado ao RPPS" />
                                                     <field name="remuneracao_rpps_ids" readonly="1" nolabel="1" colspan="4">

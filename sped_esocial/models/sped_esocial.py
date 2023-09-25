@@ -703,12 +703,15 @@ class SpedEsocial(models.Model):
                     remuneracao_dicionario[trabalhador.id].atualizar_esocial()
                     continue
 
+                diretor = self.env.ref('l10n_br_hr_payroll.hr_contract_category_410')
+
                 # Localiza os contratos válidos deste trabalhador
                 domain = [
                     ('employee_id', '=', trabalhador.id),
                     ('company_id', 'in', empresas),
                     ('date_start', '<=', periodo.date_stop),
-                    ('tp_reg_prev', 'in', ['1', False]),  # Somente contratos do tipo RGPS
+                    ('tp_reg_prev', 'in', ['1', '2', False]),  # Somente contratos do tipo RGPS
+                    ('category_id', 'not in', [diretor.id]),
                     # ('situacao_esocial', 'not in', ['0', '9']),  # Somente contratos ativos no e-Social
                 ]
                 contratos = self.env['hr.contract'].search(domain)
@@ -913,12 +916,16 @@ class SpedEsocial(models.Model):
             # servidores_com_contrato = []
             for servidor in servidores:
 
+                diretor = self.env.ref(
+                    'l10n_br_hr_payroll.hr_contract_category_410')
+
                 # Localiza os contratos válidos deste trabalhador
                 domain = [
                     ('employee_id', '=', servidor.id),
                     ('company_id', 'in', empresas),
                     ('date_start', '<=', periodo.date_stop),
                     ('tp_reg_prev', '=', '2'),  # Somente contratos do tipo RPPS
+                    ('category_id', 'in', [diretor.id]),
                     # ('situacao_esocial', 'not in', ['0', '9']),  # Somente contratos ativos no e-Social
                 ]
                 contratos = self.env['hr.contract'].search(domain)
@@ -978,6 +985,10 @@ class SpedEsocial(models.Model):
                         # Cria o registro de transmissão sped (se ainda não existir)
                         s1202.atualizar_esocial()
                 else:
+                    mes = datetime.strptime(self.periodo_id.date_start,
+                                            '%Y-%m-%d').month
+                    ano = datetime.strptime(self.periodo_id.date_start,
+                                            '%Y-%m-%d').year
                     # Busca os payslips de pagamento mensal deste autonomo
                     domain_payslip_autonomo = [
                         ('company_id', 'in', empresas),
@@ -1055,7 +1066,7 @@ class SpedEsocial(models.Model):
                     ('employee_id', '=', beneficiario.id),
                     ('company_id', 'in', empresas),
                     ('date_start', '<=', periodo.date_stop),
-                    ('tp_reg_prev', 'in', ['1', False]),  # Somente contratos RPGS - RPPS fica para 2019
+                    ('tp_reg_prev', 'in', ['1', '2', False]),  # Somente contratos RPGS - RPPS fica para 2019
                     # ('tp_reg_prev', 'in', ['1', '2', False]),  # Somente contratos com o campo tp_reg_prev definido como 1 ou 2
                     # ('situacao_esocial', 'not in', ['0', '9']),  # Somente contratos ativos no e-Social
                 ]
@@ -1947,7 +1958,7 @@ class SpedEsocial(models.Model):
 
                 # Periódicos
                 esocial.importar_remuneracoes()             # S-1200
-                # esocial.importar_remuneracoes_rpps()      # S-1202
+                esocial.importar_remuneracoes_rpps()        # S-1202
                 esocial.importar_pagamentos()               # S-1210
 
                 # Relaciona as Rescisões do Período para facilmente visualizá-las

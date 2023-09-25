@@ -107,7 +107,8 @@
                                         <field name="cod_inc_fgts" colspan="4" attrs="{'required': [('nat_rubr', '!=', False)]}" />
                                         <separator colspan="4" string="Código de Incidência tributária da rubrica para a Contribuição Sindical" />
                                         <field name="cod_inc_sind" colspan="4" attrs="{'required': [('nat_rubr', '!=', False)]}" />
-
+                                        <separator colspan="4" string="Código de Incidência tributária da rubrica para o Regime Próprio de Previdência Social" />
+                                        <field name="cod_inc_cprp" colspan="4" />
                                     </group>
                                 </page>
                             </notepad>

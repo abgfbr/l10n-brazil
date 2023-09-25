@@ -110,20 +110,36 @@ class HrContractChange(models.Model):
         self.ensure_one()
 
         # Se o registro intermediário do S-2206 não existe, criá-lo
-        if not self.sped_s2206_id:
+        if self.contract_id.sped_s2200_id:
+            if not self.sped_s2206_id:
+                if self.env.user.company_id.eh_empresa_base:
+                    matriz = self.env.user.company_id.id
+                else:
+                    matriz = self.env.user.company_id.matriz.id
+
+                self.sped_s2206_id = \
+                    self.env['sped.esocial.alteracao.contrato'].create({
+                        'company_id': matriz,
+                        'hr_contract_change_id': self.id,
+                    })
+
+            # Criar o registro de transmissão relacionado
+            self.sped_s2206_id.gerar_registro()
+        elif self.contract_id.evento_esocial == 's2300':
             if self.env.user.company_id.eh_empresa_base:
                 matriz = self.env.user.company_id.id
             else:
                 matriz = self.env.user.company_id.matriz.id
+            intermediario_s2306 = self.env['sped.esocial.alteracao.contrato.autonomo'].create({
+                'company_id': matriz,
+                'hr_contract_id': self.contract_id.id,
+                'precisa_atualizar': True,
+            })
 
-            self.sped_s2206_id = \
-                self.env['sped.esocial.alteracao.contrato'].create({
-                    'company_id': matriz,
-                    'hr_contract_change_id': self.id,
-                })
-
-        # Criar o registro de transmissão relacionado
-        self.sped_s2206_id.gerar_registro()
+            # Criar o registro de transmissão relacionado
+            intermediario_s2306.gerar_registro()
+        else:
+            self.situacao_esocial = '9'
         self.apply_contract_changes()
 
     @api.multi
