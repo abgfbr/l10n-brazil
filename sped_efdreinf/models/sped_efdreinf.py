@@ -183,6 +183,17 @@ class SpedEfdReinf(models.Model):
             if efdreinf.sped_r2099_registro.situacao in ['1', '3']:
                 registros.append(efdreinf.sped_r2099_registro.sped_inclusao.id)
 
+            # Estabelecimentos (R-4020)
+            for estabelecimento in efdreinf.estabelecimento_4020_ids:
+                # Identifica o registro a ser transmitido
+                if estabelecimento.sped_r4020_registro.situacao in ['1',
+                                                                    '3']:
+                    registros.append(estabelecimento.sped_r4020_registro.id)
+                else:
+                    for registro in estabelecimento.sped_r4020_retificacao:
+                        if registro.situacao in ['1', '3']:
+                            registros.append(registro.id)
+
             # Popula a lista de registros
             regs = efdreinf.registro_ids.ids
             for registro in registros:
@@ -497,8 +508,8 @@ class SpedEfdReinf(models.Model):
         domain = [
             ('state', 'in', ['open', 'paid']),
             ('type', '=', 'in_invoice'),
-            ('date_due', '>=', data_hora_inicial),
-            ('date_due', '<=', data_hora_final),
+            ('data_pagamento', '>=', data_hora_inicial),
+            ('data_pagamento', '<=', data_hora_final),
         ]
         nfs_busca = self.env['account.invoice'].search(domain,
                                                        order='partner_id')

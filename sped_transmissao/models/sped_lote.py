@@ -418,9 +418,12 @@ class SpedLote(models.Model, ):
             elif self.tipo == 'efdreinf':
                 if registro.cd_retorno == '0':
                     registro.situacao = '4'
-                    registro.recibo = evento.nrRecArqBase.valor
+                    registro.recibo = evento.ideStatus.nrProtLote.valor
+                    registro.hash = evento.ideStatus.hash.valor
                 elif registro.cd_retorno == '1':
                     registro.situacao = '3'
+                    registro.recibo = evento.ideStatus.nrProtLote.valor
+                    registro.hash = evento.ideStatus.hash.valor
                 elif registro.cd_retorno == '2':
                     registro.situacao = '2'
                 else:
