@@ -459,48 +459,51 @@ class SpedEfdReinf(models.Model):
 
                     if nf.inss_value_wh != 0:
                         # Cria o registro se ele não existir
-                        if not estabelecimento_id:
+                        inss_ret_periodo = data_hora_inicial <= nf.date_hour_invoice <= data_hora_final
+                        if inss_ret_periodo:
+                            if not estabelecimento_id:
+                                vals = {
+                                    'efdreinf_id': self.id,
+                                    'estabelecimento_id': empresa.id,
+                                    'prestador_id': prestador_id.id,
+                                    'periodo_id': self.periodo_id.id,
+                                    'ind_cprb': ind_cprb,
+                                }
+                                estabelecimento_id = self.env['sped.efdreinf.estabelecimento'].create(vals)
+                                self.estabelecimento_ids = [(4, estabelecimento_id.id)]
+
+                    if nf.amount_wh:
+                        estabelecimento_4020_id = self.env[
+                            'sped.efdreinf.estabelecimento.4020'].search(domain)
+
+                        # Cria o registro 4020 se ele não existir
+                        if not estabelecimento_4020_id:
                             vals = {
                                 'efdreinf_id': self.id,
                                 'estabelecimento_id': empresa.id,
                                 'prestador_id': prestador_id.id,
                                 'periodo_id': self.periodo_id.id,
-                                'ind_cprb': ind_cprb,
                             }
-                            estabelecimento_id = self.env['sped.efdreinf.estabelecimento'].create(vals)
-                            self.estabelecimento_ids = [(4, estabelecimento_id.id)]
+                            estabelecimento_4020_id = self.env[
+                                'sped.efdreinf.estabelecimento.4020'].create(vals)
+                            self.estabelecimento_4020_ids = [
+                                (4, estabelecimento_4020_id.id)]
 
-                    estabelecimento_4020_id = self.env[
-                        'sped.efdreinf.estabelecimento.4020'].search(domain)
-
-                    # Cria o registro 4020 se ele não existir
-                    if not estabelecimento_4020_id:
-                        vals = {
-                            'efdreinf_id': self.id,
-                            'estabelecimento_id': empresa.id,
-                            'prestador_id': prestador_id.id,
-                            'periodo_id': self.periodo_id.id,
-                        }
-                        estabelecimento_4020_id = self.env[
-                            'sped.efdreinf.estabelecimento.4020'].create(vals)
-                        self.estabelecimento_4020_ids = [
-                            (4, estabelecimento_4020_id.id)]
-
-                    nf_domain_400 = [
-                        ('estabelecimento_id', '=', estabelecimento_4020_id.id),
-                        ('nfs_id', "=", nf.id)
-                    ]
-                    nf_estabelecimento_4020_id = \
-                        self.env['sped.efdreinf.nfs.4020'].search(nf_domain_400)
-                    if not nf_estabelecimento_4020_id:
-                        vals = {
-                            'estabelecimento_id': estabelecimento_4020_id.id,
-                            'nfs_id': nf.id
-                        }
+                        nf_domain_400 = [
+                            ('estabelecimento_id', '=', estabelecimento_4020_id.id),
+                            ('nfs_id', "=", nf.id)
+                        ]
                         nf_estabelecimento_4020_id = \
-                            self.env['sped.efdreinf.nfs.4020'].create(vals)
-                        estabelecimento_4020_id.nfs_ids = \
-                            [(4, nf_estabelecimento_4020_id.id)]
+                            self.env['sped.efdreinf.nfs.4020'].search(nf_domain_400)
+                        if not nf_estabelecimento_4020_id:
+                            vals = {
+                                'estabelecimento_id': estabelecimento_4020_id.id,
+                                'nfs_id': nf.id
+                            }
+                            nf_estabelecimento_4020_id = \
+                                self.env['sped.efdreinf.nfs.4020'].create(vals)
+                            estabelecimento_4020_id.nfs_ids = \
+                                [(4, nf_estabelecimento_4020_id.id)]
 
     def get_fornecedores_notas_entrada(self, data_hora_final,
                                        data_hora_inicial):
