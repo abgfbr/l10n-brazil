@@ -125,7 +125,7 @@ class SpedEfdReinfEstab4020(models.Model, SpedRegistroIntermediario):
             for nota in record.nfs_ids:
                 total_bruto += nota.nfs_id.amount_untaxed
                 total_base_ret += nota.nfs_id.amount_untaxed
-                total_ret += nota.nfs_id.amount_wh - nota.nfs_id.inss_value_wh
+                total_ret += nota.nfs_id.amount_wh - nota.nfs_id.inss_value_wh - nota.nfs_id.issqn_value_wh
 
             record.vr_total_bruto = total_bruto
             record.vr_total_base_retencao = total_base_ret

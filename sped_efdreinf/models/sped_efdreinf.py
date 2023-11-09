@@ -446,7 +446,7 @@ class SpedEfdReinf(models.Model):
                     ]
                     estabelecimento_id = self.env['sped.efdreinf.estabelecimento'].search(domain)
 
-                    if nf.inss_value_wh != 0:
+                    if nf.inss_value_wh != 0 and data_hora_inicial <= nf.date_hour_invoice <= data_hora_final:
                         # Cria o registro se ele não existir
                         if not estabelecimento_id:
                             vals = {
@@ -459,17 +459,7 @@ class SpedEfdReinf(models.Model):
                             estabelecimento_id = self.env['sped.efdreinf.estabelecimento'].create(vals)
                             self.estabelecimento_ids = [(4, estabelecimento_id.id)]
 
-                    estabelecimento_4020_id = self.env[
-                        'sped.efdreinf.estabelecimento.4020'].search(domain)
-
-                    # Cria o registro 4020 se ele não existir
-                    if not estabelecimento_4020_id:
-                        vals = {
-                            'efdreinf_id': self.id,
-                            'estabelecimento_id': empresa.id,
-                            'prestador_id': prestador_id.id,
-                            'periodo_id': self.periodo_id.id,
-                        }
+                    if nf.amount_wh and data_hora_inicial <= nf.data_pagamento <= data_hora_final:
                         estabelecimento_4020_id = self.env[
                             'sped.efdreinf.estabelecimento.4020'].create(vals)
                         self.estabelecimento_4020_ids = [
@@ -497,12 +487,25 @@ class SpedEfdReinf(models.Model):
         domain = [
             ('state', 'in', ['open', 'paid']),
             ('type', '=', 'in_invoice'),
-            ('date_due', '>=', data_hora_inicial),
-            ('date_due', '<=', data_hora_final),
+            ('date_hour_invoice', '>=', data_hora_inicial),
+            ('date_hour_invoice', '<=', data_hora_final),
         ]
-        nfs_busca = self.env['account.invoice'].search(domain,
-                                                       order='partner_id')
-        return nfs_busca
+        nfs_busca_inss = self.env['account.invoice'].search(
+            domain, order='partner_id')
+
+        # Identificar NFs de entrada do período com retenção de outros tributos
+        domain = [
+            ('state', 'in', ['open', 'paid']),
+            ('type', '=', 'in_invoice'),
+            ('data_pagamento', '>=', data_hora_inicial),
+            ('data_pagamento', '<=', data_hora_final),
+        ]
+        nfs_busca_retencoes = self.env['account.invoice'].search(
+            domain, order='partner_id')
+
+        nfs_busca_inss |= nfs_busca_retencoes
+
+        return nfs_busca_inss
 
     @api.multi
     def criar_r2010(self):
