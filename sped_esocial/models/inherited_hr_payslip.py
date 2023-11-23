@@ -267,7 +267,9 @@ class HrPaylisp(models.Model):
 
             matriz  = payslip.company_id
             trabalhador = payslip.employee_id
-            period_id = self.env['account.period'].find(payslip.date_from)
+            period_id = self.env['account.period'].find(
+                payslip.data_pagamento_competencia or
+                payslip.data_pagamento_demissao)
 
             domain_s1210 = [
                 ('company_id', '=', matriz.id),
