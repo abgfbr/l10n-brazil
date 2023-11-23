@@ -302,6 +302,12 @@ class SpedEsocial(models.Model):
                 if remuneracao.sped_registro.situacao in ['1', '3']:
                     registros.append(remuneracao.sped_registro.id)
 
+            # Fechamento (S-1202)
+            for remuneracao_rpps in esocial.remuneracao_rpps_ids:
+                # Identifica o registro a ser transmitido
+                if remuneracao_rpps.sped_registro.situacao in ['1', '3']:
+                    registros.append(remuneracao_rpps.sped_registro.id)
+
             # Fechamento (S-1210)
             for pagamento in esocial.pagamento_ids:
                 # Identifica o registro a ser transmitido
