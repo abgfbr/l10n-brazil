@@ -231,7 +231,7 @@ class SpedHrRescisao(models.Model, SpedRegistroIntermediario):
 
             S2299.evento.ideEvento.nrRecibo.valor = \
                 registro_para_retificar.recibo
-
+            
         S2299.evento.ideEvento.indRetif.valor = indRetif
 
         # Processo de Emissão = Aplicativo do Contribuinte
@@ -335,10 +335,12 @@ class SpedHrRescisao(models.Model, SpedRegistroIntermediario):
 
                         total -= adiantamento_13_value
 
-                        if horas_nao_trabalhadas:
-                            valor_devido = salario.total - horas_nao_trabalhadas.total
-                            if valor_devido < 0:
-                                total -= abs(valor_devido)
+                        #if horas_nao_trabalhadas:
+                        #    valor_devido = salario.total - horas_nao_trabalhadas.total
+                        #    if valor_devido < 0:
+                        #        total -= abs(valor_devido)
+                        #if total <= 0:
+                        #    continue
 
                 data_apuracao, eh_periodo = \
                     self.validar_referencia_periodo_linha(
@@ -346,7 +348,7 @@ class SpedHrRescisao(models.Model, SpedRegistroIntermediario):
                         periodo_apuracao_inverso)
 
                 if rubrica_line.salary_rule_id.cod_inc_irrf_calculado not in \
-                        ['31', '32', '33', '34', '35', '51', '52', '53', '54', '55', '81', '82', '83']:
+                        ['33', '34', '35', '51', '52', '53', '54', '55', '81', '82', '83']:
                     if rubrica_line.total > 0:
                         condicao_pagamento_anterior = True if \
                             eh_periodo and convencao_coletiva_id and (

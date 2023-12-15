@@ -296,7 +296,7 @@ class SpedEsocialRemuneracao(models.Model, SpedRegistroIntermediario):
             dm_dev.ideDmDev.valor = payslip.number
             dm_dev.codCateg.valor = payslip.contract_id.category_id.code  # TODO Integrar com a tabela 01 do e-Social
 
-            if not payslip.contract_id.date_end:
+            if not payslip.contract_id.date_end or payslip.contract_id.date_end > self.periodo_id.date_stop:
                 # Popula dmDev.infoPerApur
                 info_per_apur = pysped.esocial.leiaute.S1200_InfoPerApur_2()
                 info_per_apur.ideEstabLot.tpInsc.valor = '1'  # CNPJ
@@ -307,12 +307,16 @@ class SpedEsocialRemuneracao(models.Model, SpedRegistroIntermediario):
                 remun_per_apur = pysped.esocial.leiaute.S1200_RemunPerApur_2()
 
                 # Só preencher matricula de EMPREGADO com vinculo
-                if payslip.contract_id.evento_esocial == 's2200' or payslip.contract_id.id == 259:
-                    remun_per_apur.matricula.valor = payslip.contract_id.matricula
+                remun_per_apur.matricula.valor = payslip.contract_id.matricula
+                #if payslip.contract_id.evento_esocial == 's2200' or payslip.contract_id.id == 259:
+                #    remun_per_apur.matricula.valor = payslip.contract_id.matricula
 
             # Somente para quando a empresa for do Simples
             # remun_per_apur.indSimples.valor =
-
+            irrf_rubrica_codigo = ['34', '35', '51', '52', '53', '54', '55',
+                                   '81', '82', '83']
+            if payslip.tipo_de_folha == 'decimo_terceiro':
+                irrf_rubrica_codigo.append('31')
             # Popula dmDev.infoPerApur.ideEstabLot.remunPerApur.itensRemun
             for line in payslip.line_ids:
                 # Só adiciona a rubrica se o campo nat_rubr estiver definido, isso define que a rubrica deve
@@ -337,7 +341,9 @@ class SpedEsocialRemuneracao(models.Model, SpedRegistroIntermediario):
                             continue
 
                     if line.salary_rule_id.cod_inc_irrf_calculado not in \
-                            ['31', '32', '33', '34', '35', '51', '52', '53', '54', '55', '81', '82', '83']:
+                            irrf_rubrica_codigo:
+                        if line.salary_rule_id.cod_inc_irrf_calculado == '33' and not payslip.tipo_de_folha == 'ferias':
+                            continue
                         if not payslip.tipo_de_folha == 'ferias' and  line.salary_rule_id.cod_inc_irrf_calculado == '13' \
                                 and not eh_periodo:
                             continue
@@ -361,8 +367,12 @@ class SpedEsocialRemuneracao(models.Model, SpedRegistroIntermediario):
                             if line.total != 0:
 
                                 itens_remun = pysped.esocial.leiaute.S1200_ItensRemun_2()
-                                itens_remun.codRubr.valor = line.salary_rule_id.codigo
-                                itens_remun.ideTabRubr.valor = line.salary_rule_id.identificador
+                                if payslip.struct_id.id == 215 and line.salary_rule_id.codigo == "HONORARIO_CONSELHO_FISCAL":
+                                    itens_remun.codRubr.valor = "HON_CONF_INSS"
+                                    itens_remun.ideTabRubr.valor = "HN_CNF_I"
+                                else:
+                                    itens_remun.codRubr.valor = line.salary_rule_id.codigo
+                                    itens_remun.ideTabRubr.valor = line.salary_rule_id.identificador
                                 if line.quantity and float(line.quantity) != 1:
                                     itens_remun.qtdRubr.valor = float(line.quantity)
                                 if line.rate and line.rate != 100:

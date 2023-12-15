@@ -235,15 +235,21 @@ class SpedEsocialPagamento(models.Model, SpedRegistroIntermediario):
                 if payslip.contract_id.evento_esocial == 's2300':
                     tipo = '3'
             if payslip.contract_id.tp_reg_prev == '2':
-                tipo = '5'
-            
+                # tipo = '5'
+                tipo = '1'
+            if payslip.contract_id.tp_reg_prev == '2' and payslip.contract_id.evento_esocial == 's2300' and payslip.contract_id.category_id.code in ['410']:
+                tipo = '4'
             info_pgto.tpPgto.valor = tipo
 
             # Esocial recusa 2 pagamentos no mesmo dia do mesmo tipo
             # mas multiplos vinculos na mesma empresa se enquadra nesse cenario
             if not data_pagamento:
-                data_pagamento = payslip.data_pagamento_competencia or \
-                                 fields.Date.today().split(' ')[0]
+                if payslip.contract_id.struct_id.id == 206:
+                    data_pagamento = payslip.data_pagamento_autonomo or \
+                                     fields.Date.today().split(' ')[0]
+                else:
+                    data_pagamento = payslip.data_pagamento_competencia or \
+                                     fields.Date.today().split(' ')[0]
 
             elif data_pagamento and tipo == '1':
                 data_pagamento = str(

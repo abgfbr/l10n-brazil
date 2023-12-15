@@ -338,6 +338,9 @@ class SpedEsocialRubrica(models.Model, SpedRegistroIntermediario):
             cod_inc_irrf = self.rubrica_id.cod_inc_irrf_9
         S1010.evento.infoRubrica.dadosRubrica.codIncIRRF.valor = cod_inc_irrf
 
+        if self.rubrica_id.cod_inc_cprp:
+            S1010.evento.infoRubrica.dadosRubrica.codIncCPRP.valor = self.rubrica_id.cod_inc_cprp
+
         # Preencher observação
         if self.rubrica_id.note:
             S1010.evento.infoRubrica.dadosRubrica.observacao.valor = \

@@ -250,10 +250,14 @@ class SpedHrRescisaoAutonomo(models.Model, SpedRegistroIntermediario):
 
         S2399.evento.ideTrabSemVinculo.cpfTrab.valor = \
             limpa_formatacao(employee_id.cpf)
-        S2399.evento.ideTrabSemVinculo.nisTrab.valor = \
-            limpa_formatacao(employee_id.pis_pasep)
-        S2399.evento.ideTrabSemVinculo.codCateg.valor = \
-            self.hr_contract_id.category_id.code
+        if self.hr_contract_id.matricula and self.hr_contract_id.category_id.id != 30:
+            S2399.evento.ideTrabSemVinculo.matricula.valor = self.hr_contract_id.matricula
+        else: 
+            S2399.evento.ideTrabSemVinculo.codCateg.valor = \
+                self.hr_contract_id.category_id.code
+            if self.hr_contract_id.category_id.code == '721':
+                S2399.evento.infoTSVTermino.mtvDesligTSV.valor = '02'
+                S2399.evento.infoTSVTermino.pensAlim.valor = '0'
 
         domain = [
             ('contract_id', '=', self.sped_hr_rescisao_id.contract_id.id),
@@ -268,7 +272,7 @@ class SpedHrRescisaoAutonomo(models.Model, SpedRegistroIntermediario):
         if rescisao_id.contract_id.category_id.code in ['721', '722', '410']:
 
             # Indicativo de pensão alimentícia para fins de retenção de FGTS
-            S2399.evento.infoTSVTermino.pensAlim.valor = self.pens_alim
+            # S2399.evento.infoTSVTermino.pensAlim.valor = self.pens_alim
             if self.pens_alim in ['1', '3']:
                 S2399.evento.infoTSVTermino.percAliment.valor = \
                     str(self.perc_aliment)
@@ -319,6 +323,7 @@ class SpedHrRescisaoAutonomo(models.Model, SpedRegistroIntermediario):
                                 det_verbas.fatorRubr.valor = rubrica_line.rate
                             det_verbas.vrRubr.valor = str(
                                 rubrica_line.total)
+                            det_verbas.indApurIR.valor = '0'
                             ide_estab_lot.detVerbas.append(det_verbas)
 
             # evtTSVAltContr.infoTSVTermino.VerbasResc.DmDev.

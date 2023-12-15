@@ -19,6 +19,10 @@ class HrPaylisp(models.Model):
         help="e-Social: S-2399 - mtvDeslig"
     )
 
+    data_pagamento_competencia = fields.Date(
+        string="Data do pagamento",
+    )
+
     @api.multi
     def hr_verify_sheet(self):
         for holerite in self:

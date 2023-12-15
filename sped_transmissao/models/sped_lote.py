@@ -286,8 +286,8 @@ class SpedLote(models.Model, ):
             self.cd_resposta = processo.resposta.status.cdResposta.valor  # TODO Incluir no processador do REINF as mesmas
             self.desc_resposta = processo.resposta.status.descResposta.valor  # variáveis da resposta do eSocial para equalizar
         if self.tipo == 'esocial':
-            self.cd_resposta = processo.resposta.cdResposta.valor  # TODO Incluir no processador do REINF as mesmas
-            self.desc_resposta = processo.resposta.descResposta.valor  # variáveis da resposta do eSocial para equalizar
+            self.cd_resposta = processo.resposta.cdResposta  # TODO Incluir no processador do REINF as mesmas
+            self.desc_resposta = processo.resposta.descResposta  # variáveis da resposta do eSocial para equalizar
             self.dh_recepcao = processo.resposta.dhRecepcao   # o tratamento da resposta
             self.versao_aplicativo_recepcao = processo.resposta.versaoAplicativoRecepcao
             self.versao_aplicativo_processamento = processo.resposta.versaoAplicativoProcessamentoLote

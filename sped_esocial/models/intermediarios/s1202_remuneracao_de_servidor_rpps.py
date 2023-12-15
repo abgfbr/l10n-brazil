@@ -145,14 +145,14 @@ class SpedEsocialRemuneracaoRPPS(models.Model, SpedRegistroIntermediario):
 
         # Popula ideTrabalhador (Dados do Trabalhador)
         S1202.evento.ideTrabalhador.cpfTrab.valor = limpa_formatacao(self.servidor_id.cpf)
-        S1202.evento.ideTrabalhador.nisTrab.valor = limpa_formatacao(self.servidor_id.pis_pasep)
+        # S1202.evento.ideTrabalhador.nisTrab.valor = limpa_formatacao(self.servidor_id.pis_pasep)
 
         # Conta o número de dependentes para fins do regime próprio de previdência social
-        dependentes = 0
-        for dependente in self.servidor_id.dependent_ids:
-            if dependente.dependent_verification:
-                dependentes += 1
-        S1202.evento.ideTrabalhador.qtdDepFP.valor = dependentes
+        # dependentes = 0
+        # for dependente in self.servidor_id.dependent_ids:
+        #     if dependente.dependent_verification:
+        #         dependentes += 1
+        # S1202.evento.ideTrabalhador.qtdDepFP.valor = dependentes
 
         # # Popula ideTrabalhador.infoMV (Dados do Empregador Cedente)  # TODO
         # #        ideTrabalhador.infoMV.remunOutrEmpr
@@ -178,6 +178,7 @@ class SpedEsocialRemuneracaoRPPS(models.Model, SpedRegistroIntermediario):
         for payslip in self.payslip_ids:
             dm_dev = pysped.esocial.leiaute.S1202_DmDev_2()
             dm_dev.ideDmDev.valor = payslip.number
+            dm_dev.codCateg.valor = payslip.contract_id.category_id.code
 
             # Popula dmDev.infoPerApur
             info_per_apur = pysped.esocial.leiaute.S1202_InfoPerApur_2()
@@ -187,23 +188,25 @@ class SpedEsocialRemuneracaoRPPS(models.Model, SpedRegistroIntermediario):
             # Popula dmDev.infoPerApur.ideEstab.remunPerApur
             remun_per_apur = pysped.esocial.leiaute.S1202_RemunPerApur_2()
             remun_per_apur.matricula.valor = payslip.contract_id.matricula
-            remun_per_apur.codCateg.valor = payslip.contract_id.category_id.code  # TODO Integrar com a tabela 01 do e-Social
+            # remun_per_apur.codCateg.valor = payslip.contract_id.category_id.code  # TODO Integrar com a tabela 01 do e-Social
 
             # Popula dmDev.infoPerApur.ideEstab.remunPerApur.itensRemun
             for line in payslip.line_ids:
-
+                if line.total == 0:
+                    continue
                 # Só adiciona a rubrica se o campo nat_rubr estiver definido, isso define que a rubrica deve
                 # ser transmitida para o e-Social.
                 if line.salary_rule_id.nat_rubr:
                     itens_remun = pysped.esocial.leiaute.S1202_ItensRemun_2()
                     itens_remun.codRubr.valor = line.salary_rule_id.codigo
                     itens_remun.ideTabRubr.valor = line.salary_rule_id.identificador
-                    if line.quantity and float(line.quantity) != 1:
-                        itens_remun.qtdRubr.valor = float(line.quantity)
-                        itens_remun.vrUnit.valor = formata_valor(line.amount)
+                    # if line.quantity and float(line.quantity) != 1:
+                    #     itens_remun.qtdRubr.valor = float(line.quantity)
+                    #     itens_remun.vrUnit.valor = formata_valor(line.amount)
                     if line.rate and line.rate != 100:
                         itens_remun.fatorRubr.valor = line.rate
                     itens_remun.vrRubr.valor = formata_valor(line.total)
+                    itens_remun.indApurIR.valor = '0'
                     remun_per_apur.itensRemun.append(itens_remun)
 
             # # Popula dmDev.infoPerApur.ideEstab.remunPerApur.infoSaudeColet  # TODO Quando tivermos plano de saúde

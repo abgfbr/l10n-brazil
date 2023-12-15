@@ -190,7 +190,7 @@ class SpedEsocialHrContrato(models.Model, SpedRegistroIntermediario):
             S2300.evento.ideEvento.indRetif.valor = '2'
 
             registro_para_retificar = self.get_registro_para_retificar(
-                self.sped_s2200_registro_inclusao)
+                self.registro_inclusao)
 
             S2300.evento.ideEvento.nrRecibo.valor = \
                 registro_para_retificar.recibo
@@ -435,9 +435,9 @@ class SpedEsocialHrContrato(models.Model, SpedRegistroIntermediario):
             #alteracoes Eder - 03-12-2022
 
             CargoFuncao.CBOCargo.valor = self.hr_contract_id.job_id.cbo_id.code
-            # CargoFuncao.CBOFuncao.valor = self.hr_contract_id.job_id.cbo_id.code
+            CargoFuncao.CBOFuncao.valor = self.hr_contract_id.job_id.cbo_id.code
             CargoFuncao.nmCargo.valor = self.hr_contract_id.job_id.cbo_id.name
-            # CargoFuncao.nmFuncao.valor = self.hr_contract_id.job_id.name
+            CargoFuncao.nmFuncao.valor = self.hr_contract_id.job_id.name
 
             # CargoFuncao.codFuncao.valor = ''
             InfoComplementares.cargoFuncao.append(CargoFuncao)
@@ -456,7 +456,6 @@ class SpedEsocialHrContrato(models.Model, SpedRegistroIntermediario):
         # InfoTSVInicio.InfoComplementares.FGTS
         if self.hr_contract_id.category_id.code in ['721']:
             FGTS = pysped.esocial.leiaute.S2300_FGTS_2()
-            FGTS.opcFGTS.valor = self.hr_contract_id.opc_fgts
             FGTS.dtOpcFGTS.valor = self.hr_contract_id.dt_opc_fgts
             data_inicio_contrato = \
                 fields.Datetime.from_string(self.hr_contract_id.date_start)

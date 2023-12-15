@@ -163,7 +163,7 @@ class HrPaylisp(models.Model):
             trabalhador = payslip.employee_id
             period_id = self.env['account.period'].find(payslip.date_from)
 
-            if self.contract_id.tp_reg_prev == '1':
+            if self.contract_id.category_id.code not in ["301", "302", "303", "304", "306", "307", "309", "310", "312", "308", "311", "313","401", "410"]:
                 # Verifica se o registro S-1200 já existe, cria ou atualiza
                 domain_s1200 = [
                     ('company_id', '=', matriz.id),
