@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 # Copyright 2018 ABGF
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+import pytz
+from datetime import datetime, timedelta
 
 from openerp import api, fields, models
 from openerp.exceptions import ValidationError
@@ -408,8 +410,26 @@ class SpedEfdReinf(models.Model):
     def importar_movimento(self):
         self.ensure_one()
 
-        data_hora_inicial = self.periodo_id.date_start + ' 00:00:00'
-        data_hora_final = self.periodo_id.date_stop + ' 23:59:59'
+        data_inicial = self.periodo_id.date_start.split('-')
+        data_hora_inicial = datetime(
+            int(data_inicial[0]),
+            int(data_inicial[1]),
+            int(data_inicial[2]),
+            0,
+            0,
+            1,
+            tzinfo=pytz.timezone('America/Sao_Paulo')
+        )
+        data_final = self.periodo_id.date_stop.split('-')
+        data_hora_final = datetime(
+            int(data_final[0]),
+            int(data_final[1]),
+            int(data_final[2]),
+            23,
+            59,
+            59,
+            tzinfo=pytz.timezone('America/Sao_Paulo')
+        )
         cnpj_base = self.company_id.cnpj_cpf[0:10]
 
         # Limpar dados anteriores que não tenham registro SPED
@@ -436,7 +456,9 @@ class SpedEfdReinf(models.Model):
                 continue
 
             nfs_busca = self.get_fornecedores_notas_entrada(
-                data_hora_final, data_hora_inicial)
+                data_hora_final.strftime("%Y-%m-%d, %H:%M:%S"),
+                data_hora_inicial.strftime("%Y-%m-%d, %H:%M:%S")
+            )
             for nf in nfs_busca:
 
                 if nf.company_id != empresa:
@@ -457,7 +479,7 @@ class SpedEfdReinf(models.Model):
                     ]
                     estabelecimento_id = self.env['sped.efdreinf.estabelecimento'].search(domain)
 
-                    if nf.inss_value_wh != 0 and data_hora_inicial <= nf.date_hour_invoice <= data_hora_final:
+                    if nf.inss_value_wh != 0 and data_hora_inicial.strftime("%Y-%m-%d") <= nf.date_hour_invoice <= data_hora_final.strftime("%Y-%m-%d"):
                         # Cria o registro se ele não existir
                         if not estabelecimento_id:
                             vals = {
@@ -470,7 +492,7 @@ class SpedEfdReinf(models.Model):
                             estabelecimento_id = self.env['sped.efdreinf.estabelecimento'].create(vals)
                             self.estabelecimento_ids = [(4, estabelecimento_id.id)]
 
-                    if nf.amount_wh and data_hora_inicial <= nf.data_pagamento <= data_hora_final:
+                    if nf.amount_wh and data_hora_inicial.strftime("%Y-%m-%d") <= nf.data_pagamento <= data_hora_final.strftime("%Y-%m-%d"):
                         estabelecimento_4020_id = self.env[
                             'sped.efdreinf.estabelecimento.4020'].search(domain)
 
