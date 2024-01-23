@@ -497,7 +497,7 @@ class SpedEsocialHrContrato(models.Model, SpedRegistroIntermediario):
         LocalTrabalho = pysped.esocial.leiaute.S2300_LocalTrabGeral_2()
         LocalTrabalho.tpInsc.valor = 1
         LocalTrabalho.nrInsc.valor = limpa_formatacao(self.company_id.cnpj_cpf)
-        InfoComplementares.localTrabalho.append(LocalTrabalho)
+        InfoComplementares.localTrabGeral.append(LocalTrabalho)
 
         # InfoTSVInicio.InfoComplementares.InfoEstagiario
         # if self.hr_contract_id.category_id.code in ['901']:
