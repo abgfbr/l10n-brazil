@@ -307,7 +307,8 @@ class SpedEsocialRemuneracao(models.Model, SpedRegistroIntermediario):
                 remun_per_apur = pysped.esocial.leiaute.S1200_RemunPerApur_2()
 
                 # Só preencher matricula de EMPREGADO com vinculo
-                remun_per_apur.matricula.valor = payslip.contract_id.matricula
+                if payslip.contract_id.category_id.id != 31 and payslip.contract_id.categoria_sefip != "11":
+                    remun_per_apur.matricula.valor = payslip.contract_id.matricula
                 #if payslip.contract_id.evento_esocial == 's2200' or payslip.contract_id.id == 259:
                 #    remun_per_apur.matricula.valor = payslip.contract_id.matricula
 
