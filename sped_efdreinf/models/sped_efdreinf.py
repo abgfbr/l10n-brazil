@@ -196,6 +196,14 @@ class SpedEfdReinf(models.Model):
                         if registro.situacao in ['1', '3']:
                             registros.append(registro.id)
 
+            # Fechamento (R-4099)
+            if efdreinf.sped_r4099_registro.situacao in ['1', '3']:
+                registros.append(efdreinf.sped_r4099_registro.sped_r4099_registro.id)
+
+            # Fechamento (R-4099)
+            if efdreinf.sped_r4099_abertura_registro.situacao in ['1', '3']:
+                registros.append(efdreinf.sped_r4099_abertura_registro.sped_r4099_registro.id)
+
             # Popula a lista de registros
             regs = efdreinf.registro_ids.ids
             for registro in registros:
@@ -753,6 +761,7 @@ class SpedEfdReinf(models.Model):
 
         # if self.sped_r4098_registro.sped_inclusao:
         #     self.sped_r4098_registro.sped_inclusao = False
+        self.compute_registro_ids()
 
     @api.multi
     def importar_reabertura_4000(self):
@@ -761,6 +770,8 @@ class SpedEfdReinf(models.Model):
         # Verifica se o registro R-2099 já existe, cria ou atualiza
         if not self.sped_r4099_abertura_registro:
             self.criar_4099_abertura()
+
+        self.compute_registro_ids()
 
     @api.multi
     def enviar_fechamento(self):
