@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<openerp>
+    <data>
+
+        <record id="sped_efdreinf_natureza_rendimento_form" model="ir.ui.view">
+            <field name="name">Natureza Rendimentos</field>
+            <field name="model">sped.reinf.natureza.rendimentos</field>
+            <field name="arch" type="xml">
+                <form string="EFD/Reinf Natureza Rendimento">
+                    <sheet>
+                        <group>
+                            <field name="codigo" />
+                            <field name="natureza_rendimento"/>
+                        </group>
+                        <separator name="nat_rend_retencoes" string="Retenções" />
+                        <group>
+                            <field name="ret_agreg"/>
+                            <field name="ret_csll"/>
+                            <field name="ret_cofins"/>
+                            <field name="ret_pp"/>
+                        </group>
+                        <separator name="nat_rend_fornecedores" string="Fornecedores" />
+                        <field name="res_partner_ids"/>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="sped_efdreinf_natureza_rendimento_tree">
+            <field name="name">Natureza Rendimentos</field>
+            <field name="model">sped.reinf.natureza.rendimentos</field>
+            <field name="arch" type="xml">
+                <tree string="EFD/Reinf Natureza Rendimento" duplicate="false">
+                    <field name="codigo" />
+                    <field name="natureza_rendimento"/>
+                    <field name="ret_agreg"/>
+                    <field name="ret_csll"/>
+                    <field name="ret_cofins"/>
+                    <field name="ret_pp"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="sped_efdreinf_natureza_rendimento_search" model="ir.ui.view">
+            <field name="name">Natureza Rendimentos</field>
+            <field name="model">sped.reinf.natureza.rendimentos</field>
+            <field name="arch" type="xml">
+                <search string="EFD/Reinf Natureza Rendimento">
+                    <field name="codigo" />
+		        </search>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="sped_efdreinf_natureza_rendimento_action">
+            <field name="name">Natureza Rendimentos</field>
+            <field name="domain">[]</field>
+            <field name="res_model">sped.reinf.natureza.rendimentos</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem id="menu_sped_efdreinf_nat_rendimentos"
+                  name="Natureza Rendimentos"
+                  sequence="110"
+                  parent="sped_efdreinf.menu_sped_efdreinf"
+                  action="sped_efdreinf_natureza_rendimento_action"
+        />
+
+    </data>
+</openerp>

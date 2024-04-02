@@ -43,6 +43,7 @@
         'views/inherited_res_company.xml',
         'views/inherited_res_partner.xml',
         'views/inherited_account_invoice.xml',
+        'views/sped_efdreinf_natureza_rendimento.xml',
 
         # View/intermediários
         'views/intermediarios/r1000_informacoes_contribuinte_view.xml',

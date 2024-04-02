@@ -12,6 +12,12 @@
                   sequence="100"
                   parent="menu_sped_efdreinf"
         />
+        <menuitem id="menu_sped_efdreinf_fornecedores"
+                  name="Fornecedores"
+                  sequence="120"
+                  parent="menu_sped_efdreinf"
+                  action="base.action_partner_supplier_form"
+        />
 
     </data>
 </openerp>
