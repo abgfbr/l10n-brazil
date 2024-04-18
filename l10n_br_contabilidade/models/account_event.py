@@ -151,7 +151,9 @@ class AccountEvent(models.Model):
         Reverter Lançamentos do Evento Contábil
         """
         for record in self:
-            data =  record.env.context.get('data', fields.Date.today())
+            if record.state == 'reversed':
+                return
+            data = record.env.context.get('data', fields.Date.today())
             account_event_reversao_id = record.copy({
                 'data': data,
                 'ref': 'Reversão do Evento: {}'.format(record.ref),
