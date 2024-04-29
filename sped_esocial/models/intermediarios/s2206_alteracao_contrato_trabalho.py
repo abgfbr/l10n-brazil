@@ -178,8 +178,18 @@ class SpedAlteracaoContrato(models.Model, SpedRegistroIntermediario):
         S2206.nrInsc = limpa_formatacao(self.company_id.cnpj_cpf)[0:8]
         S2206.evento.ideEvento.indRetif.valor = '1'
         if operacao == 'R':  # Retificação
+            registro_para_retificar = self.sped_alteracao
+            tem_retificacao = True
+            while tem_retificacao:
+                if registro_para_retificar.retificacao_ids and \
+                        registro_para_retificar.retificacao_ids[
+                            0].situacao not in ['1', '3']:
+                    registro_para_retificar = \
+                        registro_para_retificar.retificacao_ids[0]
+                else:
+                    tem_retificacao = False
             S2206.evento.ideEvento.indRetif.valor = '2'
-            S2206.evento.ideEvento.nrRecibo.valor = self.sped_alteracao.recibo
+            S2206.evento.ideEvento.nrRecibo.valor = registro_para_retificar.recibo
         S2206.evento.ideEvento.tpAmb.valor = int(
             self.company_id.esocial_tpAmb
         )
