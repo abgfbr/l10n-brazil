@@ -3,7 +3,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from openerp import api, models, fields
-from openerp.exceptions import ValidationError
+from openerp.exceptions import ValidationError, Warning
 
 TIPO_SITUACAO = [
     ('A', 'A - Acordo Coletivo de Trabalho'),
@@ -104,6 +104,16 @@ class HrPaylisp(models.Model):
         default='N',
     )
 
+    quarentena = fields.Date(
+        string='Quarentena',
+        help='Informar a data em que a quarentena será finalizada'
+    )
+
+    processo_judicial = fields.Date(
+        string='Processo Judicial',
+        help='Informar a data em que o processo será finalizado'
+    )
+
     @api.multi
     def hr_verify_sheet(self):
         for holerite in self:
@@ -120,6 +130,12 @@ class HrPaylisp(models.Model):
         if vals.get('mtv_deslig_esocial'):
             vals['mtv_deslig'] = self.retorna_motivo_desligamento(vals['mtv_deslig_esocial'])
 
+        if vals.get('quarentena') and vals.get('processo_judicial'):
+            raise Warning(
+                "Não é possível indicar a data de quarentena e "
+                "a de processo judicial ao mesmo tempo!"
+            )
+
         return super(HrPaylisp, self).create(vals)
 
     @api.multi
@@ -128,6 +144,12 @@ class HrPaylisp(models.Model):
             if vals.get('mtv_deslig_esocial'):
                 vals['mtv_deslig'] = record.retorna_motivo_desligamento(vals['mtv_deslig_esocial'])
             super(HrPaylisp, record).write(vals)
+
+            if record.quarentena and vals.get('processo_judicial') or record.processo_judicial and vals.get('quarentena') or vals.get('quarentena') and vals.get('processo_judicial'):
+                raise Warning(
+                    "Não é possível indicar a data de quarentena e "
+                    "a de processo judicial ao mesmo tempo!"
+                )
 
         return True
 

@@ -25,7 +25,8 @@
                     <field name="tipo_situacao" attrs="{'invisible': [('tipo_de_folha', 'not in', ['rescisao_complementar'])], 'required': [('tipo_de_folha', 'in', ['rescisao_complementar'])]}" />
                     <field name="descricao_situacao" attrs="{'invisible': [('tipo_de_folha', 'not in', ['rescisao_complementar'])], 'required': [('tipo_de_folha', 'in', ['rescisao_complementar'])]}" />
                     <!--<field name="remuneracao_sucessora" attrs="{'invisible': [('tipo_de_folha', 'not in', ['rescisao_complementar'])], 'required': [('tipo_de_folha', 'in', ['rescisao_complementar'])]}" />-->
-
+                    <field name="quarentena" attrs="{'invisible': [('tipo_de_folha', 'not in', ['rescisao', 'rescisao_complementar'])]}"/>
+                    <field name="processo_judicial" attrs="{'invisible': [('tipo_de_folha', 'not in', ['rescisao', 'rescisao_complementar'])]}"/>
                 </field>
                 <field name="mtv_deslig" position="attributes">
                     <attribute name="attrs">{'invisible': True, 'required': False}</attribute>

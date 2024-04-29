@@ -3,7 +3,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 
-from openerp import api, models, fields
+from openerp import api, models, fields, exceptions
 from openerp.addons.sped_transmissao.models.intermediarios.sped_registro_intermediario import SpedRegistroIntermediario
 
 from pybrasil.inscricao.cnpj_cpf import limpa_formatacao
@@ -370,6 +370,25 @@ class SpedHrRescisaoAutonomo(models.Model, SpedRegistroIntermediario):
                     info_mv.indMV.valor = '2'
 
                 verba_rescisoria.infoMV.append(info_mv)
+
+            if rescisao_id.quarentena and rescisao_id.processo_judicial:
+                raise exceptions.Warning(
+                    "Não é possível indicar a data de quarentena e "
+                    "a de processo judicial ao mesmo tempo!"
+                )
+
+            if rescisao_id.quarentena:
+                # evtTSVTermino.infoTSVTermino.RemunAposTerm
+                quarentena = pysped.esocial.leiaute.S2399_RemunAposTerm_2()
+                quarentena.indRemun.valor = '1'
+                quarentena.dtFimRemun.valor = rescisao_id.quarentena
+                S2399.evento.infoTSVTermino.remunAposTerm.append(quarentena)
+            elif rescisao_id.processo_judicial:
+                # evtTSVTermino.infoTSVTermino.RemunAposTerm
+                quarentena = pysped.esocial.leiaute.S2399_RemunAposTerm_2()
+                quarentena.indRemun.valor = '2'
+                quarentena.dtFimRemun.valor = rescisao_id.processo_judicial
+                S2399.evento.infoTSVTermino.remunAposTerm.append(quarentena)
 
             S2399.evento.infoTSVTermino.verbasResc.append(verba_rescisoria)
 
