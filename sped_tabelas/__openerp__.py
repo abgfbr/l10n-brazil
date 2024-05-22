@@ -33,6 +33,8 @@
         # Tabelas
         'views/classificacao_servico.xml',
         'views/classificacao_tributaria.xml',
+        'views/tributacao_rendimentos_no_exterior.xml',
+        'views/informacoes_relativas_rendimento_exterior.xml',
         'views/codigo_aliquota_FPAS.xml',
         'views/categoria_trabalhador.xml',
         'views/financiamento_aposentadoria.xml',
@@ -61,6 +63,8 @@
         # Data
         'data/classificacao_servico.xml',
         'data/classificacao_tributaria.xml',
+        'data/tributacao_rendimentos_no_exterior.xml',
+        'data/informacoes_relativas_rendimento_exterior.xml',
         'data/natureza_lesao.xml',
         'data/tipo_lotacao_tributaria.xml',
         'data/categoria_trabalhador.xml',
