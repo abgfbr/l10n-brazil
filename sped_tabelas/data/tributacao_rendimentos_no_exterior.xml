@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2017 KMEE
+    Copyright 2017 KMEE - Wagner Pereira <wagner.pereira@kmee.com.br>
+    Copyright 2018 ABGF - Wagner Pereira <wagner.pereira@abgf.gov.br>
+    Copyright 2024 ABGF - Luiz Felipe do Divino <luiz.divino@abgf.gov.br>
+    License AGPL-3 or later (http://www.gnu.org/licenses/agpl)
+-->
+<openerp>
+    <data>
+
+    <record id="tab09_10" model="sped.tributacao.rendimentos.exterior">
+        <field name="codigo">10</field>
+        <field name="descricao">Retenção do IRRF – alíquota padrão</field>
+    </record>
+    <record id="tab09_11" model="sped.tributacao.rendimentos.exterior">
+        <field name="codigo">11</field>
+        <field name="descricao">Retenção do IRRF – alíquota da tabela progressiva</field>
+    </record>
+    <record id="tab09_12" model="sped.tributacao.rendimentos.exterior">
+        <field name="codigo">12</field>
+        <field name="descricao">Retenção do IRRF – alíquota diferenciada (países com tributação favorecida)</field>
+    </record>
+    <record id="tab09_13" model="sped.tributacao.rendimentos.exterior">
+        <field name="codigo">13</field>
+        <field name="descricao">Retenção do IRRF – alíquota limitada conforme cláusula em convênio</field>
+    </record>
+    <record id="tab09_30" model="sped.tributacao.rendimentos.exterior">
+        <field name="codigo">30</field>
+        <field name="descricao">Retenção do IRRF – outras hipóteses</field>
+    </record>
+    <record id="tab09_40" model="sped.tributacao.rendimentos.exterior">
+        <field name="codigo">40</field>
+        <field name="descricao">Não retenção do IRRF – isenção estabelecida em convênio</field>
+    </record>
+    <record id="tab09_41" model="sped.tributacao.rendimentos.exterior">
+        <field name="codigo">41</field>
+        <field name="descricao">Não retenção do IRRF – isenção prevista em lei interna</field>
+    </record>
+    <record id="tab09_42" model="sped.tributacao.rendimentos.exterior">
+        <field name="codigo">42</field>
+        <field name="descricao">Não retenção do IRRF – alíquota zero prevista em lei interna</field>
+    </record>
+    <record id="tab09_43" model="sped.tributacao.rendimentos.exterior">
+        <field name="codigo">43</field>
+        <field name="descricao">Não retenção do IRRF – pagamento antecipado do imposto</field>
+    </record>
+    <record id="tab09_44" model="sped.tributacao.rendimentos.exterior">
+        <field name="codigo">44</field>
+        <field name="descricao">Não retenção do IRRF – medida judicial</field>
+    </record>
+    <record id="tab09_50" model="sped.tributacao.rendimentos.exterior">
+        <field name="codigo">50</field>
+        <field name="descricao">Não retenção do IRRF – outras hipóteses</field>
+    </record>
+
+    </data>
+</openerp>

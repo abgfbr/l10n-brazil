@@ -34,3 +34,5 @@ from . import tipos_lotacao_classificacao
 from . import procedimentos_diagnosticos
 from . import atividades_perigosas_insalubres
 from . import treinamentos_capacitacoes
+from . import tributacao_rendimentos_no_exterior
+from . import informacoes_relativas_rendimento_exterior

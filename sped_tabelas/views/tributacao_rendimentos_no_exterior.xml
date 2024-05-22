@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2018 ABGF
+    Copyright 2018 ABGF - Wagner Pereira <wagner.pereira@abgf.gov.br>
+    License AGPL-3 or later (http://www.gnu.org/licenses/agpl)
+-->
+<openerp>
+    <data>
+
+        <record model="ir.ui.view" id="sped_tributacao_rendimentos_exterior_form">
+            <field name="name">sped_tributacao_rendimentos_exterior_form</field>
+            <field name="model">sped.tributacao.rendimentos.exterior</field>
+            <field name="priority">1</field>
+            <field name="arch" type="xml">
+                <form string="Tributacao Rendimentos Exterior"
+                edit="false" delete="false" create="false">
+                    <sheet>
+                        <group>
+                            <group name="geral" colspan="4" col="2">
+                                <field name="codigo"/>
+                                <field name="descricao" />
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="sped_tributacao_rendimentos_exterior_tree">
+            <field name="name">sped_tributacao_rendimentos_exterior_tree</field>
+            <field name="model">sped.tributacao.rendimentos.exterior</field>
+            <field name="priority">1</field>
+            <field name="arch" type="xml">
+                <tree string="Tributacao Rendimentos Exterior"
+                edit="false" create="false" delete="false">
+                    <field name="codigo" />
+                    <field name="descricao" />
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="sped_tributacao_rendimentos_exterior_search">
+            <field name="name">sped_tributacao_rendimentos_exterior_search</field>
+            <field name="model">sped.tributacao.rendimentos.exterior</field>
+            <field name="priority">1</field>
+            <field name="arch" type="xml">
+                <search string="Tributacao Rendimentos Exterior">
+                    <field name="codigo" />
+                    <field name="descricao" />
+                </search>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="sped_tributacao_rendimentos_exterior_action">
+            <field name="name">Tributacao Rendimentos Exterior</field>
+            <field name="res_model">sped.tributacao.rendimentos.exterior</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="sped_tributacao_rendimentos_exterior_tree_action">
+            <field eval="1" name="sequence"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="sped_tributacao_rendimentos_exterior_tree"/>
+            <field name="act_window_id" ref="sped_tributacao_rendimentos_exterior_action"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="sped_tributacao_rendimentos_exterior_form_action">
+            <field eval="2" name="sequence"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="sped_tributacao_rendimentos_exterior_form"/>
+            <field name="act_window_id" ref="sped_tributacao_rendimentos_exterior_action"/>
+        </record>
+
+        <menuitem
+            action="sped_tributacao_rendimentos_exterior_action"
+            id="menu_sped_tributacao_rendimentos_exterior"
+            name="09-Tributacao Rendimentos Exterior"
+            parent="sped_tabelas.menu_sped_tabelas_efdreinf"
+            sequence="09"
+        />
+
+    </data>
+</openerp>
