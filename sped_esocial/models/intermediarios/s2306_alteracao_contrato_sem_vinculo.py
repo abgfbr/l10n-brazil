@@ -178,8 +178,9 @@ class SpedAlteracaoContratoAutonomo(models.Model, SpedRegistroIntermediario):
 
         # evtTSVAltContr.infoTSVAlteracao
         S2306.evento.infoTSVAlteracao.dtAlteracao.valor = fields.Datetime.now()
-        S2306.evento.infoTSVAlteracao.natAtividade.valor = \
-            contrato_id.nat_atividade or 1
+        if not contrato_id.category_id.code in ['721', '722', '771', '901']:
+            S2306.evento.infoTSVAlteracao.natAtividade.valor = \
+                contrato_id.nat_atividade or 1
 
         # infoTSVAlteracao.InfoComplementares.CargoFuncao
         CargoFuncao = pysped.esocial.leiaute.S2306_CargoFuncao_2()
@@ -204,6 +205,13 @@ class SpedAlteracaoContratoAutonomo(models.Model, SpedRegistroIntermediario):
 
         S2306.evento.infoTSVAlteracao.infoComplementares.remuneracao.append(
             Remuneracao)
+
+        local_trabalho_geral = pysped.esocial.leiaute.S2306_LocalTrabGeral_2()
+        local_trabalho_geral.tpInsc.valor = '1'
+        local_trabalho_geral.nrInsc.valor = limpa_formatacao(
+            self.hr_contract_id.company_id.cnpj_cpf)
+
+        S2306.evento.infoTSVAlteracao.infoComplementares.localTrabGeral.append(local_trabalho_geral)
 
         if self.hr_contract_id.category_id.code == '410':
             InfoTrabCedido = pysped.esocial.leiaute.S2306_InfoTrabCedido_2()
