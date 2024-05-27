@@ -73,7 +73,7 @@
 
         <menuitem
             action="sped_tributacao_rendimentos_exterior_action"
-            id="menu_sped_tributacao_rendimentos_exterior_action"
+            id="menu_sped_tributacao_rendimentos_exterior"
             name="09-Tributacao Rendimentos Exterior"
             parent="sped_tabelas.menu_sped_tabelas_efdreinf"
             sequence="09"

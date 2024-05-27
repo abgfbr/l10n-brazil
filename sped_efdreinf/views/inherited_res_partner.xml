@@ -9,6 +9,10 @@
             <field name="arch" type="xml">
                 <field name="suframa" position="after">
                     <field name="reinf_natureza_remuneracao_id"/>
+                    <field name="ind_nif"/>
+                    <field name="nif"/>
+                    <field name="inf_relativas_rendimento"/>
+                    <field name="trib_rendimentos_exterior"/>
                 </field>
             </field>
         </record>

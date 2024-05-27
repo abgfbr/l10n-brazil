@@ -203,8 +203,9 @@ class SpedEfdReinfEstab4020(models.Model, SpedRegistroIntermediario):
         R4020.evento.ideEstab.nrInscEstab.valor = limpa_formatacao(
             self.estabelecimento_id.cnpj_cpf)
 
-        R4020.evento.ideEstab.ideBenef.cnpjBenef.valor = limpa_formatacao(
-            self.prestador_id.cnpj_cpf)
+        if self.prestador_id.country_id.code == 'BR':
+            R4020.evento.ideEstab.ideBenef.cnpjBenef.valor = limpa_formatacao(
+                self.prestador_id.cnpj_cpf)
         # R4020.evento.ideEstab.ideBenef.isenImun.valor = 1
 
         R4020_idePgto = pysped.efdreinf.leiaute.R4020_IdePgto_2()
@@ -219,6 +220,22 @@ class SpedEfdReinfEstab4020(models.Model, SpedRegistroIntermediario):
             R4020_retencoes = pysped.efdreinf.leiaute.R4020_Retencoes_2()
             self.get_retencoes_nfs(nfs.nfs_id, R4020_retencoes)
             R4020_infoPgto.retencoes.append(R4020_retencoes)
+
+            if self.prestador_id.country_id.code != 'BR':
+                R4020_infoPgtoExt = pysped.efdreinf.leiaute.R4020_InfoPgtoExt_2()
+                R4020_infoPgtoExt.indNIF.valor = self.prestador_id.ind_nif
+                R4020_infoPgtoExt.nifBenef.valor = self.prestador_id.nif
+                R4020_infoPgtoExt.relFontPg.valor = self.prestador_id.inf_relativas_rendimento.codigo
+                R4020_infoPgtoExt.frmTribut.valor = self.prestador_id.trib_rendimentos_exterior.codigo
+
+                R4020_infoPgtoExt.endExt.dscLograd.valor = self.prestador_id.street
+                R4020_infoPgtoExt.endExt.nrLograd.valor = self.prestador_id.number
+                R4020_infoPgtoExt.endExt.complem.valor = self.prestador_id.street2
+                R4020_infoPgtoExt.endExt.bairro.valor = self.prestador_id.district
+                R4020_infoPgtoExt.endExt.cidade.valor = self.prestador_id.l10n_br_city_id.name
+                R4020_infoPgtoExt.endExt.estado.valor = self.prestador_id.state_id.name
+                R4020_infoPgtoExt.endExt.codPostal.valor = self.prestador_id.zip
+                R4020_infoPgtoExt.endExt.telef.valor = limpa_formatacao(self.prestador_id.phone)
 
             R4020_idePgto.infoPgto.append(R4020_infoPgto)
 

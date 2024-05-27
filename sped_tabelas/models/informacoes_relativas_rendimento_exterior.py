@@ -31,3 +31,14 @@ class InformacoesRelativasRendimentoExterior(models.Model):
         string='Descrição',
         required=True,
     )
+
+    name = fields.Char(
+        compute='_compute_name',
+        store=True,
+    )
+
+    @api.depends('codigo', 'descricao')
+    def _compute_name(self):
+        for record in self:
+            if record.codigo and record.descricao:
+                record.name = record.codigo + ' - ' + record.descricao

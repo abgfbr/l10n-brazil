@@ -27,12 +27,12 @@
         </record>
 
         <record model="ir.ui.view" id="sped_tabelas_informacoes_relativas_exterior_tree">
-            <field name="name">sped_tabelas_informacoes_relativas_exterior_view</field>
+            <field name="name">sped_tabelas_informacoes_relativas_exterior_tree</field>
             <field name="model">sped.informacoes.relativas.exterior</field>
             <field name="priority">1</field>
             <field name="arch" type="xml">
                 <tree string="Informacoes Relativas Rendimento Exterior" edit="false" create="false" delete="false">
-                    <field name="codigo" />
+                    <field name="codigo"/>
                     <field name="descricao" />
                 </tree>
             </field>
@@ -52,7 +52,7 @@
 
         <record model="ir.actions.act_window" id="sped_tabelas_informacoes_relativas_exterior_action">
             <field name="name">sped_tabelas.sped.informacoes_relativas_exterior_</field>
-            <field name="res_model">sped.classificacao_servico</field>
+            <field name="res_model">sped.informacoes.relativas.exterior</field>
             <field name="view_mode">tree,form</field>
         </record>
 
@@ -72,7 +72,7 @@
 
         <menuitem
             action="sped_tabelas_informacoes_relativas_exterior_action"
-            id="menu_sped_informacoes_relativas_exterior_action"
+            id="menu_sped_informacoes_relativas_exterior"
             name="10-Informacoes Relativas Rendimento Exterior"
             parent="sped_tabelas.menu_sped_tabelas_efdreinf"
             sequence="10"
