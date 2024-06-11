@@ -170,11 +170,11 @@ class SpedAlteracaoContratoAutonomo(models.Model, SpedRegistroIntermediario):
         # Popula ideTrabSemVinculo (Identificador do Trabalhador sem Vínculo)
         S2306.evento.ideTrabSemVinculo.cpfTrab.valor = \
             limpa_formatacao(self.hr_contract_id.employee_id.cpf)
-        S2306.evento.ideTrabSemVinculo.matricula.valor = \
-            self.hr_contract_id.matricula
-        if not self.hr_contract_id.matricula:
-            S2306.evento.ideTrabSemVinculo.codCateg.valor = \
-                self.hr_contract_id.category_id.code
+        # S2306.evento.ideTrabSemVinculo.matricula.valor = \
+        #     self.hr_contract_id.matricula
+        # if not self.hr_contract_id.matricula:
+        S2306.evento.ideTrabSemVinculo.codCateg.valor = \
+            self.hr_contract_id.category_id.code
 
         # evtTSVAltContr.infoTSVAlteracao
         S2306.evento.infoTSVAlteracao.dtAlteracao.valor = fields.Datetime.now()

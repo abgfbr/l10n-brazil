@@ -263,6 +263,8 @@ class SpedEsocialPagamento(models.Model, SpedRegistroIntermediario):
             if payslip.tipo_de_folha != "decimo_terceiro":
                 info_pgto.perRef.valor = self.periodo_id.code[3:7] + '-' + \
                     self.periodo_id.code[0:2]
+                if payslip.tipo_de_folha == "rescisao":
+                    info_pgto.perRef.valor = payslip.data_afastamento[0:7]
             else:
                 info_pgto.perRef.valor = self.periodo_id.code[3:7]
             info_pgto.ideDmDev.valor = payslip.number
