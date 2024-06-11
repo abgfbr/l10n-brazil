@@ -500,7 +500,7 @@ class SpedEfdReinf(models.Model):
                             estabelecimento_id = self.env['sped.efdreinf.estabelecimento'].create(vals)
                             self.estabelecimento_ids = [(4, estabelecimento_id.id)]
 
-                    if nf.amount_wh and data_hora_inicial.strftime("%Y-%m-%d") <= nf.data_pagamento <= data_hora_final.strftime("%Y-%m-%d"):
+                    if (nf.amount_wh or nf.partner_id.country_id.code != 'BR') and data_hora_inicial.strftime("%Y-%m-%d") <= nf.data_pagamento <= data_hora_final.strftime("%Y-%m-%d"):
                         estabelecimento_4020_id = self.env[
                             'sped.efdreinf.estabelecimento.4020'].search(domain)
 

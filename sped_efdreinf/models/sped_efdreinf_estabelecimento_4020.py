@@ -133,24 +133,28 @@ class SpedEfdReinfEstab4020(models.Model, SpedRegistroIntermediario):
 
     @api.multi
     def get_retencoes_nfs(self, nfs, R4020_retencoes):
-        total_nfe = formata_valor(nfs.amount_total)
-        if self.prestador_id.reinf_natureza_remuneracao_id.ret_ir:
+        if self.prestador_id.country_id.code != 'BR':
             R4020_retencoes.vlrBaseIR.valor = formata_valor(nfs.irrf_base_wh)
-            R4020_retencoes.vlrIR.valor = formata_valor(nfs.irrf_value_wh)
-        if self.prestador_id.reinf_natureza_remuneracao_id.ret_agreg:
-            R4020_retencoes.vlrBaseAgreg.valor = total_nfe
-            R4020_retencoes.vlrAgreg.valor = formata_valor(
-                nfs.amount_wh - nfs.inss_value_wh - nfs.irrf_value_wh)
-        if not self.prestador_id.reinf_natureza_remuneracao_id.ret_agreg:
-            if self.prestador_id.reinf_natureza_remuneracao_id.ret_csll:
-                R4020_retencoes.vlrBaseCSLL.valor = total_nfe
-                R4020_retencoes.vlrCSLL.valor = formata_valor(nfs.csll_value_wh)
-            if self.prestador_id.reinf_natureza_remuneracao_id.ret_cofins:
-                R4020_retencoes.vlrBaseCofins.valor = total_nfe
-                R4020_retencoes.vlrCofins.valor = formata_valor(nfs.cofins_value_wh)
-            if self.prestador_id.reinf_natureza_remuneracao_id.ret_pp:
-                R4020_retencoes.vlrBasePP.valor = total_nfe
-                R4020_retencoes.vlrPP.valor = formata_valor(nfs.pis_value_wh)
+            R4020_retencoes.vlrIR.valor = formata_valor(nfs.invoice_line.ir_value)
+        else:
+            total_nfe = formata_valor(nfs.amount_total)
+            if self.prestador_id.reinf_natureza_remuneracao_id.ret_ir:
+                R4020_retencoes.vlrBaseIR.valor = formata_valor(nfs.irrf_base_wh)
+                R4020_retencoes.vlrIR.valor = formata_valor(nfs.irrf_value_wh)
+            if self.prestador_id.reinf_natureza_remuneracao_id.ret_agreg:
+                R4020_retencoes.vlrBaseAgreg.valor = total_nfe
+                R4020_retencoes.vlrAgreg.valor = formata_valor(
+                    nfs.amount_wh - nfs.inss_value_wh - nfs.irrf_value_wh)
+            if not self.prestador_id.reinf_natureza_remuneracao_id.ret_agreg:
+                if self.prestador_id.reinf_natureza_remuneracao_id.ret_csll:
+                    R4020_retencoes.vlrBaseCSLL.valor = total_nfe
+                    R4020_retencoes.vlrCSLL.valor = formata_valor(nfs.csll_value_wh)
+                if self.prestador_id.reinf_natureza_remuneracao_id.ret_cofins:
+                    R4020_retencoes.vlrBaseCofins.valor = total_nfe
+                    R4020_retencoes.vlrCofins.valor = formata_valor(nfs.cofins_value_wh)
+                if self.prestador_id.reinf_natureza_remuneracao_id.ret_pp:
+                    R4020_retencoes.vlrBasePP.valor = total_nfe
+                    R4020_retencoes.vlrPP.valor = formata_valor(nfs.pis_value_wh)
 
     @api.multi
     def popula_xml(self, ambiente='2', operacao='I'):
@@ -206,6 +210,8 @@ class SpedEfdReinfEstab4020(models.Model, SpedRegistroIntermediario):
         if self.prestador_id.country_id.code == 'BR':
             R4020.evento.ideEstab.ideBenef.cnpjBenef.valor = limpa_formatacao(
                 self.prestador_id.cnpj_cpf)
+        else:
+            R4020.evento.ideEstab.ideBenef.nmBenef.valor = self.prestador_id.name
         # R4020.evento.ideEstab.ideBenef.isenImun.valor = 1
 
         R4020_idePgto = pysped.efdreinf.leiaute.R4020_IdePgto_2()
@@ -216,6 +222,8 @@ class SpedEfdReinfEstab4020(models.Model, SpedRegistroIntermediario):
             R4020_infoPgto = pysped.efdreinf.leiaute.R4020_InfoPgto_2()
             R4020_infoPgto.dtFG.valor = nfs.nfs_id.data_pagamento
             R4020_infoPgto.vlrBruto.valor = formata_valor(nfs.vr_bruto)
+            if self.prestador_id.country_id.code != 'BR':
+                R4020_infoPgto.paisResidExt.valor = self.prestador_id.country_id.bc_code[1:4]
 
             R4020_retencoes = pysped.efdreinf.leiaute.R4020_Retencoes_2()
             self.get_retencoes_nfs(nfs.nfs_id, R4020_retencoes)
@@ -223,10 +231,14 @@ class SpedEfdReinfEstab4020(models.Model, SpedRegistroIntermediario):
 
             if self.prestador_id.country_id.code != 'BR':
                 R4020_infoPgtoExt = pysped.efdreinf.leiaute.R4020_InfoPgtoExt_2()
-                R4020_infoPgtoExt.indNIF.valor = self.prestador_id.ind_nif
-                R4020_infoPgtoExt.nifBenef.valor = self.prestador_id.nif
-                R4020_infoPgtoExt.relFontPg.valor = self.prestador_id.inf_relativas_rendimento.codigo
-                R4020_infoPgtoExt.frmTribut.valor = self.prestador_id.trib_rendimentos_exterior.codigo
+                R4020_infoPgtoExt.indNIF.valor = '1'
+                #R4020_infoPgtoExt.indNIF.valor = self.prestador_id.ind_nif
+                R4020_infoPgtoExt.nifBenef.valor = '133417984'
+                #R4020_infoPgtoExt.nifBenef.valor = self.prestador_id.nif
+                R4020_infoPgtoExt.relFontPg.valor = '900'
+                #R4020_infoPgtoExt.relFontPg.valor = self.prestador_id.inf_relativas_rendimento.codigo
+                R4020_infoPgtoExt.frmTribut.valor = '10'
+                #R4020_infoPgtoExt.frmTribut.valor = self.prestador_id.trib_rendimentos_exterior.codigo
 
                 R4020_infoPgtoExt.endExt.dscLograd.valor = self.prestador_id.street
                 R4020_infoPgtoExt.endExt.nrLograd.valor = self.prestador_id.number
@@ -236,6 +248,8 @@ class SpedEfdReinfEstab4020(models.Model, SpedRegistroIntermediario):
                 R4020_infoPgtoExt.endExt.estado.valor = self.prestador_id.state_id.name
                 R4020_infoPgtoExt.endExt.codPostal.valor = self.prestador_id.zip
                 R4020_infoPgtoExt.endExt.telef.valor = limpa_formatacao(self.prestador_id.phone)
+
+                R4020_infoPgto.infoPgtoExt.append(R4020_infoPgtoExt)
 
             R4020_idePgto.infoPgto.append(R4020_infoPgto)
 
