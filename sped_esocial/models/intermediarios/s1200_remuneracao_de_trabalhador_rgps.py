@@ -296,7 +296,7 @@ class SpedEsocialRemuneracao(models.Model, SpedRegistroIntermediario):
             dm_dev.ideDmDev.valor = payslip.number
             dm_dev.codCateg.valor = payslip.contract_id.category_id.code  # TODO Integrar com a tabela 01 do e-Social
 
-            if not payslip.contract_id.date_end or payslip.contract_id.date_end > self.periodo_id.date_stop:
+            if not payslip.contract_id.date_end or payslip.contract_id.date_end > self.periodo_id.date_stop or (self.contract_ids.sped_s2399_id and self.contract_ids.sped_s2399_id.sped_hr_rescisao_id.quarentena) or payslip.contract_id.category_id.code in ['723']:
                 # Popula dmDev.infoPerApur
                 info_per_apur = pysped.esocial.leiaute.S1200_InfoPerApur_2()
                 info_per_apur.ideEstabLot.tpInsc.valor = '1'  # CNPJ
@@ -356,7 +356,7 @@ class SpedEsocialRemuneracao(models.Model, SpedRegistroIntermediario):
                         if condicao_pagamento_anterior:
                             rubricas_convencao_coletiva[line.id] = line
                         else:
-                            if payslip.contract_id.date_end:
+                            if payslip.contract_id.date_end and not self.contract_ids.sped_s2399_id.sped_hr_rescisao_id.quarentena and not payslip.contract_id.category_id.code in ['723']:
                                 continue
 
                             if line.salary_rule_id.code == 'BASE_INSS' and \
@@ -384,6 +384,8 @@ class SpedEsocialRemuneracao(models.Model, SpedRegistroIntermediario):
                 holerite_adiantamento_13 = self.payslip_ids.filtered(lambda payslip: payslip.tipo_de_folha == 'decimo_terceiro')
                 if holerite_adiantamento_13:
                     adiantamento_13 = holerite_adiantamento_13.line_resume_ids.filtered(lambda line: line.code == u'PRIMEIRA_PARCELA_13')
+                    media_salario_13 = holerite_adiantamento_13.line_resume_ids.filtered(lambda line: line.code == u'MEDIA_SALARIO_SUBSTI_ADIANT_13')
+                    dif_media_salario_13 = holerite_adiantamento_13.line_resume_ids.filtered(lambda line: line.code == u'DIF_MEDIA_SALARIO_SUBSTI_ADIANT_13')
                     if adiantamento_13:
                         itens_remun = pysped.esocial.leiaute.S1200_ItensRemun_2()
                         itens_remun.codRubr.valor = adiantamento_13.salary_rule_id.codigo
@@ -394,6 +396,28 @@ class SpedEsocialRemuneracao(models.Model, SpedRegistroIntermediario):
                             itens_remun.fatorRubr.valor = adiantamento_13.rate
                         itens_remun.indApurIR.valor = 0
                         itens_remun.vrRubr.valor = formata_valor(adiantamento_13.total)
+                        remun_per_apur.itensRemun.append(itens_remun)
+                    if media_salario_13:
+                        itens_remun = pysped.esocial.leiaute.S1200_ItensRemun_2()
+                        itens_remun.codRubr.valor = media_salario_13.salary_rule_id.codigo
+                        itens_remun.ideTabRubr.valor = media_salario_13.salary_rule_id.identificador
+                        if media_salario_13.quantity and float(media_salario_13.quantity) != 1:
+                            itens_remun.qtdRubr.valor = float(media_salario_13.quantity)
+                        if media_salario_13.rate and line.rate != 100:
+                            itens_remun.fatorRubr.valor = media_salario_13.rate
+                        itens_remun.indApurIR.valor = 0
+                        itens_remun.vrRubr.valor = formata_valor(media_salario_13.total)
+                        remun_per_apur.itensRemun.append(itens_remun)
+                    if dif_media_salario_13:
+                        itens_remun = pysped.esocial.leiaute.S1200_ItensRemun_2()
+                        itens_remun.codRubr.valor = dif_media_salario_13.salary_rule_id.codigo
+                        itens_remun.ideTabRubr.valor = dif_media_salario_13.salary_rule_id.identificador
+                        if dif_media_salario_13.quantity and float(dif_media_salario_13.quantity) != 1:
+                            itens_remun.qtdRubr.valor = float(dif_media_salario_13.quantity)
+                        if dif_media_salario_13.rate and line.rate != 100:
+                            itens_remun.fatorRubr.valor = dif_media_salario_13.rate
+                        itens_remun.indApurIR.valor = 0
+                        itens_remun.vrRubr.valor = formata_valor(dif_media_salario_13.total)
                         remun_per_apur.itensRemun.append(itens_remun)
 
             if payslip.contract_id.sped_s2300_id and not payslip.contract_id.category_id.code in ['723'] and  payslip.contract_id.labor_bond_type_id.id != 15:
@@ -607,7 +631,7 @@ class SpedEsocialRemuneracao(models.Model, SpedRegistroIntermediario):
             # Popula dmDev.infoComplCont  # Não teremos registros no odoo que não tenham um S2300 nesses casos
             #
 
-            if not payslip.contract_id.date_end:
+            if not payslip.contract_id.date_end or self.contract_ids.sped_s2399_id.sped_hr_rescisao_id.quarentena or payslip.contract_id.category_id.code in ['723']:
                 # Adiciona o registro nas listas das tags superiores
                 info_per_apur.ideEstabLot.remunPerApur.append(remun_per_apur)
                 dm_dev.infoPerApur.append(info_per_apur)

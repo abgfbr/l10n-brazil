@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2017 KMEE
+    Copyright 2017 KMEE - Wagner Pereira <wagner.pereira@kmee.com.br>
+    Copyright 2018 ABGF - Wagner Pereira <wagner.pereira@abgf.gov.br>
+    Copyright 2024 ABGF - Luiz Felipe do Divino <luiz.divino@abgf.gov.br>
+    License AGPL-3 or later (http://www.gnu.org/licenses/agpl)
+-->
+<openerp>
+    <data>
+
+    <record id="tab10_500" model="sped.informacoes.relativas.exterior">
+        <field name="codigo">500</field>
+        <field name="descricao">A fonte pagadora é matriz da beneficiária no exterior.</field>
+    </record>
+    <record id="tab10_510" model="sped.informacoes.relativas.exterior">
+        <field name="codigo">510</field>
+        <field name="descricao">A fonte pagadora é filial, sucursal ou agência de beneficiária no exterior.</field>
+    </record>
+    <record id="tab10_520" model="sped.informacoes.relativas.exterior">
+        <field name="codigo">520</field>
+        <field name="descricao">A fonte pagadora é controlada ou coligada da beneficiária no exterior, na forma dos §§ 1º e 2º do art.
+243 da Lei nº 6.404, de 15 de dezembro de 1976.</field>
+    </record>
+    <record id="tab10_530" model="sped.informacoes.relativas.exterior">
+        <field name="codigo">530</field>
+        <field name="descricao">A fonte pagadora é controladora ou coligada da beneficiária no exterior, na forma dos §§ 1º e 2º do
+art. 243 da Lei nº 6.404, de 1976.</field>
+    </record>
+    <record id="tab10_540" model="sped.informacoes.relativas.exterior">
+        <field name="codigo">540</field>
+        <field name="descricao">A fonte pagadora e a beneficiária no exterior estão sob controle societário ou administrativo comum
+ou quando pelo menos 10% do capital de cada uma, pertencer a uma mesma pessoa física ou jurídica.</field>
+    </record>
+    <record id="tab10_550" model="sped.informacoes.relativas.exterior">
+        <field name="codigo">550</field>
+        <field name="descricao">A fonte pagadora e a beneficiária no exterior têm participação societária no capital de uma terceira
+pessoa jurídica, cuja soma as caracterize como controladoras ou coligadas na forma dos §§ 1º e 2º do
+art. 243 da Lei nº 6.404, de 1976.</field>
+    </record>
+    <record id="tab10_560" model="sped.informacoes.relativas.exterior">
+        <field name="codigo">560</field>
+        <field name="descricao">A fonte pagadora ou a beneficiária no exterior mantenha contrato de exclusividade como agente,
+como distribuidor ou como concessionário nas operações com bens, serviços e direitos.</field>
+    </record>
+    <record id="tab10_570" model="sped.informacoes.relativas.exterior">
+        <field name="codigo">570</field>
+        <field name="descricao">A fonte pagadora e a beneficiária mantêm acordo de atuação conjunta.</field>
+    </record>
+    <record id="tab10_900" model="sped.informacoes.relativas.exterior">
+        <field name="codigo">900</field>
+        <field name="descricao">Não há relação entre a fonte pagadora e a beneficiária no exterior.</field>
+    </record>
+
+    </data>
+</openerp>

@@ -52,15 +52,15 @@ class HrEmployee(models.Model):
                       ' already exists for dependent %s'
                       % dependent.name))
 
-    @api.constrains('pis_pasep')
-    def _validate_pis_pasep(self):
-        employee = self
-        if not employee.pis_pasep:
-            return True
-        elif fiscal.validate_pis_pasep(self.pis_pasep):
-            return True
-        else:
-            raise ValidationError(_('Invalid PIS/PASEP'))
+    # @api.constrains('pis_pasep')
+    # def _validate_pis_pasep(self):
+    #     employee = self
+    #     if not employee.pis_pasep:
+    #         return True
+    #     elif fiscal.validate_pis_pasep(self.pis_pasep):
+    #         return True
+    #     else:
+    #         raise ValidationError(_('Invalid PIS/PASEP'))
 
     pis_pasep = fields.Char(u'PIS/PASEP', size=15)
     ctps = fields.Char('CTPS', help='CTPS number')

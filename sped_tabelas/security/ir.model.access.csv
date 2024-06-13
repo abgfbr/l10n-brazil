@@ -58,3 +58,7 @@ access_sped_user_29,Operador (Leitura),model_sped_atividades_perigosas_insalubre
 access_sped_gerente_29,Gerente (Todas permissões),model_sped_atividades_perigosas_insalubres,sped_tabelas.group_manager,1,1,1,1
 access_sped_user_30,Operador (Leitura),model_sped_treinamentos_capacitacoes,sped_tabelas.group_user,1,0,0,0
 access_sped_gerente_30,Gerente (Todas permissões),model_sped_treinamentos_capacitacoes,sped_tabelas.group_manager,1,1,1,1
+access_sped_user_31,Operador (Leitura),model_sped_tributacao_rendimentos_exterior,sped_tabelas.group_user,1,0,0,0
+access_sped_gerente_31,Gerente (Todas permissões),model_sped_tributacao_rendimentos_exterior,sped_tabelas.group_manager,1,1,1,1
+access_sped_user_32,Operador (Leitura),model_sped_informacoes_relativas_exterior,sped_tabelas.group_user,1,0,0,0
+access_sped_gerente_32,Gerente (Todas permissões),model_sped_informacoes_relativas_exterior,sped_tabelas.group_manager,1,1,1,1
