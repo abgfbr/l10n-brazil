@@ -196,6 +196,28 @@
                 <field name="data_atestado_saude" position="attributes">
                     <attribute name="invisible">1</attribute>
                 </field>
+                <xpath expr="//page[@string='Work Permit']" position="after">
+                    <page string="Estágio" attrs="{'invisible': [('is_internship', '=', False)]}">
+                        <group>
+                            <field name="is_internship" invisible="1"/>
+                            <field name="internship_nature" attrs="{'required': [('is_internship', '=', True)]}"/>
+                            <field name="internship_level" attrs="{'required': [('is_internship', '=', True)]}"/>
+                            <field name="internship_end_date" attrs="{'required': [('is_internship', '=', True)]}"/>
+
+                        </group>
+                         <separator string="Instituição Educacional"/>
+                        <group>
+                            <field name="internship_institution_cnpj"/>
+                            <field name="internship_institution_name" attrs="{'required': [('is_internship', '=', True), ('internship_institution_cnpj', '=', False)]}"/>
+                            <field name="internship_institution_street" attrs="{'required': [('is_internship', '=', True), ('internship_institution_cnpj', '=', False)]}"/>
+                            <field name="internship_institution_number" attrs="{'required': [('is_internship', '=', True), ('internship_institution_cnpj', '=', False)]}"/>
+                            <field name="internship_institution_neighborhood" attrs="{'required': [('is_internship', '=', True), ('internship_institution_cnpj', '=', False)]}"/>
+                            <field name="internship_institution_city" attrs="{'required': [('is_internship', '=', True), ('internship_institution_cnpj', '=', False)]}"/>
+                            <field name="internship_institution_state_id" attrs="{'required': [('is_internship', '=', True), ('internship_institution_cnpj', '=', False)]}"/>
+                            <field name="internship_institution_zipcode" attrs="{'required': [('is_internship', '=', True), ('internship_institution_cnpj', '=', False)]}"/>
+                        </group>
+                    </page>
+                </xpath>
             </field>
         </record>
 
