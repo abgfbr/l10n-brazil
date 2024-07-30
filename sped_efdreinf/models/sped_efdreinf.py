@@ -681,12 +681,7 @@ class SpedEfdReinf(models.Model):
     def transmitir_periodo(self):
         self.ensure_one()
 
-        # Cria os lotes de transmissão
-        wizard = self.env['sped.criacao.wizard'].create({})
-        lotes = wizard.popular(self.registro_ids)
-        wizard.lote_ids = [(6, 0, lotes)]
-        wizard.criar_lotes()
-        self.env['sped.lote'].transmitir_lotes_preparados()
+        self.criar_transmitir_lote(self.registro_ids)
 
     @api.multi
     def importar_fechamentos(self):
@@ -701,6 +696,8 @@ class SpedEfdReinf(models.Model):
 
         # Recalcula os registros
         self.compute_registro_ids()
+
+        self.criar_transmitir_lote(self.sped_r2099_registro.sped_inclusao)
 
     @api.multi
     def importar_reabertura(self):
@@ -729,6 +726,15 @@ class SpedEfdReinf(models.Model):
         # if self.sped_r4098_registro.sped_inclusao:
         #     self.sped_r4098_registro.sped_inclusao = False
         self.compute_registro_ids()
+
+        self.criar_transmitir_lote(self.sped_r4099_registro.sped_r4099_registro)
+
+    def criar_transmitir_lote(self, registros):
+        wizard = self.env['sped.criacao.wizard'].create({})
+        lotes = wizard.popular(registros)
+        wizard.lote_ids = [(6, 0, lotes)]
+        wizard.criar_lotes()
+        self.env['sped.lote'].transmitir_lotes_preparados()
 
     @api.multi
     def importar_reabertura_4000(self):
