@@ -73,9 +73,6 @@
                     <attribute name="options">{'no_create': True, 'no_open': True}</attribute>
                     <attribute name="attrs">{'readonly':[('situacao_esocial','!=','0')]}</attribute>
                 </field>
-                <field name="partner_union" position="attributes">
-                    <attribute name="options">{'no_create': True, 'no_open': True}</attribute>
-                </field>
                 <field name="admission_type_id" position="after">
                     <field name="admission_type_code" invisible="1"/>
                 </field>
@@ -128,8 +125,8 @@
                         </group>
                     </page>
                 </xpath>
-                <field name="partner_union" position="attributes">
-                    <attribute name="required">1</attribute>
+                <field name="partner_union" position="replace">
+                    <field name="partner_union" options="{'no_create': True, 'create_edit': False}" attrs="{'required': [('is_internship', '!=', True)]}" />
                 </field>
                 <field name="primeiro_emprego" position="before">
                     <!--<field name="tp_admissao"-->
@@ -196,6 +193,27 @@
                 <field name="data_atestado_saude" position="attributes">
                     <attribute name="invisible">1</attribute>
                 </field>
+                <field name="labor_regime_id" position="replace">
+                    <field name="labor_regime_id" options="{'no_create': True, 'create_edit': False}" attrs="{'required': [('is_internship', '!=', True)]}" />
+                </field>
+                <field name="tp_contr" position="replace">
+                    <field name="tp_contr" attrs="{'required': [('is_internship', '!=', True)]}" />
+                </field>
+                <field name="tp_contr" position="replace">
+                    <field name="tp_contr" attrs="{'required': [('is_internship', '!=', True)]}" />
+                </field>
+                <field name="tp_reg_jor" position="replace">
+                    <field name="tp_reg_jor" attrs="{'required': [('is_internship', '!=', True)]}" />
+                </field>
+                <field name="nat_atividade" position="replace">
+                    <field name="nat_atividade" attrs="{'required': [('is_internship', '!=', True)]}" />
+                </field>
+                <field name="tp_reg_prev" position="replace">
+                    <field name="tp_reg_prev" attrs="{'required': [('is_internship', '!=', True)]}" />
+                </field>
+                <field name="opc_fgts" position="replace">
+                    <field name="opc_fgts" attrs="{'required': [('is_internship', '!=', True)]}" />
+                </field>
                 <xpath expr="//page[@string='Work Permit']" position="after">
                     <page string="Estágio" attrs="{'invisible': [('is_internship', '=', False)]}">
                         <group>
@@ -203,6 +221,9 @@
                             <field name="internship_nature" attrs="{'required': [('is_internship', '=', True)]}"/>
                             <field name="internship_level" attrs="{'required': [('is_internship', '=', True)]}"/>
                             <field name="internship_end_date" attrs="{'required': [('is_internship', '=', True)]}"/>
+                            <field name="integration_agent" />
+                            <field name="internship_coordinator" />
+                            <field name="internship_supervisor" />
 
                         </group>
                          <separator string="Instituição Educacional"/>

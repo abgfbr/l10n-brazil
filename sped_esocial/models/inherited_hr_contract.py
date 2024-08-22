@@ -135,6 +135,23 @@ class HrContract(models.Model):
         string='Data prevista para o término',
     )
 
+    integration_agent = fields.Char(
+        string='Agente de Integração (CNPJ)',
+        help='CNPJ do agente de integração do estagiário.',
+    )
+
+    internship_coordinator = fields.Many2one(
+        string='Coordenador do Estagio',
+        help='Nome do coordenador do estagiário.',
+        comodel_name='hr.employee',
+    )
+
+    internship_supervisor = fields.Many2one(
+        string='Supervisão do Estagio',
+        help='Nome do supervisão do estagiário.',
+        comodel_name='hr.employee',
+    )
+
     internship_institution_cnpj = fields.Char(
         string='CNPJ da Instituição',
         help='CNPJ da instituição onde o estagiário está matriculado.',

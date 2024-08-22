@@ -507,9 +507,17 @@ class SpedEsocialHrContrato(models.Model, SpedRegistroIntermediario):
             InfoEstagiario.areaAtuacao.valor = ''
             InfoEstagiario.nrApol.valor = ''
             InfoEstagiario.dtPrevTerm.valor = self.hr_contract_id.internship_end_date
+            if self.hr_contract_id.integration_agent:
+                agente_integracao = pysped.esocial.leiaute.S2300_AgeIntegracao_2()
+                agente_integracao.cnpjAgntInteg.valor = limpa_formatacao(self.hr_contract_id.integration_agent)
+                InfoEstagiario.ageIntegracao.append(agente_integracao)
+            if self.hr_contract_id.internship_supervisor:
+                supervisor_estagio = pysped.esocial.leiaute.S2300_SupervisorEstagio_2()
+                supervisor_estagio.cpfSupervisor.valor = limpa_formatacao(self.hr_contract_id.internship_supervisor.cpf)
+                InfoEstagiario.supervisorEstagio.append(supervisor_estagio)
 
             # InfoTSVInicio.InfoComplementares.InfoEstagiario.InstEnsino
-            InfoEstagiario.instEnsino.cnpjInstEnsino.valor = self.hr_contract_id.internship_institution_cnpj or ''
+            InfoEstagiario.instEnsino.cnpjInstEnsino.valor = limpa_formatacao(self.hr_contract_id.internship_institution_cnpj) or ''
             InfoEstagiario.instEnsino.nmRazao.valor = self.hr_contract_id.internship_institution_name or ''
             InfoEstagiario.instEnsino.dscLograd.valor = self.hr_contract_id.internship_institution_street or ''
             InfoEstagiario.instEnsino.nrLograd.valor = self.hr_contract_id.internship_institution_number or ''
