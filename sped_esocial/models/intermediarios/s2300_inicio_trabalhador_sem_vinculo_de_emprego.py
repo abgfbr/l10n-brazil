@@ -517,7 +517,7 @@ class SpedEsocialHrContrato(models.Model, SpedRegistroIntermediario):
                 InfoEstagiario.supervisorEstagio.append(supervisor_estagio)
 
             # InfoTSVInicio.InfoComplementares.InfoEstagiario.InstEnsino
-            InfoEstagiario.instEnsino.cnpjInstEnsino.valor = limpa_formatacao(self.hr_contract_id.internship_institution_cnpj) or ''
+            InfoEstagiario.instEnsino.cnpjInstEnsino.valor = limpa_formatacao(self.hr_contract_id.internship_institution_cnpj) if self.hr_contract_id.internship_institution_cnpj else ''
             InfoEstagiario.instEnsino.nmRazao.valor = self.hr_contract_id.internship_institution_name or ''
             InfoEstagiario.instEnsino.dscLograd.valor = self.hr_contract_id.internship_institution_street or ''
             InfoEstagiario.instEnsino.nrLograd.valor = self.hr_contract_id.internship_institution_number or ''
