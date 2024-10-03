@@ -103,6 +103,103 @@ class HrContract(models.Model):
         string='Divulgar Horário?',
         default=True,
     )
+
+    is_internship = fields.Boolean(
+        string='Is this contract for internship?',
+        default=False
+    )
+
+    internship_nature = fields.Selection(
+        string='Natureza do Estagio',
+        selection=[
+            ('O', 'Obrigatório'),
+            ('N', 'Não Obrigatório'),
+        ],
+        help='Indica se o contrato é obrigatório ou não.'
+    )
+
+    internship_level = fields.Selection(
+        string='Nível do Estagio',
+        selection=[
+            ('1', 'Fundamental'),
+            ('2', 'Médio'),
+            ('3', 'Formação profissional'),
+            ('4', 'Superior'),
+            ('8', 'Especial'),
+            ('9', 'Mãe social (Lei 7.644/1987)'),
+        ],
+        help='Indica o nível do estagio.'
+    )
+
+    internship_end_date = fields.Date(
+        string='Data prevista para o término',
+    )
+
+    integration_agent = fields.Char(
+        string='Agente de Integração (CNPJ)',
+        help='CNPJ do agente de integração do estagiário.',
+    )
+
+    internship_coordinator = fields.Many2one(
+        string='Coordenador do Estagio',
+        help='Nome do coordenador do estagiário.',
+        comodel_name='hr.employee',
+    )
+
+    internship_supervisor = fields.Many2one(
+        string='Supervisão do Estagio',
+        help='Nome do supervisão do estagiário.',
+        comodel_name='hr.employee',
+    )
+
+    internship_institution_cnpj = fields.Char(
+        string='CNPJ da Instituição',
+        help='CNPJ da instituição onde o estagiário está matriculado.',
+    )
+
+    internship_institution_name = fields.Char(
+        string='Nome da Instituição',
+        help='Nome da instituição onde o estagiário está matriculado.',
+    )
+
+    internship_institution_street = fields.Char(
+        string='Logradouro',
+        help='Logradouro da instituição onde o estagiário está matriculado.',
+    )
+
+    internship_institution_number = fields.Char(
+        string='Número',
+        help='Número do endereço da instituição onde o estagiário está matriculado.',
+    )
+
+    internship_institution_neighborhood = fields.Char(
+        string='Bairro',
+        help='Bairro da instituição onde o estagiário está matriculado.',
+    )
+
+    internship_institution_city = fields.Char(
+        string='Cidade',
+        help='Cidade da instituição onde o estagiário está matriculado.',
+    )
+
+    internship_institution_state_id = fields.Many2one(
+        comodel_name='res.country.state',
+        string='UF',
+        help='Unidade Federativa da instituição onde o estagiário está matriculado.',
+    )
+
+    internship_institution_zipcode = fields.Char(
+        string='CEP',
+        help='CEP da instituição onde o estagiário está matriculado.',
+    )
+
+    @api.onchange('category_id')
+    def onchange_is_internship(self):
+        if self.category_id and self.category_id.id == self.env.ref('l10n_br_hr_payroll.hr_contract_category_901').id:
+            self.is_internship = True
+        else:
+            self.is_internship = False
+
     # Método que calcula a situação do contrato no e-Social
     @api.depends('sped_s2200_id', 'sped_s2206_ids', 'sped_s2299_ids', 'sped_s2300_id', 'sped_s2306_ids', 'sped_s2399_id')
     def compute_situacao_esocial(self):

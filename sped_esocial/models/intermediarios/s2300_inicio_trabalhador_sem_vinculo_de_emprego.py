@@ -422,7 +422,7 @@ class SpedEsocialHrContrato(models.Model, SpedRegistroIntermediario):
 
         S2300.evento.infoTSVInicio.codCateg.valor = self.hr_contract_id.category_id.code
         S2300.evento.infoTSVInicio.dtInicio.valor = self.hr_contract_id.date_start
-        if self.hr_contract_id.category_id.code not in ['721', '722']:
+        if self.hr_contract_id.category_id.code not in ['721', '722', '901']:
             S2300.evento.infoTSVInicio.natAtividade.valor = self.hr_contract_id.nat_atividade
 
         # InfoTSVInicio.InfoComplementares
@@ -500,27 +500,33 @@ class SpedEsocialHrContrato(models.Model, SpedRegistroIntermediario):
         InfoComplementares.localTrabGeral.append(LocalTrabalho)
 
         # InfoTSVInicio.InfoComplementares.InfoEstagiario
-        # if self.hr_contract_id.category_id.code in ['901']:
-        # InfoEstagiario = pysped.esocial.leiaute.S2300_InfoEstagiario_2()
-        # InfoEstagiario.natEstagio.valor = ''
-        # InfoEstagiario.nivEstagio.valor = ''
-        # InfoEstagiario.areaAtuacao.valor = ''
-        # InfoEstagiario.nrApol.valor = ''
-        # InfoEstagiario.vlrBolsa.valor = ''
-        # InfoEstagiario.dtPrevTerm.valor = ''
-        # InfoComplementares.infoEstagiario.append(InfoEstagiario)
+        if self.hr_contract_id.category_id.code in ['901']:
+            InfoEstagiario = pysped.esocial.leiaute.S2300_InfoEstagiario_2()
+            InfoEstagiario.natEstagio.valor = self.hr_contract_id.internship_nature
+            InfoEstagiario.nivEstagio.valor = self.hr_contract_id.internship_level
+            InfoEstagiario.areaAtuacao.valor = ''
+            InfoEstagiario.nrApol.valor = ''
+            InfoEstagiario.dtPrevTerm.valor = self.hr_contract_id.internship_end_date
+            if self.hr_contract_id.integration_agent:
+                agente_integracao = pysped.esocial.leiaute.S2300_AgeIntegracao_2()
+                agente_integracao.cnpjAgntInteg.valor = limpa_formatacao(self.hr_contract_id.integration_agent)
+                InfoEstagiario.ageIntegracao.append(agente_integracao)
+            if self.hr_contract_id.internship_supervisor:
+                supervisor_estagio = pysped.esocial.leiaute.S2300_SupervisorEstagio_2()
+                supervisor_estagio.cpfSupervisor.valor = limpa_formatacao(self.hr_contract_id.internship_supervisor.cpf)
+                InfoEstagiario.supervisorEstagio.append(supervisor_estagio)
 
-        # InfoTSVInicio.InfoComplementares.InfoEstagiario.InstEnsino
-        # InstEnsino = pysped.esocial.leiaute.S2300_InstEnsino_2()
-        # InstEnsino.cnpjInstEnsino = ''
-        # InstEnsino.nmRazao = ''
-        # InstEnsino.dscLograd = ''
-        # InstEnsino.nrLograd = ''
-        # InstEnsino.bairro = ''
-        # InstEnsino.cep = ''
-        # InstEnsino.codMunic = ''
-        # InstEnsino.uf = ''
-        # InfoComplementares.instEnsino.append(InstEnsino)
+            # InfoTSVInicio.InfoComplementares.InfoEstagiario.InstEnsino
+            InfoEstagiario.instEnsino.cnpjInstEnsino.valor = limpa_formatacao(self.hr_contract_id.internship_institution_cnpj) if self.hr_contract_id.internship_institution_cnpj else ''
+            InfoEstagiario.instEnsino.nmRazao.valor = self.hr_contract_id.internship_institution_name or ''
+            InfoEstagiario.instEnsino.dscLograd.valor = self.hr_contract_id.internship_institution_street or ''
+            InfoEstagiario.instEnsino.nrLograd.valor = self.hr_contract_id.internship_institution_number or ''
+            InfoEstagiario.instEnsino.bairro.valor = self.hr_contract_id.internship_institution_neighborhood or ''
+            InfoEstagiario.instEnsino.cep.valor = self.hr_contract_id.internship_institution_zipcode or ''
+            InfoEstagiario.instEnsino.codMunic.valor = self.hr_contract_id.internship_institution_city or ''
+            InfoEstagiario.instEnsino.uf.valor = self.hr_contract_id.internship_institution_state_id or ''
+
+            InfoComplementares.infoEstagiario.append(InfoEstagiario)
 
         # InfoTSVInicio.InfoComplementares.InfoEstagiario.AgeIntegracao
         # AgeIntegracao = pysped.esocial.leiaute.S2300_AgeIntegracao_2()
