@@ -764,11 +764,24 @@ class SpedEsocial(models.Model):
                                 ('ano', '=', ano),
                                 # ('state', 'in', ['verify', 'done']),
                                 ('tipo_de_folha', 'in',
-                                 ['normal', 'ferias', 'rescisao_complementar', 'decimo_terceiro']),
+                                 ['normal', 'rescisao_complementar', 'decimo_terceiro']),
                                 ('is_simulacao', '=', False),
                             ]
 
                         payslips = self.env['hr.payslip'].search(domain_payslip)
+
+                        domain_payslip_ferias = [
+                            ('company_id', 'in', empresas),
+                            ('contract_id', 'in', contratos_validos),
+                            ('data_pagamento_competencia', '>=', self.periodo_id.date_start),
+                            ('data_pagamento_competencia', '<=', self.periodo_id.date_stop),
+                            # ('state', 'in', ['verify', 'done']),
+                            ('tipo_de_folha', 'in',
+                             ['ferias']),
+                            ('is_simulacao', '=', False),
+                        ]
+
+                        payslips |= self.env['hr.payslip'].search(domain_payslip_ferias)
 
                     else:
                         # Busca os payslips de pagamento mensal deste autonomo
@@ -957,10 +970,26 @@ class SpedEsocial(models.Model):
                         ('mes_do_ano', '=', mes),
                         ('ano', '=', ano),
                         ('state', 'in', ['verify', 'done']),
-                        ('tipo_de_folha', 'in', ['normal', 'ferias', 'decimo_terceiro']),
+                        ('tipo_de_folha', 'in', ['normal', 'decimo_terceiro']),
                         ('is_simulacao', '=', False),
                     ]
                     payslips = self.env['hr.payslip'].search(domain_payslip)
+
+                    domain_payslip_ferias = [
+                        ('company_id', 'in', empresas),
+                        ('contract_id', 'in', contratos_validos),
+                        ('data_pagamento_competencia', '>=',
+                         self.periodo_id.date_start),
+                        ('data_pagamento_competencia', '<=',
+                         self.periodo_id.date_stop),
+                        # ('state', 'in', ['verify', 'done']),
+                        ('tipo_de_folha', 'in',
+                         ['ferias']),
+                        ('is_simulacao', '=', False),
+                    ]
+
+                    payslips |= self.env['hr.payslip'].search(
+                        domain_payslip_ferias)
 
                     # Se tem payslip, cria o registro S-1202
                     if payslips:
@@ -1123,6 +1152,22 @@ class SpedEsocial(models.Model):
                                 domain_payslip_decimo_terceiro)
 
                             payslips |= payslips_decimo_terceiro
+
+                        domain_payslip_ferias = [
+                            ('company_id', 'in', empresas),
+                            ('contract_id', 'in', contratos_validos),
+                            ('data_pagamento_competencia', '>=',
+                             self.periodo_id.date_start),
+                            ('data_pagamento_competencia', '<=',
+                             self.periodo_id.date_stop),
+                            # ('state', 'in', ['verify', 'done']),
+                            ('tipo_de_folha', 'in',
+                             ['ferias']),
+                            ('is_simulacao', '=', False),
+                        ]
+
+                        payslips |= self.env['hr.payslip'].search(
+                            domain_payslip_ferias)
 
                     else:
                         # Busca os payslips de pagamento mensal deste autonomo
