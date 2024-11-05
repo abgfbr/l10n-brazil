@@ -449,7 +449,7 @@ class SpedEsocialRemuneracao(models.Model, SpedRegistroIntermediario):
                         itens_remun.vrRubr.valor = formata_valor(dif_media_salario_13.total)
                         remun_per_apur.itensRemun.append(itens_remun)
 
-            if payslip.contract_id.sped_s2300_id and not payslip.contract_id.category_id.code in ['723'] and  payslip.contract_id.labor_bond_type_id.id != 15:
+            if payslip.contract_id.sped_s2300_id and not payslip.contract_id.category_id.code in ['723', '901'] and payslip.contract_id.labor_bond_type_id.id != 15:
                 info_compl_cont = pysped.esocial.leiaute.S1200_InfoComplCont_2()
                 info_compl_cont.codCBO.valor = payslip.contract_id.job_id.cbo_id.code
                 dm_dev.infoComplCont.append(info_compl_cont)
