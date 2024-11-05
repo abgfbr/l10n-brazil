@@ -161,6 +161,8 @@ class SpedEsocialRemuneracao(models.Model, SpedRegistroIntermediario):
             self.env['hr.salary.rule'].search([('code', '=', 'FERIAS_1/3_IR')]).id,
             self.env['hr.salary.rule'].search([('code', '=', 'INSS_FERIAS_IR')]).id,
             self.env['hr.salary.rule'].search([('code', '=', 'IRPF_FERIAS')]).id,
+            self.env['hr.salary.rule'].search([('code', '=', 'ABONO_PECUNIARIO')]).id,
+            self.env['hr.salary.rule'].search([('code', '=', '1/3_ABONO_PECUNIARIO')]).id,
         ]
 
     def verificar_rubricas_ferias_holerite(self, rubrica):
