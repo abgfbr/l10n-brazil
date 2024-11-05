@@ -155,6 +155,13 @@ class SpedEsocialRemuneracao(models.Model, SpedRegistroIntermediario):
 
         return False
 
+    def rubricas_ir_ferias(self):
+        return [
+            self.env['hr.salary.rule'].search([('code', '=', 'FERIAS_IR')]).id,
+            self.env['hr.salary.rule'].search([('code', '=', 'FERIAS_1/3_IR')]).id,
+            self.env['hr.salary.rule'].search([('code', '=', 'INSS_FERIAS_IR')]).id,
+            self.env['hr.salary.rule'].search([('code', '=', 'IRPF_FERIAS')]).id,
+        ]
 
     def verificar_rubricas_ferias_holerite(self, rubrica):
         rubricas_ferias = [
@@ -312,8 +319,9 @@ class SpedEsocialRemuneracao(models.Model, SpedRegistroIntermediario):
 
             # Somente para quando a empresa for do Simples
             # remun_per_apur.indSimples.valor =
-            irrf_rubrica_codigo = ['34', '35', '51', '52', '53', '54', '55',
-                                   '81', '82', '83']
+            irrf_rubrica_codigo = [
+                '13', '34', '35', '51', '52', '53', '54', '55', '81', '82', '83'
+            ]
             if payslip.tipo_de_folha == 'decimo_terceiro':
                 irrf_rubrica_codigo.append('31')
             # Popula dmDev.infoPerApur.ideEstabLot.remunPerApur.itensRemun
@@ -339,7 +347,25 @@ class SpedEsocialRemuneracao(models.Model, SpedRegistroIntermediario):
                                 line.salary_rule_id):
                             continue
 
-                    if line.salary_rule_id.cod_inc_irrf_calculado not in \
+                    if payslip.tipo_de_folha == 'ferias':
+                        if line.salary_rule_id.id in self.rubricas_ir_ferias():
+                            if line.total != 0:
+
+                                itens_remun = pysped.esocial.leiaute.S1200_ItensRemun_2()
+                                if payslip.struct_id.id == 215 and line.salary_rule_id.codigo == "HONORARIO_CONSELHO_FISCAL":
+                                    itens_remun.codRubr.valor = "HON_CONF_INSS"
+                                    itens_remun.ideTabRubr.valor = "HN_CNF_I"
+                                else:
+                                    itens_remun.codRubr.valor = line.salary_rule_id.codigo
+                                    itens_remun.ideTabRubr.valor = line.salary_rule_id.identificador
+                                if line.quantity and float(line.quantity) != 1:
+                                    itens_remun.qtdRubr.valor = float(line.quantity)
+                                if line.rate and line.rate != 100:
+                                    itens_remun.fatorRubr.valor = line.rate
+                                itens_remun.indApurIR.valor = 0
+                                itens_remun.vrRubr.valor = formata_valor(line.total)
+                                remun_per_apur.itensRemun.append(itens_remun)
+                    elif line.salary_rule_id.cod_inc_irrf_calculado not in \
                             irrf_rubrica_codigo:
                         if line.salary_rule_id.cod_inc_irrf_calculado == '33' and not payslip.tipo_de_folha == 'ferias':
                             continue
@@ -379,6 +405,7 @@ class SpedEsocialRemuneracao(models.Model, SpedRegistroIntermediario):
                                 itens_remun.indApurIR.valor = 0
                                 itens_remun.vrRubr.valor = formata_valor(line.total)
                                 remun_per_apur.itensRemun.append(itens_remun)
+
 
             if payslip.tipo_de_folha == 'normal' and payslip.mes_do_ano < 12:
                 holerite_adiantamento_13 = self.payslip_ids.filtered(lambda payslip: payslip.tipo_de_folha == 'decimo_terceiro')
