@@ -770,18 +770,19 @@ class SpedEsocial(models.Model):
 
                         payslips = self.env['hr.payslip'].search(domain_payslip)
 
-                        domain_payslip_ferias = [
-                            ('company_id', 'in', empresas),
-                            ('contract_id', 'in', contratos_validos),
-                            ('data_pagamento_competencia', '>=', self.periodo_id.date_start),
-                            ('data_pagamento_competencia', '<=', self.periodo_id.date_stop),
-                            # ('state', 'in', ['verify', 'done']),
-                            ('tipo_de_folha', 'in',
-                             ['ferias']),
-                            ('is_simulacao', '=', False),
-                        ]
+                        if self.periodo_id.code != '13/{}'.format(ano):
+                            domain_payslip_ferias = [
+                                ('company_id', 'in', empresas),
+                                ('contract_id', 'in', contratos_validos),
+                                ('data_pagamento_competencia', '>=', self.periodo_id.date_start),
+                                ('data_pagamento_competencia', '<=', self.periodo_id.date_stop),
+                                # ('state', 'in', ['verify', 'done']),
+                                ('tipo_de_folha', 'in',
+                                 ['ferias']),
+                                ('is_simulacao', '=', False),
+                            ]
 
-                        payslips |= self.env['hr.payslip'].search(domain_payslip_ferias)
+                            payslips |= self.env['hr.payslip'].search(domain_payslip_ferias)
 
                     else:
                         # Busca os payslips de pagamento mensal deste autonomo
@@ -1126,7 +1127,6 @@ class SpedEsocial(models.Model):
 
                     # Trabalhadores autonomos tem holerite separado
                     if beneficiario.tipo != 'autonomo':
-
                         domain_payslip = [
                             ('company_id', 'in', empresas),
                             ('contract_id', 'in', contratos_validos),
