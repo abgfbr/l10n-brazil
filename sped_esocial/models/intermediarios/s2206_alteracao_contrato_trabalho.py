@@ -150,9 +150,11 @@ class SpedAlteracaoContrato(models.Model, SpedRegistroIntermediario):
             'origem_intermediario': (
                     'sped.esocial.alteracao.contrato,%s' % self.id),
         }
+
         if not self.sped_alteracao:
-            sped_alteracao = self.env['sped.registro'].create(values)
-            self.sped_alteracao = sped_alteracao
+            if not self.checar_existencia_registro():
+                sped_alteracao = self.env['sped.registro'].create(values)
+                self.sped_alteracao = sped_alteracao
         elif self.precisa_atualizar:
             # Cria o registro de Retificação
             values['operacao'] = 'R'
@@ -320,3 +322,10 @@ class SpedAlteracaoContrato(models.Model, SpedRegistroIntermediario):
             # Com o registro identificado, é só rodar o método consulta_lote() do registro
             if registro:
                 registro.consulta_lote()
+
+    def checar_existencia_registro(self):
+        self.ensure_one()
+
+        return self.env["sped.registro"].search([
+            ("origem_intermediario", "=", self.id),
+        ])
