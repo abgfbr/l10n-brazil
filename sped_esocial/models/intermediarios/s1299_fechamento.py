@@ -167,6 +167,7 @@ class SpedEsocialFechamento(models.Model, SpedRegistroIntermediario):
 
         # Popula infoFech (Informações do Fechamento)
         S1299.evento.infoFech.evtRemun.valor = self.evt_remun
+        S1299.evento.infoFech.evtPgtos.valor = self.evt_pgtos
         S1299.evento.infoFech.evtComProd.valor = self.evt_com_prod
         S1299.evento.infoFech.evtContratAvNP.valor = self.evt_contrat_av_np
         S1299.evento.infoFech.evtInfoComplPer.valor = self.evt_infocompl_per
