@@ -234,6 +234,7 @@ class AccountFechamento(models.Model):
                     'credit': abs(line.get('credit')),
                     'name': record.account_journal_id.
                     template_historico_padrao_id.get_historico_padrao(),
+                    'company_id': record.account_journal_id.company_id.id,
                 }))
 
             # Gera nome do lançamento a partir do template
@@ -247,6 +248,7 @@ class AccountFechamento(models.Model):
                 'date': move.get('date'),
                 'line_id': line_list,
                 'lancamento_de_fechamento': True,
+                'company_id': record.account_journal_id.company_id.id,
             })
 
             res.post()
@@ -350,6 +352,7 @@ class AccountFechamento(models.Model):
                     'account_id': self.conta_reclassificacao(op='L').id,
                     'debit': 0.0,
                     'credit': resultado,
+                    'company_id': record.account_journal_id.company_id.id,
                 })
 
                 # Partida 2 -> Debita valor da conta ARE
@@ -357,6 +360,7 @@ class AccountFechamento(models.Model):
                     'account_id': self.conta_are(op='D').id,
                     'debit': resultado,
                     'credit': 0.0,
+                    'company_id': record.account_journal_id.company_id.id,
                 })
 
             # Crédito < Debito = Prejuízo
@@ -366,6 +370,7 @@ class AccountFechamento(models.Model):
                     'account_id': self.conta_reclassificacao(op='P').id,
                     'debit': resultado,
                     'credit': 0.0,
+                    'company_id': record.account_journal_id.company_id.id,
                 })
 
                 # Partida 2 -> Credita valor na conta ARE
@@ -373,6 +378,7 @@ class AccountFechamento(models.Model):
                     'account_id': self.conta_are(op='C').id,
                     'debit': 0.0,
                     'credit': resultado,
+                    'company_id': record.account_journal_id.company_id.id,
                 })
 
             # Lançamento
@@ -383,6 +389,7 @@ class AccountFechamento(models.Model):
                     'period_id': record.periodo_fim.id,
                     'date': record.periodo_fim.date_stop,
                     'lancamento_de_fechamento': True,
+                    'company_id': record.account_journal_id.company_id.id,
                 }
 
                 # Associa lançamento ao encerramento
@@ -441,6 +448,7 @@ class AccountFechamento(models.Model):
                             'name': record.account_journal_id.
                             template_historico_padrao_id.
                             get_historico_padrao(),
+                            'company_id': record.account_journal_id.company_id.id,
                         }
 
                         are_id = {
@@ -450,6 +458,7 @@ class AccountFechamento(models.Model):
                             'name': record.account_journal_id.
                             template_historico_padrao_id.
                             get_historico_padrao(),
+                            'company_id': record.account_journal_id.company_id.id,
                         }
 
                     elif series_conta['result'] < 0.0:
@@ -460,6 +469,7 @@ class AccountFechamento(models.Model):
                             'name': record.account_journal_id.
                             template_historico_padrao_id.
                             get_historico_padrao(),
+                            'company_id': record.account_journal_id.company_id.id,
                         }
 
                         are_id = {
@@ -469,6 +479,7 @@ class AccountFechamento(models.Model):
                             'name': record.account_journal_id.
                             template_historico_padrao_id.
                             get_historico_padrao(),
+                            'company_id': record.account_journal_id.company_id.id,
                         }
 
                     record.env['account.move'].sudo(SUPERUSER_ID).create({
@@ -478,7 +489,8 @@ class AccountFechamento(models.Model):
                         'state': 'draft',
                         'lancamento_de_fechamento': True,
                         'account_fechamento_id': record.id,
-                        'line_id': [(0, 0, conta_id), (0, 0, are_id)]
+                        'line_id': [(0, 0, conta_id), (0, 0, are_id)],
+                        'company_id': record.account_journal_id.company_id.id,
                     }).post()
 
         return True
