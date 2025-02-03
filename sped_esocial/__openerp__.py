@@ -75,6 +75,7 @@
         'views/hr_atestado_medico.xml',
         'views/hr_treinamentos_capacitacoes.xml',
         'views/hr_professor_treinamento.xml',
+        'views/inherited_hr_employee_dependent.xml',
 
         # Intermediarios
         'views/intermediarios/s1000_informacoes_do_empregador_contribuinte_orgao_publico.xml',

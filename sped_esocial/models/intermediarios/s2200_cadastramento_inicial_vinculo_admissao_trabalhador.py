@@ -282,6 +282,9 @@ class SpedEsocialHrContrato(models.Model, SpedRegistroIntermediario):
             Dependente.incTrab.valor = 'S' if dependente.inc_trab else 'N'
             S2200.evento.trabalhador.dependente.append(Dependente)
 
+        if S2200.evento.trabalhador.dependente:
+            self.hr_contract_id.employee_id.set_cadastro_dependentes_esocial()
+
         # Popula trabEstrangeiro se pais_nascto_id diferente de Brasil
         if self.hr_contract_id.employee_id.pais_nascto_id != self.env.ref('sped_tabelas.tab06_105'):
             TrabEstrangeiro = pysped.esocial.leiaute.S2200_TrabEstrangeiro_2()

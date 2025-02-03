@@ -51,3 +51,4 @@ from . import hr_agente_causador
 from . import hr_atestado_medico
 from . import hr_treinamentos_capacitacoes
 from . import hr_professor_treinamento
+from . import inherited_hr_employee_dependent
