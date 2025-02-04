@@ -239,5 +239,4 @@ class HrEmployee(models.Model):
     @api.multi
     def set_cadastro_dependentes_esocial(self):
         for record in self:
-            for dependente in record.dependent_ids:
-                dependente.in_esocial = True
+            record.dependent_ids.set_cadastro_dependentes_esocial()

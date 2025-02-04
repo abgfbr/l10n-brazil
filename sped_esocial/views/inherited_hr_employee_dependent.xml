@@ -8,7 +8,9 @@
             <field name="inherit_id" ref="l10n_br_hr.view_l10n_br_hr_employee_dependent_form" />
             <field name="arch" type="xml">
                 <field name="inscr_est" position="after">
-                    <field name="in_esocial" string="Incluído no e-Social" />
+                    <group>
+                        <field name="in_esocial" string="Incluído no e-Social" />
+                    </group>
                 </field>
             </field>
         </record>

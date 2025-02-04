@@ -52,3 +52,4 @@ from . import hr_atestado_medico
 from . import hr_treinamentos_capacitacoes
 from . import hr_professor_treinamento
 from . import inherited_hr_employee_dependent
+from . import sped_lote

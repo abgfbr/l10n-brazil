@@ -12,3 +12,8 @@ class HrEmployeeDependent(models.Model):
         string='Incluído no e-Social',
         default=False,
     )
+
+    @api.multi
+    def set_cadastro_dependentes_esocial(self):
+        for record in self:
+            record.in_esocial = True
