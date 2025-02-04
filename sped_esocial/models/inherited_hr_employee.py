@@ -235,3 +235,8 @@ class HrEmployee(models.Model):
             ('N', 'N-Não'),
         ],
     )
+
+    @api.multi
+    def set_cadastro_dependentes_esocial(self):
+        for record in self:
+            record.dependent_ids.set_cadastro_dependentes_esocial()

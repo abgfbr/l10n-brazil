@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<openerp>
+    <data>
+
+        <record model="ir.ui.view" id="sped_hr_employee_dependent_form">
+            <field name="name">hr.employee.dependent.view.form (in sped_esocial)</field>
+            <field name="model">hr.employee.dependent</field>
+            <field name="inherit_id" ref="l10n_br_hr.view_l10n_br_hr_employee_dependent_form" />
+            <field name="arch" type="xml">
+                <field name="inscr_est" position="after">
+                    <group>
+                        <field name="in_esocial" string="Incluído no e-Social" />
+                    </group>
+                </field>
+            </field>
+        </record>
+
+        <record id="sped_hr_employee_dependent_tree" model="ir.ui.view">
+            <field name="name">hr.employee.dependent.view.tree (in sped_esocial)</field>
+            <field name="model">hr.employee.dependent</field>
+            <field name="inherit_id" ref="l10n_br_hr.view_l10n_br_hr_employee_dependent_tree" />
+            <field name="arch" type="xml">
+                <field name="dependent_type_id" position="after">
+                    <field name="in_esocial"  string="Incluído no e-Social" />
+                </field>
+            </field>
+        </record>
+
+    </data>
+</openerp>

@@ -14,6 +14,13 @@ from dateutil.relativedelta import relativedelta
 import pysped
 
 
+TIPO_RENDIMENTO = {
+    'normal': '11',
+    'decimo_terceiro': '12',
+    'ferias': '13',
+}
+
+
 class SpedEsocialPagamento(models.Model, SpedRegistroIntermediario):
     _name = "sped.esocial.pagamento"
     _rec_name = "codigo"
@@ -196,6 +203,12 @@ class SpedEsocialPagamento(models.Model, SpedRegistroIntermediario):
 
         adiantamento_13_total = 0.00
 
+        dependentes_nao_cadastrados = []
+        if self.beneficiario_id.dependent_ids:
+            dependentes_nao_cadastrados = self.beneficiario_id.dependent_ids.filtered(
+                lambda dep: not dep.in_esocial
+            )
+
         for payslip in self.payslip_ids:
             if payslip.tipo_de_folha == 'decimo_terceiro' and payslip.mes_do_ano < 12:
                 holerite_adiantamento_13 = self.payslip_ids.filtered(
@@ -215,6 +228,10 @@ class SpedEsocialPagamento(models.Model, SpedRegistroIntermediario):
                 folhas_ordenadas.append(payslip)
 
         data_pagamento = ''
+
+        info_compl_ir = None
+        info_ircr = None
+
         for payslip in folhas_ordenadas or self.payslip_autonomo_ids:
             info_pgto = pysped.esocial.leiaute.S1210_InfoPgto_2()
 
@@ -227,6 +244,8 @@ class SpedEsocialPagamento(models.Model, SpedRegistroIntermediario):
             # 7 - Recibo de férias;
             # 9 - Pagamento relativo a competências anteriores ao início da obrigatoriedade dos eventos
             #     periódicos para o contribuinte;
+
+            pensao_alimenticia_line_id = payslip.line_ids.filtered(lambda line: line.code == "PENSAO_ALIMENTICIA")
 
             tipo = '1'
             if payslip.tipo_de_folha == 'rescisao':
@@ -394,6 +413,39 @@ class SpedEsocialPagamento(models.Model, SpedRegistroIntermediario):
             #
             #     # Popula a tag detPgtoFl
             #     info_pgto.detPgtoFer.append(det_pgto_fer)
+
+            if payslip.tipo_de_folha == "normal":
+                for dependente in dependentes_nao_cadastrados:
+                    info_compl_ir = pysped.esocial.leiaute.S1210_InfoIRComplem_2()
+                    dependente_esocial = pysped.esocial.leiaute.S1210_InfoDep_2()
+                    dependente_esocial.cpfDep.valor = limpa_formatacao(dependente.cnpj_cpf)
+                    dependente_esocial.dtNascto.valor = dependente.dependent_dob
+                    dependente_esocial.nome.valor = dependente.partner_id.name
+                    if dependente.dependent_verification:
+                        dependente_esocial.depIRRF.valor = 'S'
+                        dependente_esocial.tpDep.valor = dependente.dependent_type_id.code
+                        if dependente.dependent_type_id.code == '99':
+                            dependente_esocial.descrDep.valor = 'Agregado/Outros'
+
+                    info_compl_ir.infoDep.append(dependente_esocial)
+
+            if pensao_alimenticia_line_id:
+                if not info_compl_ir:
+                    info_compl_ir = pysped.esocial.leiaute.S1210_InfoIRComplem_2()
+
+                if not info_ircr:
+                    info_ircr = pysped.esocial.leiaute.S1210_InfoIRCR_2()
+                    info_ircr.tpCR.valor = '056107'
+                pen_alim_esocial = pysped.esocial.leiaute.S1210_PenAlim_2()
+                pen_alim_esocial.tpRend.valor = TIPO_RENDIMENTO[payslip.tipo_de_folha]
+                pen_alim_esocial.cpfDep.valor = limpa_formatacao(payslip.contract_id.employee_id.dependent_ids.cnpj_cpf)
+                pen_alim_esocial.vlrDedPenAlim.valor = formata_valor(pensao_alimenticia_line_id.total)
+
+                info_ircr.penAlim.append(pen_alim_esocial)
+                info_compl_ir.infoIRCR.append(info_ircr)
+
+            if info_compl_ir:
+                S1210.evento.ideBenef.infoIRComplem.append(info_compl_ir)
 
             S1210.evento.ideBenef.infoPgto.append(info_pgto)
 

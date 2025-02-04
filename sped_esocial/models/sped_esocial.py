@@ -542,11 +542,12 @@ class SpedEsocial(models.Model):
             lotacoes = self.env['res.company'].search([])
             lots = []
             for lotacao in lotacoes:
-                if lotacao.lotacao_periodo_inicial_id and \
-                        lotacao.lotacao_periodo_inicial_id .date_start <= self.periodo_id.date_start:
-                    lotacao.atualizar_lotacao()
-                    if lotacao.situacao_lotacao_esocial not in ['0', '9']:
-                        lots.append(lotacao.sped_lotacao_id.id)
+                if lotacao.situacao_lotacao_esocial:
+                    if lotacao.lotacao_periodo_inicial_id and \
+                            lotacao.lotacao_periodo_inicial_id .date_start <= self.periodo_id.date_start:
+                        lotacao.atualizar_lotacao()
+                        if lotacao.situacao_lotacao_esocial not in ['0', '9']:
+                            lots.append(lotacao.sped_lotacao_id.id)
             self.lotacao_ids = [(6, 0, lots)]
 
     # Controle de registros S-1030
