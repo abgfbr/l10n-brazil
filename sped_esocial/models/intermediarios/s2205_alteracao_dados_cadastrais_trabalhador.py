@@ -97,9 +97,9 @@ class SpedEmpregador(models.Model, SpedRegistroIntermediario):
             'origem_intermediario': (
                     'sped.esocial.alteracao.funcionario,%s' % self.id),
         }
-        if not self.sped_alteracao:
-            sped_alteracao = self.env['sped.registro'].create(values)
-            self.sped_alteracao = sped_alteracao
+
+        sped_alteracao = self.env['sped.registro'].create(values)
+        self.sped_alteracao = sped_alteracao
 
     @api.multi
     def popula_xml(self, ambiente='2', operacao='na'):
@@ -200,18 +200,21 @@ class SpedEmpregador(models.Model, SpedRegistroIntermediario):
         for dependente in empregado_id.dependent_ids:
             dependente_xml = pysped.esocial.leiaute.S2205_Dependente_2()
 
-            dependente_xml.tpDep.valor = '03'
-            # dependente_xml.tpDep.valor = dependente.dependent_type_id.code
+            dependente_xml.tpDep.valor = dependente.dependent_type_id.code.zfill(2)
             dependente_xml.nmDep.valor = dependente.name
             dependente_xml.dtNascto.valor = dependente.dependent_dob
-            if dependente.cnpj_cpf: dependente_xml.cpfDep.valor = \
-                limpa_formatacao(dependente.cnpj_cpf)
+            dependente_xml.cpfDep.valor = limpa_formatacao(dependente.cnpj_cpf)
+            # if dependente.dependent_gender: dependente_xml.sexoDep.valor = (
+            #     dependente.dependent_gender.upper())
             if dependente.dependent_verification:
                 dependente_xml.depIRRF.valor = 'S'
+                dependente_xml.depSF.valor = 'N'
+                dependente_xml.incTrab.valor = \
+                    'N' if not dependente.inc_trab else 'S'
             else:
                 dependente_xml.depIRRF.valor = 'N'
-            dependente_xml.depSF.valor = 'N'
-            dependente_xml.incTrab.valor = 'N'
+                dependente_xml.depSF.valor = 'N'
+                dependente_xml.incTrab.valor = 'N'
 
             dados_trabalhador.dependente.append(dependente_xml)
 

@@ -16,5 +16,5 @@ class SpedRegistro(models.Model):
             if self.situacao == '4':
                 for evento in self.transmissao_ids:
                     if evento.situacao == '4':
-                        if evento.registro in ['S-2200', 'S-1210']:
+                        if evento.registro in ['S-2200', 'S-2205', 'S-1210']:
                             evento.employee_id.set_cadastro_dependentes_esocial()
