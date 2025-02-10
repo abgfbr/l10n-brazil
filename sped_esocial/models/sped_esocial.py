@@ -1996,8 +1996,8 @@ class SpedEsocial(models.Model):
                 esocial.importar_estabelecimentos()         # S-1005
                 esocial.importar_rubricas()                 # S-1010
                 esocial.importar_lotacoes()                 # S-1020
-                esocial.importar_cargos()                   # S-1030
-                esocial.importar_turnos_trabalho()          # S-1050
+                # esocial.importar_cargos()                   # S-1030
+                # esocial.importar_turnos_trabalho()          # S-1050
 
                 # Não Periódicos
                 esocial.importar_admissao()                 # S-2200

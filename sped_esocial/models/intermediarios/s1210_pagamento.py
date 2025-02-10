@@ -423,7 +423,7 @@ class SpedEsocialPagamento(models.Model, SpedRegistroIntermediario):
                     dependente_esocial.nome.valor = dependente.partner_id.name
                     if dependente.dependent_verification:
                         dependente_esocial.depIRRF.valor = 'S'
-                        dependente_esocial.tpDep.valor = dependente.dependent_type_id.code
+                        dependente_esocial.tpDep.valor = dependente.dependent_type_id.code.zfill(2)
                         if dependente.dependent_type_id.code == '99':
                             dependente_esocial.descrDep.valor = 'Agregado/Outros'
 
