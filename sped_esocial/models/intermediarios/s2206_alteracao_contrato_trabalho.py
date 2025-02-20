@@ -233,7 +233,7 @@ class SpedAlteracaoContrato(models.Model, SpedRegistroIntermediario):
         # Popula infoContrato (Informações do Contrato de Trabalho)
         info_contrato = vinculo.infoContrato
         info_contrato.nmCargo.valor = contrato_id.job_id.name
-        info_contrato.CBOCargo.valor = contrato_id.job_id.cbo_id.code
+        info_contrato.CBOCargo.valor = contrato_id.job_id.cbo_id.code.replace('-', '')
         info_contrato.acumCargo.valor = 'N'
 
         info_contrato.codCateg.valor = contrato_id.category_id.code
