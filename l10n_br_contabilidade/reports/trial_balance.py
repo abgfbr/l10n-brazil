@@ -375,13 +375,13 @@ def compute_balance_data(self, data, filter_report_type=None):
             to_display_accounts.update(
                 dict([(a.id, True) for a in account.child_id]))
         debit_accounts[account.id] = \
-            accounts_by_ids[account.id]['debit']
+            abs(accounts_by_ids[account.id]['debit'])
         credit_accounts[account.id] = \
-            accounts_by_ids[account.id]['credit']
+            abs(accounts_by_ids[account.id]['credit'])
         balance_accounts[account.id] = \
-            accounts_by_ids[account.id]['balance']
+            abs(accounts_by_ids[account.id]['balance'])
         init_balance_accounts[account.id] = \
-            accounts_by_ids[account.id].get('init_balance', 0.0)
+            abs(accounts_by_ids[account.id].get('init_balance', 0.0))
         natureza_init_balance_accounts[account.id] = \
             accounts_by_ids[account.id].get('natureza_init_balance', '')
         natureza_balance_accounts[account.id] = \
