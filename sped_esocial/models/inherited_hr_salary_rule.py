@@ -238,6 +238,7 @@ class HrSalaryRule(models.Model):
             ('11', '11-Base de cálculo do FGTS'),
             ('12', '12-Base de Cálculo do FGTS 13º salário'),
             ('21', '21-Base de Cálculo do FGTS Rescisório (aviso prévio)'),
+            ('31', '31-Desconto eConsignado'),
             ('91', '91-Incidência suspensa em decorrência de decisão judicial'),
         ],
     )
