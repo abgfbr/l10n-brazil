@@ -5,7 +5,7 @@ import pytz
 from datetime import datetime, timedelta
 
 from openerp import api, fields, models
-from openerp.exceptions import ValidationError
+from openerp.exceptions import ValidationError, Warning
 
 
 class SpedEfdReinf(models.Model):
@@ -690,6 +690,24 @@ class SpedEfdReinf(models.Model):
     def executa_analise(self):
         for efdreinf in self:
 
+            for estabelecimento in efdreinf.estabelecimento_ids:
+                sped_registro = estabelecimento.sped_r2010_registro
+                if sped_registro and sped_registro.situacao == "4":
+                    raise Warning(
+                        "Não é possível reanalizar o período porque já existem "
+                        "registros R-2010 transmitidos para o EFD-Reinf!"
+                    )
+
+            if efdreinf.estabelecimento_ids:
+                for estabelecimento in efdreinf.estabelecimento_ids:
+                    for nfs in estabelecimento.nfs_ids:
+                        nfs.servico_ids.unlink()
+                    estabelecimento.nfs_ids.unlink()
+                    if estabelecimento.sped_r2010_registro:
+                        estabelecimento.sped_r2010_registro.unlink()
+
+                efdreinf.estabelecimento_ids.unlink()
+
             # Periódicos
             efdreinf.importar_movimento()
             efdreinf.estabelecimento_ids.calcular_valores_impostos()
@@ -735,6 +753,13 @@ class SpedEfdReinf(models.Model):
     @api.multi
     def importar_reabertura(self):
         self.ensure_one()
+
+        r2099_interm = self.sped_r2099_registro
+        r2099_interm.sped_registro_reabertos_ids = [
+            (4, r2099_interm.sped_inclusao.id)
+        ]
+
+        r2099_interm.sped_inclusao = False
 
         # Verifica se o registro R-2099 já existe, cria ou atualiza
         if not self.sped_r2098_registro:

@@ -55,6 +55,13 @@ class SpedReinfContribuinte(models.Model, SpedRegistroIntermediario):
         string='Data da última atualização',
         compute='compute_ultima_atualizacao',
     )
+    sped_registro_reabertos_ids = fields.Many2many(
+        string=u'Registros Reabertos',
+        comodel_name='sped.registro',
+        relation='sped_fechamento_sped_registro_todos_rel',
+        column1='sped_fechamento_intermendiario_id',
+        column2='sped_registro_id',
+    )
 
     @api.depends('company_id')
     def _compute_name(self):

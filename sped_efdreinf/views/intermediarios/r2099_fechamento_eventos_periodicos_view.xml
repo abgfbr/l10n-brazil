@@ -30,6 +30,8 @@
                             </group>
                             <field name="ultima_atualizacao"/>
                             <field name="precisa_incluir"/>
+                            <separator string="Fechamentos Reabertos" />
+                            <field name="sped_registro_reabertos_ids" nolabel="1"/>
                         </group>
                     </sheet>
                 </form>
